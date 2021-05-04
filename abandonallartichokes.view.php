@@ -75,6 +75,22 @@
         }
         
         */
+        $this->page->begin_block("abandonallartichokes_abandonallartichokes", "garden");
+        $garden_row = $this->game->get_cards_for_location("garden");
+        $this->page->insert_block("garden", array(
+            "DESCRIPTION" => "This is the garden.",
+            "GARDEN_ROW" => $garden_row,
+        ) );
+
+        global $g_user;
+        $current_player_id = $g_user->get_id();
+
+        $this->page->begin_block("abandonallartichokes_abandonallartichokes", "player");
+        $player_hand = $this->game->get_cards_for_location($current_player_id);
+        $this->page->insert_block("player", array(
+            "DESCRIPTION" => "This is the player.",
+            "CARDS" => $player_hand,
+        ) );
 
 
 

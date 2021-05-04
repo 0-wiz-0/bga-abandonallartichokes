@@ -41,4 +41,18 @@ var jstpl_some_game_item='<div class="my_game_item" id="my_game_item_${MY_ITEM_I
 
 </script>  
 
+<!-- BEGIN garden -->
+<div>
+  {DESCRIPTION}
+  {GARDEN_ROW}
+</div>
+<!-- END garden -->
+
+<!-- BEGIN player -->
+<div>
+  {DESCRIPTION}
+  {CARDS}
+</div>
+<!-- END player -->
+
 {OVERALL_GAME_FOOTER}

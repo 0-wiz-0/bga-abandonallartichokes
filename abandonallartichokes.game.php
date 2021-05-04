@@ -164,6 +164,15 @@ class AbandonAllArtichokes extends Table
         return 0;
     }
 
+    function get_cards_for_location($location) {
+        $cards = $this->cards->getCardsInLocation($location);
+        $allcards = "";
+        foreach ($cards as $key => $value) {
+            $allcards .= $this->vegetables[$value['type']]['name'] . ";";
+        }
+        return $allcards;
+        
+    }
 
 //////////////////////////////////////////////////////////////////////////////
 //////////// Utility functions
