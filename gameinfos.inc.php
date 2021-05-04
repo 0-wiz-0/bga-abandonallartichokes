@@ -148,6 +148,10 @@ $gameinfos = array(
 //  IMPORTANT: it is mandatory that the FIRST tag is 1, 2, 3 and 4 (= game category)
 'tags' => array( 2, 11, 200 ),
 
+'custom_buy_button' => array(
+     'url' => 'https://gamewright.com/wheretobuy/',
+     'label' => 'Gamewrigth (store locator)'
+),
 
 //////// BGA SANDBOX ONLY PARAMETERS (DO NOT MODIFY)
 
