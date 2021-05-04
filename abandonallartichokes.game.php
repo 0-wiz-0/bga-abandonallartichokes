@@ -19,7 +19,6 @@
 
 require_once( APP_GAMEMODULE_PATH.'module/table/table.game.php' );
 
-
 class AbandonAllArtichokes extends Table
 {
 	function __construct( )
@@ -40,7 +39,10 @@ class AbandonAllArtichokes extends Table
             //    "my_second_game_variant" => 101,
             //      ...
         ) );        
-	}
+
+        $this->cards = self::getNew( "module.common.deck" );
+        $this->cards->init( "card" );
+    }
 	
     protected function getGameName( )
     {
@@ -89,6 +91,30 @@ class AbandonAllArtichokes extends Table
 
         // TODO: setup the initial game situation here
        
+        // Create cards
+        $cards = array();
+        foreach( $this->vegetables as $vegetable_id => $vegetable ) // spade, heart, diamond, club
+        {
+            if ($vegetable_id != $this->artichoke_id) {
+                $cards[] = array( 'type' => $vegetable_id, 'type_arg' => 0, 'nbr' => 6);
+            } else {
+                $cards[] = array( 'type' => $vegetable_id, 'type_arg' => 0, 'nbr' => 10 * count($players));
+            }
+        }
+        $this->cards->createCards( $cards, 'garden' );
+
+        $artichokes = $this->cards->getCardsOfType($this->artichoke_id);
+        if (count($artichokes) != 10 * count($players)) {
+            // TODO: error
+        }
+        $player_no = 0;
+        foreach( $players as $player_id => $player )
+        {
+            $get_id = function($n) { return $n['id']; };
+            $player_artichokes = array_slice($artichokes, 10 * $player_no, 10);
+            $player_artichokes_2 = array_map($get_id, $player_artichokes);
+            $this->cards->moveCards($player_artichokes_2, $player_id, 0);
+        }
 
         // Activate first player (which is in general a good idea :) )
         $this->activeNextPlayer();

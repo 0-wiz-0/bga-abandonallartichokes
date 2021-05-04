@@ -32,6 +32,29 @@ $this->card_types = array(
 
 */
 
+$this->vegetables = array(
+    1 => array( 'name' => clienttranslate('beet'),
+                'nametr' => self::_('beet') ),
+    2 => array( 'name' => clienttranslate('broccoli'),
+                'nametr' => self::_('broccoli') ),
+    3 => array( 'name' => clienttranslate('carrot'),
+                'nametr' => self::_('carrot') ),
+    4 => array( 'name' => clienttranslate('corn'),
+                'nametr' => self::_('corn') ),
+    5 => array( 'name' => clienttranslate('eggplant'),
+                'nametr' => self::_('eggplant') ),
+    6 => array( 'name' => clienttranslate('leek'),
+                'nametr' => self::_('leek') ),
+    7 => array( 'name' => clienttranslate('onion'),
+                'nametr' => self::_('onion') ),
+    8 => array( 'name' => clienttranslate('peas'),
+                'nametr' => self::_('peas') ),
+    9 => array( 'name' => clienttranslate('pepper'),
+                'nametr' => self::_('pepper') ),
+    10 => array( 'name' => clienttranslate('potato'),
+                 'nametr' => self::_('potato') ),
+    11 => array( 'name' => clienttranslate('artichoke'),
+                 'nametr' => self::_('artichoke') ),
+);
 
-
-
+$this->artichoke_id = 11;

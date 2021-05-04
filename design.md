@@ -8,15 +8,16 @@ The players start with a personal deck of 10 artichokes, 5 in hand.
 There is a garden row of 5 cards (of vegetables), refilled from the
 garden stack after each player's turn.
 
-A card can be in
-- players'personal deck:
-  + hand
-  + draw pile
-  + discard pile
-- garden deck
-  + garden row
-  + garden stack
-- community compost pile (trash)
+## Locations
+
+- garden deck (location "garden")
+  - garden stack (location_arg 0)
+  - garden row (location_arg 1)
+- community compost pile (location "compost")
+- player deck (location $player_id)
+  - draw pile (location_arg 0)
+  - hand (location_arg 1)
+  - discard pile (location_arg 2)
 
 # Turn overview
 
@@ -33,7 +34,7 @@ During a players turn:
     -> "market chooser", but on top of deck instead of hand
   - eggplant + artichoke: compost both, all players pass two cards to the left
     -> "everyone choose two cards from hand"
-  - leak: choose an opponent, show top card of draw pile (opponent must have cards outside of hand) - player chooses to keep it (into hand) or not (opponent's discard pile)
+  - leek: choose an opponent, show top card of draw pile (opponent must have cards outside of hand) - player chooses to keep it (into hand) or not (opponent's discard pile)
     -> "choose opponent"; then "take card or not"
   - onion + artichoke: choose an opponent that gets the onion
     -> "choose opponent"
@@ -57,8 +58,8 @@ List of states
 - play cards
 - corn_market
 - eggplant_everyone
-- leak_choose_opponent
-- leak_take_card
+- leek_choose_opponent
+- leek_take_card
 - onion_choose_opponent
 - peas_choose_card
 - peas_choose_opponent
