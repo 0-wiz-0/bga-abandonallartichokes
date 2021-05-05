@@ -17,11 +17,11 @@
   */
 
 
-require_once( APP_GAMEMODULE_PATH.'module/table/table.game.php' );
+require_once(APP_GAMEMODULE_PATH.'module/table/table.game.php');
 
 class AbandonAllArtichokes extends Table
 {
-	function __construct( )
+	function __construct()
 	{
         // Your global variables labels:
         //  Here, you can assign labels to global variables you are using for this game.
@@ -31,20 +31,20 @@ class AbandonAllArtichokes extends Table
         // Note: afterwards, you can get/set the global variables with getGameStateValue/setGameStateInitialValue/setGameStateValue
         parent::__construct();
         
-        self::initGameStateLabels( array( 
+        self::initGameStateLabels(array(
             //    "my_first_global_variable" => 10,
             //    "my_second_global_variable" => 11,
             //      ...
             //    "my_first_game_variant" => 100,
             //    "my_second_game_variant" => 101,
             //      ...
-        ) );        
+       ));        
 
-        $this->cards = self::getNew( "module.common.deck" );
-        $this->cards->init( "card" );
+        $this->cards = self::getNew("module.common.deck");
+        $this->cards->init("card");
     }
 	
-    protected function getGameName( )
+    protected function getGameName()
     {
 		// Used for translations and stuff. Please do not modify.
         return "abandonallartichokes";
@@ -57,7 +57,7 @@ class AbandonAllArtichokes extends Table
         In this method, you must setup the game according to the game rules, so that
         the game is ready to be played.
     */
-    protected function setupNewGame( $players, $options = array() )
+    protected function setupNewGame($players, $options = array())
     {    
         // Set the colors of the players with HTML color code
         // The default below is red/green/blue/orange/brown
@@ -69,54 +69,61 @@ class AbandonAllArtichokes extends Table
         // Note: if you added some extra field on "player" table in the database (dbmodel.sql), you can initialize it there.
         $sql = "INSERT INTO player (player_id, player_color, player_canal, player_name, player_avatar) VALUES ";
         $values = array();
-        foreach( $players as $player_id => $player )
+        foreach($players as $player_id => $player)
         {
-            $color = array_shift( $default_colors );
-            $values[] = "('".$player_id."','$color','".$player['player_canal']."','".addslashes( $player['player_name'] )."','".addslashes( $player['player_avatar'] )."')";
+            $color = array_shift($default_colors);
+            $values[] = "('".$player_id."','$color','".$player['player_canal']."','".addslashes($player['player_name'])."','".addslashes($player['player_avatar'])."')";
         }
-        $sql .= implode( $values, ',' );
-        self::DbQuery( $sql );
-        self::reattributeColorsBasedOnPreferences( $players, $gameinfos['player_colors'] );
+        $sql .= implode($values, ',');
+        self::DbQuery($sql);
+        self::reattributeColorsBasedOnPreferences($players, $gameinfos['player_colors']);
         self::reloadPlayersBasicInfos();
         
         /************ Start the game initialization *****/
 
         // Init global values with their initial values
-        //self::setGameStateInitialValue( 'my_first_global_variable', 0 );
+        //self::setGameStateInitialValue('my_first_global_variable', 0);
         
         // Init game statistics
         // (note: statistics used in this file must be defined in your stats.inc.php file)
-        //self::initStat( 'table', 'table_teststat1', 0 );    // Init a table statistics
-        //self::initStat( 'player', 'player_teststat1', 0 );  // Init a player statistics (for all players)
+        //self::initStat('table', 'table_teststat1', 0);    // Init a table statistics
+        //self::initStat('player', 'player_teststat1', 0);  // Init a player statistics (for all players)
 
         // TODO: setup the initial game situation here
        
         // Create cards
         $cards = array();
-        foreach( $this->vegetables as $vegetable_id => $vegetable ) // spade, heart, diamond, club
+        foreach($this->vegetables as $vegetable_id => $vegetable)
         {
             if ($vegetable_id != $this->artichoke_id) {
-                $cards[] = array( 'type' => $vegetable_id, 'type_arg' => 0, 'nbr' => 6);
+                $cards[] = array('type' => $vegetable_id, 'type_arg' => 0, 'nbr' => 6);
             } else {
-                $cards[] = array( 'type' => $vegetable_id, 'type_arg' => 0, 'nbr' => 10 * count($players));
+                $cards[] = array('type' => $vegetable_id, 'type_arg' => 0, 'nbr' => 10 * count($players));
             }
         }
-        $this->cards->createCards( $cards, 'garden' );
+        $this->cards->createCards($cards, "garden_stack");
 
         $artichokes = $this->cards->getCardsOfType($this->artichoke_id);
         if (count($artichokes) != 10 * count($players)) {
             // TODO: error
         }
         $player_no = 0;
-        foreach( $players as $player_id => $player )
+        foreach($players as $player_id => $player)
         {
             $get_id = function($n) { return $n['id']; };
             $player_artichokes = array_slice($artichokes, 10 * $player_no, 10);
             $player_artichokes_2 = array_map($get_id, $player_artichokes);
-            $this->cards->moveCards($player_artichokes_2, $player_id, 0);
+            $this->cards->moveCards($player_artichokes_2, "deck_" . $player_id, 0);
         }
 
-        // Activate first player (which is in general a good idea :) )
+        // garden row
+        $this->cards->shuffle("garden_stack");
+        $this->cards->pickCardsForLocation(5, "garden_stack", "garden_row");
+        // player hands
+        foreach ($players as $player_id => $player) {
+            $this->cards->pickCards(5, "deck_" . $player_id, $player_id);
+        }
+        // Activate first player (which is in general a good idea :))
         $this->activeNextPlayer();
 
         /************ End of the game initialization *****/
@@ -140,10 +147,12 @@ class AbandonAllArtichokes extends Table
         // Get information about players
         // Note: you can retrieve some extra field you added for "player" table in "dbmodel.sql" if you need it.
         $sql = "SELECT player_id id, player_score score FROM player ";
-        $result['players'] = self::getCollectionFromDb( $sql );
+        $result['players'] = self::getCollectionFromDb($sql);
   
         // TODO: Gather all information about current game situation (visible by player $current_player_id).
-  
+        $result['garden_row'] = $this->cards->getCardsInLocation("garden_row");
+        $result['hand'] = $this->cards->getPlayerHand($current_player_id);
+
         return $result;
     }
 
@@ -164,16 +173,35 @@ class AbandonAllArtichokes extends Table
         return 0;
     }
 
-    function get_cards_for_location($location) {
-        $cards = $this->cards->getCardsInLocation($location);
-        $allcards = "";
-        foreach ($cards as $key => $value) {
-            $allcards .= $this->vegetables[$value['type']]['name'] . ";";
+    function stRefillGardenRow() {
+        $row_no = $this->cards->countCardInLocation("garden_row");
+        // This should always be true
+        if ($row_no < 5) {
+            $this->cards->pickCardsForLocation(5 - $row_no, "garden_stack", "garden_row");
         }
-        return $allcards;
+
+        $player_id = self::activeNextPlayer();
+        self::giveExtraTime($player_id);
         
+        $this->gamestate->nextState("");
     }
 
+    function harvestCard($id) {
+        self::checkAction("harvestCard");
+        $card = $this->cards->getCard($id);
+        if ($card == null || $card['location'] != "garden_row") {
+            throw new feException(self::_("You must select a card from the garden row"), true);
+        }
+
+        $this->cards->moveCard($id, "hand", self::getCurrentPlayerId());
+
+        // TODO: i18n?
+        self::notifyAllPlayers('harvestCard', clienttranslate('${player_name} harvested ${vegetable}'), array(
+            'vegetable' => $this->vegetables[$card['type']]['name'],
+            'player_name' => self::getActivePlayerName(),
+        ));
+    }
+    
 //////////////////////////////////////////////////////////////////////////////
 //////////// Utility functions
 ////////////    
@@ -197,10 +225,10 @@ class AbandonAllArtichokes extends Table
     
     Example:
 
-    function playCard( $card_id )
+    function playCard($card_id)
     {
         // Check that this is the player's turn and that it is a "possible action" at this game state (see states.inc.php)
-        self::checkAction( 'playCard' ); 
+        self::checkAction('playCard'); 
         
         $player_id = self::getActivePlayerId();
         
@@ -208,12 +236,12 @@ class AbandonAllArtichokes extends Table
         ...
         
         // Notify all players about the card played
-        self::notifyAllPlayers( "cardPlayed", clienttranslate( '${player_name} plays ${card_name}' ), array(
+        self::notifyAllPlayers("cardPlayed", clienttranslate('${player_name} plays ${card_name}'), array(
             'player_id' => $player_id,
             'player_name' => self::getActivePlayerName(),
             'card_name' => $card_name,
             'card_id' => $card_id
-        ) );
+       ));
           
     }
     
@@ -243,7 +271,7 @@ class AbandonAllArtichokes extends Table
             'variable1' => $value1,
             'variable2' => $value2,
             ...
-        );
+       );
     }    
     */
 
@@ -265,7 +293,7 @@ class AbandonAllArtichokes extends Table
         // Do some stuff ...
         
         // (very often) go to another gamestate
-        $this->gamestate->nextState( 'some_gamestate_transition' );
+        $this->gamestate->nextState('some_gamestate_transition');
     }    
     */
 
@@ -286,14 +314,14 @@ class AbandonAllArtichokes extends Table
         you must _never_ use getCurrentPlayerId() or getCurrentPlayerName(), otherwise it will fail with a "Not logged" error message. 
     */
 
-    function zombieTurn( $state, $active_player )
+    function zombieTurn($state, $active_player)
     {
     	$statename = $state['name'];
     	
         if ($state['type'] === "activeplayer") {
             switch ($statename) {
                 default:
-                    $this->gamestate->nextState( "zombiePass" );
+                    $this->gamestate->nextState("zombiePass");
                 	break;
             }
 
@@ -302,12 +330,12 @@ class AbandonAllArtichokes extends Table
 
         if ($state['type'] === "multipleactiveplayer") {
             // Make sure player is in a non blocking status for role turn
-            $this->gamestate->setPlayerNonMultiactive( $active_player, '' );
+            $this->gamestate->setPlayerNonMultiactive($active_player, '');
             
             return;
         }
 
-        throw new feException( "Zombie mode not supported at this game state: ".$statename );
+        throw new feException("Zombie mode not supported at this game state: ".$statename);
     }
     
 ///////////////////////////////////////////////////////////////////////////////////:
@@ -325,26 +353,26 @@ class AbandonAllArtichokes extends Table
     
     */
     
-    function upgradeTableDb( $from_version )
+    function upgradeTableDb($from_version)
     {
         // $from_version is the current version of this game database, in numerical form.
         // For example, if the game was running with a release of your game named "140430-1345",
         // $from_version is equal to 1404301345
         
         // Example:
-//        if( $from_version <= 1404301345 )
+//        if($from_version <= 1404301345)
 //        {
 //            // ! important ! Use DBPREFIX_<table_name> for all tables
 //
 //            $sql = "ALTER TABLE DBPREFIX_xxxxxxx ....";
-//            self::applyDbUpgradeToAllDB( $sql );
+//            self::applyDbUpgradeToAllDB($sql);
 //        }
-//        if( $from_version <= 1405061421 )
+//        if($from_version <= 1405061421)
 //        {
 //            // ! important ! Use DBPREFIX_<table_name> for all tables
 //
 //            $sql = "CREATE TABLE DBPREFIX_xxxxxxx ....";
-//            self::applyDbUpgradeToAllDB( $sql );
+//            self::applyDbUpgradeToAllDB($sql);
 //        }
 //        // Please add your future database scheme changes here
 //

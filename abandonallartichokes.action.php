@@ -62,7 +62,13 @@
     }
     
     */
+      public function harvestCard() {
+          self::setAjaxMode();
+          $id = self::getArg("id", AT_posint, true);
 
+          $this->game->harvestCard($id);
+          self::ajaxResponse();
+      }
   }
   
 

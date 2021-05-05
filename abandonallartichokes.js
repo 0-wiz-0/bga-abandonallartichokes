@@ -18,17 +18,16 @@
 define([
     "dojo","dojo/_base/declare",
     "ebg/core/gamegui",
-    "ebg/counter"
+    "ebg/counter",
+    "ebg/stock"
 ],
 function (dojo, declare) {
     return declare("bgagame.abandonallartichokes", ebg.core.gamegui, {
-        constructor: function(){
+        constructor: function() {
             console.log('abandonallartichokes constructor');
-              
-            // Here, you can init the global variables of your user interface
-            // Example:
-            // this.myGlobalValue = 0;
 
+            this.cardwidth = 72;
+            this.cardheight = 96;
         },
         
         /*
@@ -44,18 +43,24 @@ function (dojo, declare) {
             "gamedatas" argument contains all datas retrieved by your "getAllDatas" PHP method.
         */
         
-        setup: function( gamedatas )
-        {
+        setup: function(gamedatas) {
             console.log( "Starting game setup" );
-            
+
+	    // TODO: remove
+            console.log(gamedatas);
             // Setting up player boards
             for( var player_id in gamedatas.players )
             {
                 var player = gamedatas.players[player_id];
-                         
                 // TODO: Setting up players boards if needed
             }
-            
+
+            this.gardenRow = this.setupCardStocks('garden_row', 'onGardenRowSelect');
+	    this.gardenRow.setSelectionMode(1);
+            this.playerHand = this.setupCardStocks('myhand', 'onPlayerHandSelectionChanged');
+            this.addCardsToStock(this.gardenRow, this.gamedatas.garden_row);
+            this.addCardsToStock(this.playerHand, this.gamedatas.hand);
+
             // TODO: Set up your game interface here, according to "gamedatas"
             
  
@@ -68,7 +73,55 @@ function (dojo, declare) {
 
         ///////////////////////////////////////////////////
         //// Game & client states
-        
+
+        // Initialize a card stock
+        // Arguments: div id, function which occurs when the card selection changes
+        setupCardStocks: function(id, selectionChangeFunctionName) {
+            var stock = new ebg.stock();
+            stock.create(this, $(id), this.cardwidth, this.cardheight);
+            for (var vegetable_id = 1; vegetable_id < 12; vegetable_id++) {
+                stock.addItemType(vegetable_id, vegetable_id, g_gamethemeurl + 'img/' + vegetable_id + '.png', vegetable_id);
+            }
+	    dojo.connect(stock, 'onChangeSelection', this, selectionChangeFunctionName);
+            return stock;
+        },
+
+	// Add an array of server cards to a particular stock
+        addCardsToStock: function(stock, cards) {
+	    stock.removeAll();
+            Object.values(cards).forEach(function(card) {
+                stock.addToStockWithId(card.type, card.id);
+            });
+	},
+
+	onPlayerHandSelectionChanged: function(control_name, item_id) {
+	    // TODO
+	},
+
+	onGardenRowSelect: function(control_name, item_id) {
+	    var items = this.gardenRow.getSelectedItems();
+
+	    if (items.length > 0) {
+                if( this.checkAction('harvestCard', true)) {
+                    var card_id = items[0].id;
+
+                    this.ajaxcall("/abandonallartichokes/abandonallartichokes/harvestCard.html", { 
+                        id: card_id,
+			lock: true
+                    }, this, function(result) {  }, function (is_error) { } );                        
+
+                    this.gardenRow.unselectAll();
+                }
+		else {
+		    // TODO: report error
+		}
+	    }
+            else
+            {
+                // TODO: report error
+            }                
+	},
+
         // onEnteringState: this method is called each time we are entering into a new game state.
         //                  You can use this method to perform some user interface changes at this moment.
         //
@@ -234,9 +287,15 @@ function (dojo, declare) {
             //            see what is happening in the game.
             // dojo.subscribe( 'cardPlayed', this, "notif_cardPlayed" );
             // this.notifqueue.setSynchronous( 'cardPlayed', 3000 );
-            // 
+            //
+	    dojo.subscribe('harvestCard', this, "notif_harvestCard");
         },  
-        
+
+	notif_harvestCard: function(notification) {
+	    console.log('harvestCard notification');
+	    console.log(notification);
+	},
+				    
         // TODO: from this point and below, you can write your game notifications handling methods
         
         /*

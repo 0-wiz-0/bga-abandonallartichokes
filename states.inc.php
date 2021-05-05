@@ -49,6 +49,12 @@
 
 //    !! It is not a good idea to modify this file when a game is running !!
 
+if (!defined('STATE_END_GAME')) { // ensure this block is only invoked once, since it is included multiple times
+   define("STATE_NEXT_PLAYER", 2);
+   define("STATE_HARVEST", 3);
+   define("STATE_PLAY_CARDS", 4);
+   define("STATE_END_GAME", 99);
+}
  
 $machinestates = array(
 
@@ -61,17 +67,31 @@ $machinestates = array(
         "transitions" => array( "" => 2 )
     ),
     
-    // Note: ID=2 => your first state
-
-    2 => array(
-    		"name" => "playerTurn",
-    		"description" => clienttranslate('${actplayer} must play a card or pass'),
-    		"descriptionmyturn" => clienttranslate('${you} must play a card or pass'),
-    		"type" => "activeplayer",
-    		"possibleactions" => array( "playCard", "pass" ),
-    		"transitions" => array( "playCard" => 2, "pass" => 2 )
+    STATE_NEXT_PLAYER => array(
+        "name" => "nextPlayer",
+        "description" => clienttranslate('Refilling garden row'),
+        "type" => "game",
+        "action" => "stRefillGardenRow",
+        "transitions" => array("" => STATE_HARVEST)
     ),
-    
+
+    STATE_HARVEST => array(
+        "name" => "harvest",
+        "description" => clienttranslate('${actplayer} must harvest a card from the garden row'),
+        "descriptionmyturn" => clienttranslate('${you} must harvest a card from the garden row'),
+        "type" => "activeplayer",
+        "possibleactions" => array("harvestCard"),
+        "transitions" => array("harvestCard" => STATE_PLAY_CARDS),
+    ),
+
+    STATE_PLAY_CARDS => array(
+        "name" => "playCards",
+        "description" => clienttranslate('${actplayer} must play cards or pass'),
+        "descriptionmyturn" => clienttranslate('${you} must play cards or pass'),
+        "type" => "activeplayer",
+        "possibleactions" => array("playCard", "pass"), // TODO
+        "transitions" => array("playCards" => STATE_PLAY_CARDS, "pass" => STATE_NEXT_PLAYER),
+    ),
 /*
     Examples:
     
