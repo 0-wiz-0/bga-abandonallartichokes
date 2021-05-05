@@ -10,14 +10,12 @@ garden stack after each player's turn.
 
 ## Locations
 
-- garden deck (location "garden")
-  - garden stack (location_arg 0)
-  - garden row (location_arg 1)
+- garden deck (location "garden_stack", location_arg = order)
+- garden row (location "garden_row")
 - community compost pile (location "compost")
-- player deck (location $player_id)
-  - draw pile (location_arg 0)
-  - hand (location_arg 1)
-  - discard pile (location_arg 2)
+- player deck (location "deck_$player_id", location_arg = order)
+- player discard (location "discard_$player_id", location_arg = order)
+- player hand (location "hand", location_arg $player_id)
 
 # Turn overview
 
@@ -53,16 +51,18 @@ During a players turn:
 List of states
 -----
 
-- player_start
+- gameSetup
 - harvest
-- play cards
-- corn_market
-- eggplant_everyone
-- leek_choose_opponent
-- leek_take_card
-- onion_choose_opponent
-- peas_choose_card
-- peas_choose_opponent
-- pepper_choose_card
-- player_finish
-- not_my_turn
+- playCards
+- cornMarket
+- eggplantEveryone
+- leekChooseOpponent
+- leekTakecard
+- onionChooseOpponent
+- peasChooseCard
+- peasChooseOpponent
+- pepperChooseCard
+- playerFinish
+- nextPlayer (+ refresh garden row)
+- notMyTurn
+- gameEnd
