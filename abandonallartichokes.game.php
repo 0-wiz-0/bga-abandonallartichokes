@@ -199,6 +199,9 @@ class AbandonAllArtichokes extends Table
         self::notifyAllPlayers('harvestCard', clienttranslate('${player_name} harvested ${vegetable}'), array(
             'vegetable' => $this->vegetables[$card['type']]['name'],
             'player_name' => self::getActivePlayerName(),
+            'type' => $card['type'],
+            'player_id' => self::getCurrentPlayerId(),
+            'card_id' => $id,
         ));
     }
     

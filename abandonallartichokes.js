@@ -26,8 +26,8 @@ function (dojo, declare) {
         constructor: function() {
             console.log('abandonallartichokes constructor');
 
-            this.cardwidth = 72;
-            this.cardheight = 96;
+            this.cardwidth = 150;
+            this.cardheight = 200;
         },
         
         /*
@@ -294,6 +294,12 @@ function (dojo, declare) {
 	notif_harvestCard: function(notification) {
 	    console.log('harvestCard notification');
 	    console.log(notification);
+	    if (notification.args.player_id == this.player_id) {
+		this.playerHand.addToStockWithId(notification.args.type, notification.args.card_id, 'garden_row_item_' + notification.args.card_id);
+		this.gardenRow.removeFromStockById(notification.args.card_id, 'myhand');
+	    } else {
+		this.gardenRow.removeFromStockById(notification.args.card_id);
+	    }
 	},
 				    
         // TODO: from this point and below, you can write your game notifications handling methods
