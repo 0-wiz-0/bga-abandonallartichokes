@@ -40,6 +40,12 @@ function (dojo, declare) {
 		PlayedCard: 'played_card',
 		Compost: 'compost',
 	    };
+	    // this needs to match the names in m material.inc.php
+	    this.Notification = {
+		PlayedCard: "played_card",
+		HarvestedCard: "harvested_card",
+		CompostedCard: "composted_card",
+	    };
         },
         /*
             setup:
@@ -334,12 +340,21 @@ function (dojo, declare) {
             // dojo.subscribe( 'cardPlayed', this, "notif_cardPlayed" );
             // this.notifqueue.setSynchronous( 'cardPlayed', 3000 );
             //
-	    dojo.subscribe('harvestCard', this, "notif_harvestCard");
-	    dojo.subscribe('compostCard', this, "notif_compostCard");
+	    dojo.subscribe(this.Notification.CompostedCard, this, "notif_compostedCard");
+	    dojo.subscribe(this.Notification.HarvestedCard, this, "notif_harvestedCard");
+	    dojo.subscribe(this.Notification.PlayedCard, this, "notif_playedCard");
         },  
 
-	notif_harvestCard: function(notification) {
-	    console.log('harvestCard notification');
+	notif_compostedCard: function(notification) {
+	    console.log(this.Notification.CompostedCard + ' notification');
+	    console.log(notification);
+	    this.stock[this.Stock.Compost].removeAll();
+	    this.stock[this.Stock.Compost].addToStockWithId(notification.args.type, notification.args.card_id, notification.args.origin + '_item_' + notification.args.card_id);
+	    this.stock[notification.args.origin].removeFromStockById(notification.args.card_id, this.Stock.Compost);
+	},
+
+	notif_harvestedCard: function(notification) {
+	    console.log(this.Notification.HarvestedCard + ' notification');
 	    console.log(notification);
 	    if (notification.args.player_id == this.player_id) {
 		this.stock[this.Stock.Hand].addToStockWithId(notification.args.type, notification.args.card_id, this.Stock.GardenRow + '_item_' + notification.args.card_id);
@@ -349,11 +364,11 @@ function (dojo, declare) {
 	    }
 	},
 
-	notif_compostCard: function(notification) {
-	    console.log('compostCard notification');
+	notif_playedCard: function(notification) {
+	    console.log(this.Notification.PlayedCard + ' notification');
 	    console.log(notification);
-	    //this.playerHand.addToStockWithId(notification.args.type, notification.args.card_id, 'garden_row_item_' + notification.args.card_id);
-	    //this.gardenRow.removeFromStockById(notification.args.card_id, 'myhand');
+	    this.stock[this.Stock.PlayedCard].addToStockWithId(notification.args.type, notification.args.card_id, notification.args.origin + '_item_' + notification.args.card_id);
+	    this.stock[notification.args.origin].removeFromStockById(notification.args.card_id, this.Stock.PlayedCard);
 	},
 
         // TODO: from this point and below, you can write your game notifications handling methods

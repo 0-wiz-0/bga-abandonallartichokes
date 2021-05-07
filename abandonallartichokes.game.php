@@ -199,7 +199,7 @@ class AbandonAllArtichokes extends Table
 
         $this->cards->moveCard($id, STOCK_HAND, self::getCurrentPlayerId());
 
-        self::notifyAllPlayers('harvestCard', clienttranslate('${player_name} harvested ${vegetable}'), array(
+        self::notifyAllPlayers(NOTIFICATION_HARVESTED_CARD, clienttranslate('${player_name} harvested ${vegetable}'), array(
             // TODO: translate vegetable
             'vegetable' => $this->vegetables[$card['type']]['name'],
             'player_name' => self::getActivePlayerName(),
@@ -218,14 +218,12 @@ class AbandonAllArtichokes extends Table
             throw new feException(self::_("You must play a card from your hand"), true);
         }
 
-        $this->cards->moveCard($id, STOCK_PLAYED_CARD);
-
         if ($card['type'] != VEGETABLE_CARROT) {
             throw new feException(self::_("You must play a carrot from your hand"), true);
         }
-        $hand = $this->cards->getPlayerHand(self::getCurrentPlayerId());
 
-        // do you have two artichokes?
+        // find artichokes to compost
+        $hand = $this->cards->getPlayerHand(self::getCurrentPlayerId());
         $art1 = null;
         $art2 = null;
         foreach ($hand as $card) {
@@ -242,13 +240,18 @@ class AbandonAllArtichokes extends Table
             throw new feException(self::_("You must have two artichokes in hand to play a carrot"), true);
         }
 
-        self::notifyAllPlayers('played_card', clienttranslate('${player_name} played ${vegetable}'), array(
+        $this->cards->moveCard($id, STOCK_PLAYED_CARD);
+        $card = $this->cards->getCard($id);
+
+        self::notifyAllPlayers(NOTIFICATION_PLAYED_CARD, clienttranslate('${player_name} played ${vegetable}'), array(
             // TODO: translate vegetable
             'vegetable' => $this->vegetables[$card['type']]['name'],
             'player_name' => self::getActivePlayerName(),
             'type' => $card['type'],
             'player_id' => self::getCurrentPlayerId(),
             'card_id' => $id,
+            'origin' => STOCK_HAND,
+            'origin_arg' => self::getCurrentPlayerId(),
         ));
 
         // compost them
@@ -444,7 +447,7 @@ class AbandonAllArtichokes extends Table
         $type = $card['type'];
 
         $this->cards->moveCard($id, STOCK_COMPOST);
-        self::notifyAllPlayers('compost_card', clienttranslate('${player_name} composted ${vegetable}'), array(
+        self::notifyAllPlayers(NOTIFICATION_COMPOSTED_CARD, clienttranslate('${player_name} composted ${vegetable}'), array(
             // TODO: translate vegetable
             'vegetable' => $this->vegetables[$type]['name'],
             'player_name' => self::getActivePlayerName(),

@@ -54,6 +54,13 @@ if (!defined('STOCK_GARDEN_ROW')) { // ensure this block is only invoked once, s
    define("STOCK_COMPOST", 'compost');
 }
 
+// these definitions need to match the ones in the constructr in the JavaScript code
+if (!defined('NOTIFICATION_PLAYED_CARD')) { // ensure this block is only invoked once, since it is included multiple times
+    define("NOTIFICATION_PLAYED_CARD", "played_card");
+    define("NOTIFICATION_HARVESTED_CARD", "harvested_card");
+    define("NOTIFICATION_COMPOSTED_CARD", "composted_card");
+}
+
 $this->vegetables = array(
     VEGETABLE_BEET => array( 'name' => clienttranslate('beet'),
                              'nametr' => self::_('beet') ),
