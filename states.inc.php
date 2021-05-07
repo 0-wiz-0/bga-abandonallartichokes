@@ -64,15 +64,15 @@ $machinestates = array(
         "description" => "",
         "type" => "manager",
         "action" => "stGameSetup",
-        "transitions" => array( "" => 2 )
+        "transitions" => array( "" => STATE_HARVEST)
     ),
     
     STATE_NEXT_PLAYER => array(
         "name" => "nextPlayer",
-        "description" => clienttranslate('Refilling garden row'),
+        "description" => clienttranslate('Player cleanup and refilling garden row'),
         "type" => "game",
-        "action" => "stRefillGardenRow",
-        "transitions" => array("" => STATE_HARVEST)
+        "action" => "stNextPlayer",
+        "transitions" => array(STATE_HARVEST => STATE_HARVEST, STATE_END_GAME => STATE_END_GAME)
     ),
 
     STATE_HARVEST => array(
@@ -81,7 +81,7 @@ $machinestates = array(
         "descriptionmyturn" => clienttranslate('${you} must harvest a card from the garden row'),
         "type" => "activeplayer",
         "possibleactions" => array("harvestCard"),
-        "transitions" => array("playCard" => STATE_PLAY_CARD),
+        "transitions" => array(STATE_PLAY_CARD => STATE_PLAY_CARD),
     ),
 
     STATE_PLAY_CARD => array(
@@ -90,7 +90,7 @@ $machinestates = array(
         "descriptionmyturn" => clienttranslate('${you} must play a card  or pass'),
         "type" => "activeplayer",
         "possibleactions" => array("playCard", "pass"), // TODO
-        "transitions" => array("playCard" => STATE_PLAY_CARD, "pass" => STATE_NEXT_PLAYER),
+        "transitions" => array(STATE_PLAY_CARD => STATE_PLAY_CARD, STATE_NEXT_PLAYER => STATE_NEXT_PLAYER),
     ),
 /*
     Examples:
@@ -117,7 +117,7 @@ $machinestates = array(
    
     // Final state.
     // Please do not modify (and do not overload action/args methods).
-    99 => array(
+    STATE_END_GAME => array(
         "name" => "gameEnd",
         "description" => clienttranslate("End of game"),
         "type" => "manager",

@@ -2,6 +2,8 @@
 - javascript report errors
 - this.Stock is ugly
 - add play areas for other players
-- pass -> redraw
 - all vegetables except carrots
 - game end
+- garden row refill
+- statistics (final deck contents per type?, perhaps played cards per type?)
+- translations

@@ -49,7 +49,9 @@ if (!defined('VEGETABLE_BEET')) { // ensure this block is only invoked once, sin
 // these definitions need to match the ones in the constructor in the JavaScript code
 if (!defined('STOCK_GARDEN_ROW')) { // ensure this block is only invoked once, since it is included multiple times
    define("STOCK_GARDEN_ROW", 'garden_row');
-   define("STOCK_HAND", 'hand');
+   define("STOCK_DECK_PREFIX", 'deck_');
+   define("STOCK_HAND", 'hand'); // this must be called "hand" for some automatic handling of the Deck component
+   define("STOCK_DISCARD_PREFIX", 'discard_');
    define("STOCK_PLAYED_CARD", 'played_card');
    define("STOCK_COMPOST", 'compost');
 }
@@ -59,6 +61,7 @@ if (!defined('NOTIFICATION_PLAYED_CARD')) { // ensure this block is only invoked
     define("NOTIFICATION_PLAYED_CARD", "played_card");
     define("NOTIFICATION_HARVESTED_CARD", "harvested_card");
     define("NOTIFICATION_COMPOSTED_CARD", "composted_card");
+    define("NOTIFICATION_DREW_HAND", "drew_hand");
 }
 
 $this->vegetables = array(
