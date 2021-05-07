@@ -69,6 +69,14 @@
           $this->game->harvestCard($id);
           self::ajaxResponse();
       }
+
+      public function playCard() {
+          self::setAjaxMode();
+          $id = self::getArg("id", AT_posint, true);
+
+          $this->game->playCard($id);
+          self::ajaxResponse();
+      }
   }
   
 

@@ -13,6 +13,7 @@ garden stack after each player's turn.
 - garden deck (location "garden_stack", location_arg = order)
 - garden row (location "garden_row")
 - community compost pile (location "compost")
+- play area (location "played_card")
 - player deck (location "deck_$player_id", location_arg = order)
 - player discard (location "discard_$player_id", location_arg = order)
 - player hand (location "hand", location_arg $player_id)

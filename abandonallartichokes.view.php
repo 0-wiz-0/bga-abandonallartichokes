@@ -79,10 +79,17 @@
         $this->page->insert_block("garden", array(
             "DESCRIPTION" => self::_("This is the garden."),
         ) );
-
+        $this->page->begin_block("abandonallartichokes_abandonallartichokes", "play_area");
+        $this->page->insert_block("play_area", array(
+            "DESCRIPTION" => self::_("This is the play area."),
+        ) );
         $this->page->begin_block("abandonallartichokes_abandonallartichokes", "player");
         $this->page->insert_block("player", array(
             "DESCRIPTION" => self::_("This is the player."),
+        ) );
+        $this->page->begin_block("abandonallartichokes_abandonallartichokes", "compost");
+        $this->page->insert_block("compost", array(
+            "DESCRIPTION" => self::_("This is the last composted card."),
         ) );
 
 

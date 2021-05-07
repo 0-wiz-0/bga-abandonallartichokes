@@ -95,15 +95,16 @@ class AbandonAllArtichokes extends Table
         $cards = array();
         foreach($this->vegetables as $vegetable_id => $vegetable)
         {
-            if ($vegetable_id != $this->artichoke_id) {
-                $cards[] = array('type' => $vegetable_id, 'type_arg' => 0, 'nbr' => 6);
+            if ($vegetable_id != VEGETABLE_ARTICHOKE) {
+                //                $cards[] = array('type' => $vegetable_id, 'type_arg' => 0, 'nbr' => 6);
+                $cards[] = array('type' => VEGETABLE_CARROT, 'type_arg' => 0, 'nbr' => 6);
             } else {
                 $cards[] = array('type' => $vegetable_id, 'type_arg' => 0, 'nbr' => 10 * count($players));
             }
         }
         $this->cards->createCards($cards, "garden_stack");
 
-        $artichokes = $this->cards->getCardsOfType($this->artichoke_id);
+        $artichokes = $this->cards->getCardsOfType(VEGETABLE_ARTICHOKE);
         if (count($artichokes) != 10 * count($players)) {
             // TODO: error
         }
@@ -152,6 +153,9 @@ class AbandonAllArtichokes extends Table
         // TODO: Gather all information about current game situation (visible by player $current_player_id).
         $result['garden_row'] = $this->cards->getCardsInLocation("garden_row");
         $result['hand'] = $this->cards->getPlayerHand($current_player_id);
+        $result['played_card'] = $this->cards->getCardsInLocation("played_card");
+        $compost = $this->cards->getCardOnTop("compost");
+        $result['last_composted_card'] = $compost ? array($compost) : array();
 
         return $result;
     }
@@ -195,16 +199,67 @@ class AbandonAllArtichokes extends Table
 
         $this->cards->moveCard($id, "hand", self::getCurrentPlayerId());
 
-        // TODO: i18n?
         self::notifyAllPlayers('harvestCard', clienttranslate('${player_name} harvested ${vegetable}'), array(
+            // TODO: translate vegetable
             'vegetable' => $this->vegetables[$card['type']]['name'],
             'player_name' => self::getActivePlayerName(),
             'type' => $card['type'],
             'player_id' => self::getCurrentPlayerId(),
             'card_id' => $id,
         ));
+
+        $this->gamestate->nextState("playCard");
     }
-    
+
+    function playCard($id) {
+        self::checkAction("playCard");
+        $card = $this->cards->getCard($id);
+        if ($card == null || $card['location'] != "hand" || $card['location_arg'] != self::getCurrentPlayerId()) {
+            throw new feException(self::_("You must play a card from your hand"), true);
+        }
+
+        $this->cards->moveCard($id, "played_card");
+
+        if ($card['type'] != VEGETABLE_CARROT) {
+            throw new feException(self::_("You must play a carrot from your hand"), true);
+        }
+        $hand = $this->cards->getPlayerHand(self::getCurrentPlayerId());
+
+        // do you have two artichokes?
+        $art1 = null;
+        $art2 = null;
+        foreach ($hand as $card) {
+            if ($card['type'] == VEGETABLE_ARTICHOKE) {
+                if ($art1 == null) {
+                    $art1 = $card;
+                } else {
+                    $art2 = $card;
+                    break;
+                }
+            }
+        }
+        if ($art2 == null) {
+            throw new feException(self::_("You must have two artichokes in hand to play a carrot"), true);
+        }
+
+        self::notifyAllPlayers('played_card', clienttranslate('${player_name} played ${vegetable}'), array(
+            // TODO: translate vegetable
+            'vegetable' => $this->vegetables[$card['type']]['name'],
+            'player_name' => self::getActivePlayerName(),
+            'type' => $card['type'],
+            'player_id' => self::getCurrentPlayerId(),
+            'card_id' => $id,
+        ));
+
+        // compost them
+        $this->move_to_compost($art1);
+        $this->move_to_compost($art2);
+        $this->move_to_compost($card);
+
+        $this->gamestate->nextState("pass");
+        //$this->gamestate->nextState("playCard");
+    }
+
 //////////////////////////////////////////////////////////////////////////////
 //////////// Utility functions
 ////////////    
@@ -382,5 +437,22 @@ class AbandonAllArtichokes extends Table
 //
 
 
-    }    
+    }
+
+    function move_to_compost($card) {
+        $id = $card['id'];
+        $type = $card['type'];
+
+        $this->cards->moveCard($id, "compost");
+        self::notifyAllPlayers('compost_card', clienttranslate('${player_name} composted ${vegetable}'), array(
+            // TODO: translate vegetable
+            'vegetable' => $this->vegetables[$type]['name'],
+            'player_name' => self::getActivePlayerName(),
+            'type' => $type,
+            'player_id' => self::getCurrentPlayerId(),
+            'card_id' => $id,
+            'origin' => $card['location'],
+            'origin_arg' => $card['location_arg'],
+        ));
+    }
 }

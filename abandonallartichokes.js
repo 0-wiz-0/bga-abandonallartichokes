@@ -23,13 +23,23 @@ define([
 ],
 function (dojo, declare) {
     return declare("bgagame.abandonallartichokes", ebg.core.gamegui, {
-        constructor: function() {
+	constructor: function() {
             console.log('abandonallartichokes constructor');
 
             this.cardwidth = 150;
             this.cardheight = 200;
+	    // the values must be the same in
+	    // - gamedatas
+	    // - HTML tpl (div id)
+	    // - stock constructor
+	    // TODO: make this nicer
+	    this.Stock = {
+		GardenRow: 'garden_row',
+		Hand: 'hand',
+		PlayedCard: 'played_card',
+		LastCompostedCard: 'last_composted_card',
+	    };
         },
-        
         /*
             setup:
             
@@ -55,12 +65,24 @@ function (dojo, declare) {
                 // TODO: Setting up players boards if needed
             }
 
-            this.gardenRow = this.setupCardStocks('garden_row', 'onGardenRowSelect');
-	    this.gardenRow.setSelectionMode(1);
-            this.playerHand = this.setupCardStocks('myhand', 'onPlayerHandSelectionChanged');
-            this.addCardsToStock(this.gardenRow, this.gamedatas.garden_row);
-            this.addCardsToStock(this.playerHand, this.gamedatas.hand);
+	    const stock_constructor = [
+		{ name: this.Stock.GardenRow, callback: 'onGardenRowSelect', selectionMode: 1 },
+		{ name: this.Stock.Hand, callback: 'onPlayerHandSelectionChanged', selectionMode: 1 },
+		{ name: this.Stock.PlayedCard, callback: null, selectionMode: 0 },
+		{ name: this.Stock.LastCompostedCard, callback: null, selectionMode: 0 },
+	    ];
 
+	    this.stock = new Object();
+	    for (var stock_entry of stock_constructor) {
+		console.log(this.stock);
+		console.log(stock_entry);
+		this.stock[stock_entry.name] = this.setupCardStocks(stock_entry.name, stock_entry.callback);
+		this.stock[stock_entry.name].setSelectionMode(stock_entry.selectionMode);
+		this.addCardsToStock(this.stock[stock_entry.name], this.gamedatas[stock_entry.name]);
+	    }
+
+	    console.log("stock");
+	    console.log(this.stock);
             // TODO: Set up your game interface here, according to "gamedatas"
             
  
@@ -82,7 +104,9 @@ function (dojo, declare) {
             for (var vegetable_id = 1; vegetable_id < 12; vegetable_id++) {
                 stock.addItemType(vegetable_id, vegetable_id, g_gamethemeurl + 'img/' + vegetable_id + '.png', vegetable_id);
             }
-	    dojo.connect(stock, 'onChangeSelection', this, selectionChangeFunctionName);
+	    if (selectionChangeFunctionName != null) {
+		dojo.connect(stock, 'onChangeSelection', this, selectionChangeFunctionName);
+	    }
             return stock;
         },
 
@@ -95,11 +119,32 @@ function (dojo, declare) {
 	},
 
 	onPlayerHandSelectionChanged: function(control_name, item_id) {
-	    // TODO
+	    var items = this.stock[this.Stock.Hand].getSelectedItems();
+
+	    if (items.length > 0) {
+		// TODO: this will break for eggplant
+                if( this.checkAction('playCard', true)) {
+                    var card_id = items[0].id;
+
+                    this.ajaxcall("/abandonallartichokes/abandonallartichokes/playCard.html", { 
+                        id: card_id,
+			lock: true
+                    }, this, function(result) {  }, function (is_error) { } );                        
+
+                    this.stock[this.Stock.Hand].unselectAll();
+                }
+		else {
+		    // TODO: report error
+		}
+	    }
+            else
+            {
+                // TODO: report error
+            }                
 	},
 
 	onGardenRowSelect: function(control_name, item_id) {
-	    var items = this.gardenRow.getSelectedItems();
+	    var items = this.stock[this.Stock.GardenRow].getSelectedItems();
 
 	    if (items.length > 0) {
                 if( this.checkAction('harvestCard', true)) {
@@ -110,7 +155,7 @@ function (dojo, declare) {
 			lock: true
                     }, this, function(result) {  }, function (is_error) { } );                        
 
-                    this.gardenRow.unselectAll();
+                    this.stock[this.Stock.GardenRow].unselectAll();
                 }
 		else {
 		    // TODO: report error
@@ -289,19 +334,27 @@ function (dojo, declare) {
             // this.notifqueue.setSynchronous( 'cardPlayed', 3000 );
             //
 	    dojo.subscribe('harvestCard', this, "notif_harvestCard");
+	    dojo.subscribe('compostCard', this, "notif_compostCard");
         },  
 
 	notif_harvestCard: function(notification) {
 	    console.log('harvestCard notification');
 	    console.log(notification);
 	    if (notification.args.player_id == this.player_id) {
-		this.playerHand.addToStockWithId(notification.args.type, notification.args.card_id, 'garden_row_item_' + notification.args.card_id);
-		this.gardenRow.removeFromStockById(notification.args.card_id, 'myhand');
+		this.stock[this.Stock.Hand].addToStockWithId(notification.args.type, notification.args.card_id, this.Stock.GardenRow + '_item_' + notification.args.card_id);
+		this.stock[this.Stock.GardenRow].removeFromStockById(notification.args.card_id, this.Stock.Hand);
 	    } else {
-		this.gardenRow.removeFromStockById(notification.args.card_id);
+		this.stock[this.Stock.GardenRow].removeFromStockById(notification.args.card_id);
 	    }
 	},
-				    
+
+	notif_compostCard: function(notification) {
+	    console.log('compostCard notification');
+	    console.log(notification);
+	    //this.playerHand.addToStockWithId(notification.args.type, notification.args.card_id, 'garden_row_item_' + notification.args.card_id);
+	    //this.gardenRow.removeFromStockById(notification.args.card_id, 'myhand');
+	},
+
         // TODO: from this point and below, you can write your game notifications handling methods
         
         /*
