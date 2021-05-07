@@ -35,6 +35,7 @@ function (dojo, declare) {
 	    // - php code (material.inc.php)
 	    // TODO: make this nicer
 	    this.Stock = {
+		GardenStack: 'garden_stack',
 		GardenRow: 'garden_row',
 		Hand: 'hand',
 		DeckPrefix: 'deck_',

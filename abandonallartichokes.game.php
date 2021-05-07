@@ -109,7 +109,7 @@ class AbandonAllArtichokes extends Table
                 $cards[] = array('type' => $vegetable_id, 'type_arg' => 0, 'nbr' => 10 * count($players));
             }
         }
-        $this->cards->createCards($cards, "garden_stack");
+        $this->cards->createCards($cards, STOCK_GARDEN_STACK);
 
         $artichokes = $this->cards->getCardsOfType(VEGETABLE_ARTICHOKE);
         $i = 0;
@@ -123,8 +123,8 @@ class AbandonAllArtichokes extends Table
         }
 
         // garden row
-        $this->cards->shuffle("garden_stack");
-        $this->cards->pickCardsForLocation(5, "garden_stack", STOCK_GARDEN_ROW);
+        $this->cards->shuffle(STOCK_GARDEN_STACK);
+        $this->cards->pickCardsForLocation(5, STOCK_GARDEN_STACK, STOCK_GARDEN_ROW);
         // player hands
         foreach ($players as $player_id => $player) {
             $this->cards->pickCards(5, $this->player_deck($player_id), $player_id);
@@ -211,7 +211,7 @@ class AbandonAllArtichokes extends Table
         $row_before = $this->cards->getCardsInLocation(STOCK_GARDEN_ROW);
         // This condition should always be true
         if (count($row_before) < 5) {
-            $this->cards->pickCardsForLocation(5 - count($row_before), "garden_stack", STOCK_GARDEN_ROW);
+            $this->cards->pickCardsForLocation(5 - count($row_before), STOCK_GARDEN_STACK, STOCK_GARDEN_ROW);
         }
         $row_after = $this->cards->getCardsInLocation(STOCK_GARDEN_ROW);
         $new_cards = array();
