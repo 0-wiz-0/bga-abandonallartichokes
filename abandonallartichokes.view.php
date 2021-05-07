@@ -75,21 +75,21 @@
         }
         
         */
-        $this->page->begin_block("abandonallartichokes_abandonallartichokes", "garden");
-        $this->page->insert_block("garden", array(
-            "DESCRIPTION" => self::_("This is the garden."),
+        $this->page->begin_block("abandonallartichokes_abandonallartichokes", "garden_area");
+        $this->page->insert_block("garden_area", array(
+            "DESCRIPTION" => self::_("This is the garden area."),
         ) );
-        $this->page->begin_block("abandonallartichokes_abandonallartichokes", "play_area");
-        $this->page->insert_block("play_area", array(
+        $this->page->begin_block("abandonallartichokes_abandonallartichokes", "played_card_area");
+        $this->page->insert_block("played_card_area", array(
             "DESCRIPTION" => self::_("This is the play area."),
         ) );
-        $this->page->begin_block("abandonallartichokes_abandonallartichokes", "player");
-        $this->page->insert_block("player", array(
-            "DESCRIPTION" => self::_("This is the player."),
+        $this->page->begin_block("abandonallartichokes_abandonallartichokes", "hand_area");
+        $this->page->insert_block("hand_area", array(
+            "DESCRIPTION" => self::_("This is the player hand."),
         ) );
-        $this->page->begin_block("abandonallartichokes_abandonallartichokes", "compost");
-        $this->page->insert_block("compost", array(
-            "DESCRIPTION" => self::_("This is the last composted card."),
+        $this->page->begin_block("abandonallartichokes_abandonallartichokes", "compost_area");
+        $this->page->insert_block("compost_area", array(
+            "DESCRIPTION" => self::_("This is the compost area."),
         ) );
 
 

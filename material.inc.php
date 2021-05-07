@@ -46,6 +46,14 @@ if (!defined('VEGETABLE_BEET')) { // ensure this block is only invoked once, sin
    define("VEGETABLE_ARTICHOKE", 11);
 }
 
+// these definitions need to match the ones in the constructor in the JavaScript code
+if (!defined('STOCK_GARDEN_ROW')) { // ensure this block is only invoked once, since it is included multiple times
+   define("STOCK_GARDEN_ROW", 'garden_row');
+   define("STOCK_HAND", 'hand');
+   define("STOCK_PLAYED_CARD", 'played_card');
+   define("STOCK_COMPOST", 'compost');
+}
+
 $this->vegetables = array(
     VEGETABLE_BEET => array( 'name' => clienttranslate('beet'),
                              'nametr' => self::_('beet') ),

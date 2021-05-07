@@ -30,14 +30,15 @@ function (dojo, declare) {
             this.cardheight = 200;
 	    // the values must be the same in
 	    // - gamedatas
-	    // - HTML tpl (div id)
-	    // - stock constructor
+	    // - HTML *.tpl file (div id)
+	    // - stock constructor (below)
+	    // - php code (material.inc.php)
 	    // TODO: make this nicer
 	    this.Stock = {
 		GardenRow: 'garden_row',
 		Hand: 'hand',
 		PlayedCard: 'played_card',
-		LastCompostedCard: 'last_composted_card',
+		Compost: 'compost',
 	    };
         },
         /*
@@ -69,7 +70,7 @@ function (dojo, declare) {
 		{ name: this.Stock.GardenRow, callback: 'onGardenRowSelect', selectionMode: 1 },
 		{ name: this.Stock.Hand, callback: 'onPlayerHandSelectionChanged', selectionMode: 1 },
 		{ name: this.Stock.PlayedCard, callback: null, selectionMode: 0 },
-		{ name: this.Stock.LastCompostedCard, callback: null, selectionMode: 0 },
+		{ name: this.Stock.Compost, callback: null, selectionMode: 0 },
 	    ];
 
 	    this.stock = new Object();

@@ -106,7 +106,7 @@ class AbandonAllArtichokes extends Table
 
         $artichokes = $this->cards->getCardsOfType(VEGETABLE_ARTICHOKE);
         if (count($artichokes) != 10 * count($players)) {
-            // TODO: error
+            throw new feException(self::_("Internal error during setup, please report"), true);
         }
         $player_no = 0;
         foreach($players as $player_id => $player)
@@ -119,7 +119,7 @@ class AbandonAllArtichokes extends Table
 
         // garden row
         $this->cards->shuffle("garden_stack");
-        $this->cards->pickCardsForLocation(5, "garden_stack", "garden_row");
+        $this->cards->pickCardsForLocation(5, "garden_stack", STOCK_GARDEN_ROW);
         // player hands
         foreach ($players as $player_id => $player) {
             $this->cards->pickCards(5, "deck_" . $player_id, $player_id);
@@ -151,11 +151,11 @@ class AbandonAllArtichokes extends Table
         $result['players'] = self::getCollectionFromDb($sql);
   
         // TODO: Gather all information about current game situation (visible by player $current_player_id).
-        $result['garden_row'] = $this->cards->getCardsInLocation("garden_row");
-        $result['hand'] = $this->cards->getPlayerHand($current_player_id);
-        $result['played_card'] = $this->cards->getCardsInLocation("played_card");
-        $compost = $this->cards->getCardOnTop("compost");
-        $result['last_composted_card'] = $compost ? array($compost) : array();
+        $result[STOCK_GARDEN_ROW] = $this->cards->getCardsInLocation(STOCK_GARDEN_ROW);
+        $result[STOCK_HAND] = $this->cards->getPlayerHand($current_player_id);
+        $result[STOCK_PLAYED_CARD] = $this->cards->getCardsInLocation(STOCK_PLAYED_CARD);
+        $compost = $this->cards->getCardOnTop(STOCK_COMPOST);
+        $result[STOCK_COMPOST] = $compost ? array($compost) : array();
 
         return $result;
     }
@@ -178,10 +178,10 @@ class AbandonAllArtichokes extends Table
     }
 
     function stRefillGardenRow() {
-        $row_no = $this->cards->countCardInLocation("garden_row");
+        $row_no = $this->cards->countCardInLocation(STOCK_GARDEN_ROW);
         // This should always be true
         if ($row_no < 5) {
-            $this->cards->pickCardsForLocation(5 - $row_no, "garden_stack", "garden_row");
+            $this->cards->pickCardsForLocation(5 - $row_no, "garden_stack", STOCK_GARDEN_ROW);
         }
 
         $player_id = self::activeNextPlayer();
@@ -193,11 +193,11 @@ class AbandonAllArtichokes extends Table
     function harvestCard($id) {
         self::checkAction("harvestCard");
         $card = $this->cards->getCard($id);
-        if ($card == null || $card['location'] != "garden_row") {
+        if ($card == null || $card['location'] != STOCK_GARDEN_ROW) {
             throw new feException(self::_("You must select a card from the garden row"), true);
         }
 
-        $this->cards->moveCard($id, "hand", self::getCurrentPlayerId());
+        $this->cards->moveCard($id, STOCK_HAND, self::getCurrentPlayerId());
 
         self::notifyAllPlayers('harvestCard', clienttranslate('${player_name} harvested ${vegetable}'), array(
             // TODO: translate vegetable
@@ -214,11 +214,11 @@ class AbandonAllArtichokes extends Table
     function playCard($id) {
         self::checkAction("playCard");
         $card = $this->cards->getCard($id);
-        if ($card == null || $card['location'] != "hand" || $card['location_arg'] != self::getCurrentPlayerId()) {
+        if ($card == null || $card['location'] != STOCK_HAND || $card['location_arg'] != self::getCurrentPlayerId()) {
             throw new feException(self::_("You must play a card from your hand"), true);
         }
 
-        $this->cards->moveCard($id, "played_card");
+        $this->cards->moveCard($id, STOCK_PLAYED_CARD);
 
         if ($card['type'] != VEGETABLE_CARROT) {
             throw new feException(self::_("You must play a carrot from your hand"), true);
@@ -443,7 +443,7 @@ class AbandonAllArtichokes extends Table
         $id = $card['id'];
         $type = $card['type'];
 
-        $this->cards->moveCard($id, "compost");
+        $this->cards->moveCard($id, STOCK_COMPOST);
         self::notifyAllPlayers('compost_card', clienttranslate('${player_name} composted ${vegetable}'), array(
             // TODO: translate vegetable
             'vegetable' => $this->vegetables[$type]['name'],
