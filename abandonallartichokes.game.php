@@ -251,7 +251,7 @@ class AbandonAllArtichokes extends Table
 
     function pass() {
         $this->gamestate->nextState(STATE_NEXT_PLAYER);
-        self::notifyAllPlayers(NOTIFICATION_INFO, clienttranslate('${player_name} passed.'), array(
+        self::notifyAllPlayers(NOTIFICATION_MESSAGE, clienttranslate('${player_name} passed.'), array(
             'player_name' => self::getActivePlayerName(),
         ));
     }

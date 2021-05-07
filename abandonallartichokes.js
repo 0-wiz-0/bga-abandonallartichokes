@@ -334,7 +334,6 @@ function (dojo, declare) {
 	    dojo.subscribe(this.Notification.HarvestedCard, this, "notif_harvestedCard");
 	    dojo.subscribe(this.Notification.PlayedCard, this, "notif_playedCard");
 	    dojo.subscribe(this.Notification.RefilledGardenRow, this, "notif_refilledGardenRow");
-	    dojo.subscribe(this.Notification.Info, this, "notif_info");
         },
 
 	notif_compostedCard: function(notification) {
@@ -361,11 +360,6 @@ function (dojo, declare) {
 	    } else {
 		this.stock[this.Stock.GardenRow].removeFromStockById(notification.args.card_id);
 	    }
-	},
-
-	notif_info: function(notification) {
-	    console.log(this.Notification.Info + ' notification');
-	    console.log(notification);
 	},
 
 	notif_playedCard: function(notification) {
