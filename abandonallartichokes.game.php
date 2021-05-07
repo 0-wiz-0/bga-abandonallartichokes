@@ -118,7 +118,7 @@ class AbandonAllArtichokes extends Table
             $get_id = function($n) { return $n['id']; };
             $player_artichokes = array_slice($artichokes, 10 * $i, 10);
             $artichoke_ids = array_map($get_id, $player_artichokes);
-            $this->cards->moveCards($artichoke_ids, "deck_1", 0);
+            $this->cards->moveCards($artichoke_ids, $this->player_deck($player_id), 0);
             $i++;
         }
 
@@ -127,7 +127,7 @@ class AbandonAllArtichokes extends Table
         $this->cards->pickCardsForLocation(5, "garden_stack", STOCK_GARDEN_ROW);
         // player hands
         foreach ($players as $player_id => $player) {
-            $this->cards->pickCards(5, "deck_1", $player_id);
+            $this->cards->pickCards(5, $this->player_deck($player_id), $player_id);
         }
 
         // activate first player
