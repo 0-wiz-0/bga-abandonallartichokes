@@ -10,3 +10,4 @@
   - Developed by
 - add proper graphics
 - check usage of getCurrentPlayerId vs. getActivePlayerId
+- tooltips (translated card texts)

@@ -144,16 +144,12 @@ function (dojo, declare) {
                 if( this.checkAction('playCard', true)) {
                     var card_id = items[0].id;
 		    this.changeState(this.AjaxActions.PlayCard, { id: card_id });
-                    this.stock[this.Stock.Hand].unselectAll();
                 }
 		else {
-		    // TODO: report error
+		    this.showMessage(_("You can't play cards from your hand now."), "error");
 		}
+                this.stock[this.Stock.Hand].unselectAll();
 	    }
-            else
-            {
-                // TODO: report error
-            }
 	},
 
 	onGardenRowSelect: function(control_name, item_id) {
@@ -163,16 +159,12 @@ function (dojo, declare) {
                 if( this.checkAction('harvestCard', true)) {
                     var card_id = items[0].id;
 		    this.changeState(this.AjaxActions.Harvest, { id: card_id });
-                    this.stock[this.Stock.GardenRow].unselectAll();
                 }
 		else {
-		    // TODO: report error
+		    this.showMessage(_("You can't harvest cards now."), "error");
 		}
+                this.stock[this.Stock.GardenRow].unselectAll();
 	    }
-            else
-            {
-                // TODO: report error
-            }
 	},
 
         // onEnteringState: this method is called each time we are entering into a new game state.
