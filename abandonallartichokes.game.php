@@ -73,13 +73,14 @@ class AbandonAllArtichokes extends Table
         $default_colors = $gameinfos['player_colors'];
 
         // Create players
-        // Note: if you added some extra field on "player" table in the database (dbmodel.sql), you can initialize it there.
-        $sql = "INSERT INTO player (player_id, player_color, player_canal, player_name, player_avatar) VALUES ";
+        $sql = "INSERT INTO player (player_id, player_color, player_canal, player_name, player_avatar, player_deck, player_discard) VALUES ";
         $values = array();
-        foreach($players as $player_id => $player)
+        $player_no = 1;
+        foreach ($players as $player_id => $player)
         {
             $color = array_shift($default_colors);
-            $values[] = "('".$player_id."','$color','".$player['player_canal']."','".addslashes($player['player_name'])."','".addslashes($player['player_avatar'])."')";
+            $values[] = "('" . $player_id . "','" . $color . "','" . $player['player_canal'] . "','" . addslashes($player['player_name']) . "','" . addslashes($player['player_avatar']) . "','" . "deck_" . $player_no . "','" . "discard_" . $player_no . "')";
+            $player_no++;
         }
         $sql .= implode($values, ',');
         self::DbQuery($sql);
@@ -100,10 +101,9 @@ class AbandonAllArtichokes extends Table
 
         // Create cards
         $cards = array();
-        foreach($this->vegetables as $vegetable_id => $vegetable)
+        foreach ($this->vegetables as $vegetable_id => $vegetable)
         {
             if ($vegetable_id != VEGETABLE_ARTICHOKE) {
-                //                $cards[] = array('type' => $vegetable_id, 'type_arg' => 0, 'nbr' => 6);
                 $cards[] = array('type' => VEGETABLE_CARROT, 'type_arg' => 0, 'nbr' => 6);
             } else {
                 $cards[] = array('type' => $vegetable_id, 'type_arg' => 0, 'nbr' => 10 * count($players));
@@ -112,14 +112,15 @@ class AbandonAllArtichokes extends Table
         $this->cards->createCards($cards, "garden_stack");
 
         $artichokes = $this->cards->getCardsOfType(VEGETABLE_ARTICHOKE);
-        $player_no = 0;
+        $i = 0;
         foreach ($players as $player_id => $player)
         {
             $get_id = function($n) { return $n['id']; };
-            $player_artichokes = array_slice($artichokes, 10 * $player_no, 10);
-            $player_artichokes_2 = array_map($get_id, $player_artichokes);
-            //$this->cards->moveCards($player_artichokes_2, STOCK_DECK_PREFIX . $player_id, 0);
-            $this->cards->moveCards($player_artichokes_2, "deck_1", 0);
+            $player_artichokes = array_slice($artichokes, 10 * $i, 10);
+            $artichoke_ids = array_map($get_id, $player_artichokes);
+            //            $this->cards->moveCards($artichokes_ids, $this->player_deck($player_id), 0);
+            $this->cards->moveCards($artichoke_ids, "deck_1", 0);
+            $i++;
         }
 
         // garden row
@@ -129,6 +130,7 @@ class AbandonAllArtichokes extends Table
         foreach ($players as $player_id => $player) {
             //$this->cards->pickCards(5, STOCK_DECK_PREFIX . $player_id, $player_id);
             $this->cards->pickCards(5, "deck_1", $player_id);
+            //$this->cards->pickCards(5, $this->player_deck($player_id), $player_id);
         }
 
         // activate first player
@@ -163,7 +165,7 @@ class AbandonAllArtichokes extends Table
         $result[STOCK_PLAYED_CARD] = $this->cards->getCardsInLocation(STOCK_PLAYED_CARD);
         $compost = $this->cards->getCardOnTop(STOCK_COMPOST);
         $result[STOCK_COMPOST] = $compost ? array($compost) : array();
-
+        $result['deckname'] = $this->player_deck($current_player_id);
         return $result;
     }
 
@@ -188,10 +190,11 @@ class AbandonAllArtichokes extends Table
         $player_id = self::getCurrentPlayerId();
         // discard cards
         //$this->cards->moveAllCardsInLocation(STOCK_HAND, STOCK_DISCARD_PREFIX . $player_id, $player_id, $player_id);
-        $this->cards->moveAllCardsInLocation(STOCK_HAND, "discard_1", $player_id, $player_id);
+        $this->cards->moveAllCardsInLocation(STOCK_HAND, $this->player_discard($player_id), $player_id, $player_id);
         // draw up to five cards
         //$this->cards->pickCards(5, STOCK_DECK_PREFIX . $player_id, $player_id);
-        $this->cards->pickCards(5, "deck_1", $player_id);
+        //$this->cards->pickCards(5, "deck_1", $player_id);
+        $this->cards->pickCards(5, $this->player_deck($player_id), $player_id);
         self::notifyPlayer($player_id, NOTIFICATION_DREW_HAND, '', array(
             'cards' => $this->cards->getPlayerHand($player_id)
         ));
@@ -486,5 +489,15 @@ class AbandonAllArtichokes extends Table
             'origin' => $card['location'],
             'origin_arg' => $card['location_arg'],
         ));
+    }
+
+    function player_deck($player_id) {
+        $sql = "SELECT player_deck FROM player WHERE player_id = " . $player_id;
+        return self::getUniqueValueFromDB($sql);
+    }
+
+    function player_discard($player_id) {
+        $sql = "SELECT player_discard FROM player WHERE player_id = " . $player_id;
+        return self::getUniqueValueFromDB($sql);
     }
 }
