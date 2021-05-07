@@ -70,6 +70,12 @@
           self::ajaxResponse();
       }
 
+      public function pass() {
+          self::setAjaxMode();
+          $this->game->pass();
+          self::ajaxResponse();
+      }
+
       public function playCard() {
           self::setAjaxMode();
           $id = self::getArg("id", AT_posint, true);

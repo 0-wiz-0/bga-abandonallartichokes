@@ -249,6 +249,13 @@ class AbandonAllArtichokes extends Table
         $this->gamestate->nextState(STATE_PLAY_CARD);
     }
 
+    function pass() {
+        $this->gamestate->nextState(STATE_NEXT_PLAYER);
+        self::notifyAllPlayers(NOTIFICATION_INFO, clienttranslate('${player_name} passed.'), array(
+            'player_name' => self::getActivePlayerName(),
+        ));
+    }
+
     function playCard($id) {
         self::checkAction("playCard");
         $card = $this->cards->getCard($id);

@@ -42,13 +42,20 @@ function (dojo, declare) {
 		PlayedCard: 'played_card',
 		Compost: 'compost',
 	    };
-	    // this needs to match the names in m material.inc.php
+	    // this needs to match the names in material.inc.php
 	    this.Notification = {
 		PlayedCard: "played_card",
 		HarvestedCard: "harvested_card",
 		CompostedCard: "composted_card",
 		DrewHand: "drew_hand",
 		RefilledGardenRow: "refilled_garden_row",
+		Info: "info",
+	    };
+	    // this needs to match the values in abandonallartichokes.action.php
+	    this.AjaxActions = {
+		Harvest: 'harvestCard',
+		PlayCard: 'playCard',
+		Pass: 'pass',
 	    };
         },
         /*
@@ -136,12 +143,7 @@ function (dojo, declare) {
 		// TODO: this will break for eggplant
                 if( this.checkAction('playCard', true)) {
                     var card_id = items[0].id;
-
-                    this.ajaxcall("/abandonallartichokes/abandonallartichokes/playCard.html", {
-                        id: card_id,
-			lock: true
-                    }, this, function(result) {  }, function (is_error) { } );
-
+		    this.changeState(this.AjaxActions.PlayCard, { id: card_id });
                     this.stock[this.Stock.Hand].unselectAll();
                 }
 		else {
@@ -160,12 +162,7 @@ function (dojo, declare) {
 	    if (items.length > 0) {
                 if( this.checkAction('harvestCard', true)) {
                     var card_id = items[0].id;
-
-                    this.ajaxcall("/abandonallartichokes/abandonallartichokes/harvestCard.html", {
-                        id: card_id,
-			lock: true
-                    }, this, function(result) {  }, function (is_error) { } );
-
+		    this.changeState(this.AjaxActions.Harvest, { id: card_id });
                     this.stock[this.Stock.GardenRow].unselectAll();
                 }
 		else {
@@ -233,28 +230,16 @@ function (dojo, declare) {
         // onUpdateActionButtons: in this method you can manage "action buttons" that are displayed in the
         //                        action status bar (ie: the HTML links in the status bar).
         //
-        onUpdateActionButtons: function( stateName, args )
-        {
-            console.log( 'onUpdateActionButtons: '+stateName );
+        onUpdateActionButtons: function(stateName, args) {
+            console.log('onUpdateActionButtons: ' + stateName);
 
-            if( this.isCurrentPlayerActive() )
-            {
-                switch( stateName )
-                {
-/*
-                 Example:
-
-                 case 'myGameState':
-
-                    // Add 3 action buttons in the action status bar:
-
-                    this.addActionButton( 'button_1_id', _('Button 1 label'), 'onMyMethodToCall1' );
-                    this.addActionButton( 'button_2_id', _('Button 2 label'), 'onMyMethodToCall2' );
-                    this.addActionButton( 'button_3_id', _('Button 3 label'), 'onMyMethodToCall3' );
-                    break;
-*/
-                }
-            }
+            if(this.isCurrentPlayerActive()) {
+                switch (stateName) {
+		case this.AjaxActions.PlayCard:
+		    this.addActionButton('pass', _('Pass'), 'onPass');
+		    break;
+		}
+	    }
         },
 
         ///////////////////////////////////////////////////
@@ -349,6 +334,7 @@ function (dojo, declare) {
 	    dojo.subscribe(this.Notification.HarvestedCard, this, "notif_harvestedCard");
 	    dojo.subscribe(this.Notification.PlayedCard, this, "notif_playedCard");
 	    dojo.subscribe(this.Notification.RefilledGardenRow, this, "notif_refilledGardenRow");
+	    dojo.subscribe(this.Notification.Info, this, "notif_info");
         },
 
 	notif_compostedCard: function(notification) {
@@ -377,12 +363,17 @@ function (dojo, declare) {
 	    }
 	},
 
+	notif_info: function(notification) {
+	    console.log(this.Notification.Info + ' notification');
+	    console.log(notification);
+	},
+
 	notif_playedCard: function(notification) {
 	    console.log(this.Notification.PlayedCard + ' notification');
-	    console.log(notification);
-	    this.stock[this.Stock.PlayedCard].addToStockWithId(notification.args.type, notification.args.card_id, notification.args.origin + '_item_' + notification.args.card_id);
-	    this.stock[notification.args.origin].removeFromStockById(notification.args.card_id, this.Stock.PlayedCard);
-	},
+            console.log(notification);
+           this.stock[this.Stock.PlayedCard].addToStockWithId(notification.args.type, notification.args.card_id, notification.args.origin + '_item_' + notification.args.card_id);
+           this.stock[notification.args.origin].removeFromStockById(notification.args.card_id, this.Stock.PlayedCard);
+        },
 
 	notif_refilledGardenRow: function(notification) {
 	    console.log(this.Notification.RefilledGardenRow + ' notification');
@@ -392,22 +383,15 @@ function (dojo, declare) {
 	    }
 	},
 
-        // TODO: from this point and below, you can write your game notifications handling methods
+	onPass: function() {
+	    this.changeState(this.AjaxActions.Pass);
+	},
 
-        /*
-        Example:
-
-        notif_cardPlayed: function( notif )
-        {
-            console.log( 'notif_cardPlayed' );
-            console.log( notif );
-
-            // Note: notif.args contains the arguments specified during you "notifyAllPlayers" / "notifyPlayer" PHP call
-
-            // TODO: play the card in the user interface.
-        },
-
-        */
+	changeState: function(targetState, args = {}) {
+	    args.lock = true;
+            this.ajaxcall("/abandonallartichokes/abandonallartichokes/" + targetState + ".html", args,
+			  this, function(result) {  }, function (is_error) { } );
+	}
    });
 });
 
