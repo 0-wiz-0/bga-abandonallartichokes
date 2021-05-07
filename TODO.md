@@ -1,0 +1,7 @@
+- moving cards for other players (played cards, composted cards)
+- javascript report errors
+- this.Stock is ugly
+- add play areas for other players
+- pass -> redraw
+- all vegetables except carrots
+- game end

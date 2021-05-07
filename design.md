@@ -55,14 +55,14 @@ List of states
 - gameSetup
 - harvest
 - playCards
-- cornMarket
-- eggplantEveryone
-- leekChooseOpponent
-- leekTakecard
-- onionChooseOpponent
-- peasChooseCard
-- peasChooseOpponent
-- pepperChooseCard
+  - cornMarket
+  - eggplantEveryone
+  - leekChooseOpponent
+  - leekTakecard
+  - onionChooseOpponent
+  - peasChooseCard
+  - peasChooseOpponent
+  - pepperChooseCard
 - playerFinish
 - nextPlayer (+ refresh garden row)
 - notMyTurn
