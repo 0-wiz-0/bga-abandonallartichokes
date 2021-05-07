@@ -3,7 +3,6 @@
 - this.Stock is ugly
 - add play areas for other players
 - all vegetables except carrots
-- game end
 - statistics (final deck contents per type?, perhaps played cards per type?)
 - translations
 - HTML Seiten:
