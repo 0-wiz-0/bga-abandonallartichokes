@@ -100,8 +100,22 @@ $gameinfos = array(
 'diplomacy' => 0,
 
 // Colors attributed to players
-// TODO: fill in colors
-'player_colors' => array( "ff0000", "008000", "0000ff", "ffa500", "773300" ),
+// list all available preference colours (as of May 2021) since the game has none
+// from "Player color preferences" on https://en.doc.boardgamearena.com/Main_game_logic:_yourgamename.game.php
+'player_colors' => array(
+    "#ff0000",
+    "#008000",
+    "#0000ff",
+    "#ffa500",
+    "#000000",
+    "#ffffff",
+    "#e94190",
+    "#982fff",
+    "#72c3b1",
+    "#f07f16",
+    "#bdd002",
+    "#7b7b7b",
+),
 
 // Favorite colors support : if set to "true", support attribution of favorite colors based on player's preferences (see reattributeColorsBasedOnPreferences PHP method)
 // NB: this parameter is used only to flag games supporting this feature; you must use (or not use) reattributeColorsBasedOnPreferences PHP method to actually enable or disable the feature.
