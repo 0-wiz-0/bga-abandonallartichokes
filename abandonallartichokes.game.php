@@ -118,7 +118,6 @@ class AbandonAllArtichokes extends Table
             $get_id = function($n) { return $n['id']; };
             $player_artichokes = array_slice($artichokes, 10 * $i, 10);
             $artichoke_ids = array_map($get_id, $player_artichokes);
-            //            $this->cards->moveCards($artichokes_ids, $this->player_deck($player_id), 0);
             $this->cards->moveCards($artichoke_ids, "deck_1", 0);
             $i++;
         }
@@ -128,9 +127,7 @@ class AbandonAllArtichokes extends Table
         $this->cards->pickCardsForLocation(5, "garden_stack", STOCK_GARDEN_ROW);
         // player hands
         foreach ($players as $player_id => $player) {
-            //$this->cards->pickCards(5, STOCK_DECK_PREFIX . $player_id, $player_id);
             $this->cards->pickCards(5, "deck_1", $player_id);
-            //$this->cards->pickCards(5, $this->player_deck($player_id), $player_id);
         }
 
         // activate first player
@@ -189,11 +186,8 @@ class AbandonAllArtichokes extends Table
     function stNextPlayer() {
         $player_id = self::getCurrentPlayerId();
         // discard cards
-        //$this->cards->moveAllCardsInLocation(STOCK_HAND, STOCK_DISCARD_PREFIX . $player_id, $player_id, $player_id);
         $this->cards->moveAllCardsInLocation(STOCK_HAND, $this->player_discard($player_id), $player_id, $player_id);
         // draw up to five cards
-        //$this->cards->pickCards(5, STOCK_DECK_PREFIX . $player_id, $player_id);
-        //$this->cards->pickCards(5, "deck_1", $player_id);
         $this->cards->pickCards(5, $this->player_deck($player_id), $player_id);
         self::notifyPlayer($player_id, NOTIFICATION_DREW_HAND, '', array(
             'cards' => $this->cards->getPlayerHand($player_id)
@@ -209,11 +203,23 @@ class AbandonAllArtichokes extends Table
         }
 
         // refill garden row
-        $row_no = $this->cards->countCardInLocation(STOCK_GARDEN_ROW);
-        // This should always be true
-        if ($row_no < 5) {
-            $this->cards->pickCardsForLocation(5 - $row_no, "garden_stack", STOCK_GARDEN_ROW);
+        $row_before = $this->cards->getCardsInLocation(STOCK_GARDEN_ROW);
+        // This condition should always be true
+        if (count($row_before) < 5) {
+            $this->cards->pickCardsForLocation(5 - count($row_before), "garden_stack", STOCK_GARDEN_ROW);
         }
+        $row_after = $this->cards->getCardsInLocation(STOCK_GARDEN_ROW);
+        $new_cards = array();
+        foreach ($row_after as $key => $value) {
+            if (!array_key_exists($key, $row_before)) {
+                $new_cards[] = $value;
+            }
+        }
+        self::notifyAllPlayers(NOTIFICATION_REFILLED_GARDEN_ROW, '', array (
+            'before' => $row_before,
+            'after' => $row_after,
+            'new_cards' => $new_cards,
+        ));
 
         // switch to next player
         $player_id = self::activeNextPlayer();

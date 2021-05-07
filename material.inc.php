@@ -60,6 +60,7 @@ if (!defined('NOTIFICATION_PLAYED_CARD')) { // ensure this block is only invoked
     define("NOTIFICATION_HARVESTED_CARD", "harvested_card");
     define("NOTIFICATION_COMPOSTED_CARD", "composted_card");
     define("NOTIFICATION_DREW_HAND", "drew_hand");
+    define("NOTIFICATION_REFILLED_GARDEN_ROW", "refilled_garden_row");
 }
 
 $this->vegetables = array(

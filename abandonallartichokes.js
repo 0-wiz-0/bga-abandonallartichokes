@@ -48,6 +48,7 @@ function (dojo, declare) {
 		HarvestedCard: "harvested_card",
 		CompostedCard: "composted_card",
 		DrewHand: "drew_hand",
+		RefilledGardenRow: "refilled_garden_row",
 	    };
         },
         /*
@@ -347,6 +348,7 @@ function (dojo, declare) {
 	    dojo.subscribe(this.Notification.DrewHand, this, "notif_drewHand");
 	    dojo.subscribe(this.Notification.HarvestedCard, this, "notif_harvestedCard");
 	    dojo.subscribe(this.Notification.PlayedCard, this, "notif_playedCard");
+	    dojo.subscribe(this.Notification.RefilledGardenRow, this, "notif_refilledGardenRow");
         },
 
 	notif_compostedCard: function(notification) {
@@ -380,6 +382,14 @@ function (dojo, declare) {
 	    console.log(notification);
 	    this.stock[this.Stock.PlayedCard].addToStockWithId(notification.args.type, notification.args.card_id, notification.args.origin + '_item_' + notification.args.card_id);
 	    this.stock[notification.args.origin].removeFromStockById(notification.args.card_id, this.Stock.PlayedCard);
+	},
+
+	notif_refilledGardenRow: function(notification) {
+	    console.log(this.Notification.RefilledGardenRow + ' notification');
+	    console.log(notification);
+	    for (var card of notification.args.new_cards) {
+		this.stock[this.Stock.GardenRow].addToStockWithId(card.type, card.id);
+	    }
 	},
 
         // TODO: from this point and below, you can write your game notifications handling methods
