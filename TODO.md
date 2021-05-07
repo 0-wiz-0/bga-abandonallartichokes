@@ -7,3 +7,10 @@
 - garden row refill
 - statistics (final deck contents per type?, perhaps played cards per type?)
 - translations
+- HTML Seiten:
+  - How to Play
+  - Developed by
+- add proper graphics
+- map deck_? to player decks
+- pass button
+- check usage of getCurrentPlayerId vs. getActivePlayerId
