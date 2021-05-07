@@ -1,5 +1,15 @@
 {OVERALL_GAME_HEADER}
 
+<script type="text/javascript">
+
+var jstpl_player_board = '<div class="deck_board">\
+    <span>deck</span><span id="deck_${id}">\${deck_count}</span>\
+    <span>hand</span><span id="hand_${id}">\${hand_count}</span>\
+    <span>discard</span><span id="discard_${id}">\${discard_count}</span>\
+</div>';
+
+</script>
+
 <div id="table">
      <div id="garden_area">
        <!-- BEGIN garden_area -->

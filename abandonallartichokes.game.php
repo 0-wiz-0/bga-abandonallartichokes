@@ -149,20 +149,25 @@ class AbandonAllArtichokes extends Table
     {
         $result = array();
 
-        $current_player_id = self::getCurrentPlayerId();    // !! We must only return informations visible by this player !!
+        $player_id = self::getCurrentPlayerId();    // !! We must only return informations visible by this player !!
 
         // Get information about players
         // Note: you can retrieve some extra field you added for "player" table in "dbmodel.sql" if you need it.
         $sql = "SELECT player_id id, player_score score FROM player ";
         $result['players'] = self::getCollectionFromDb($sql);
 
-        // TODO: Gather all information about current game situation (visible by player $current_player_id).
+        // TODO: Gather all information about current game situation (visible by player $player_id).
         $result[STOCK_GARDEN_ROW] = $this->cards->getCardsInLocation(STOCK_GARDEN_ROW);
-        $result[STOCK_HAND] = $this->cards->getPlayerHand($current_player_id);
+        $result[STOCK_HAND] = $this->cards->getPlayerHand($player_id);
         $result[STOCK_PLAYED_CARD] = $this->cards->getCardsInLocation(STOCK_PLAYED_CARD);
         $compost = $this->cards->getCardOnTop(STOCK_COMPOST);
         $result[STOCK_COMPOST] = $compost ? array($compost) : array();
-        $result['deckname'] = $this->player_deck($current_player_id);
+
+        // for overview panel
+        $result['deck_count'] = $this->cards->countCardInLocation($this->player_deck($player_id));
+        $result['hand_count'] = $this->cards->countCardInLocation(STOCK_HAND, $player_id);
+        $result['discard_count'] = $this->cards->countCardInLocation($this->player_discard($player_id));
+
         return $result;
     }
 

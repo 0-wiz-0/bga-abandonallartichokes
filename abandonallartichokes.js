@@ -80,7 +80,14 @@ function (dojo, declare) {
             for( var player_id in gamedatas.players )
             {
                 var player = gamedatas.players[player_id];
-                // TODO: Setting up players boards if needed
+		var player_board_div = $('player_board_' + player_id);
+		var parameters = {
+		    id: player_id,
+		    deck_count: gamedatas.deck_count,
+		    hand_count: gamedatas.hand_count,
+		    discard_count: gamedatas.discard_count,
+		};
+		dojo.place(this.format_block('jstpl_player_board', parameters), player_board_div);
             }
 
 	    const stock_constructor = [
