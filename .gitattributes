@@ -1,0 +1,13 @@
+# Set the default behavior, in case people don't have core.autocrlf set.
+* text=auto
+
+*.css text
+*.jpg binary
+*.js text
+*.md text
+*.php text
+*.png binary
+*.sql text
+*.tpl text
+LICENSE_BGA text
+README text
