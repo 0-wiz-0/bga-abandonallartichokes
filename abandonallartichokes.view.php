@@ -83,13 +83,17 @@
         $this->page->insert_block("played_card_area", array(
             "DESCRIPTION" => self::_("This is the play area."),
         ) );
-        $this->page->begin_block("abandonallartichokes_abandonallartichokes", "hand_area");
-        $this->page->insert_block("hand_area", array(
-            "DESCRIPTION" => self::_("This is the player hand."),
+        $this->page->begin_block("abandonallartichokes_abandonallartichokes", "displayed_card_area");
+        $this->page->insert_block("displayed_card_area", array(
+            "DESCRIPTION" => self::_("This is the area for displayed cards."),
         ) );
         $this->page->begin_block("abandonallartichokes_abandonallartichokes", "compost_area");
         $this->page->insert_block("compost_area", array(
             "DESCRIPTION" => self::_("This is the compost area."),
+        ) );
+        $this->page->begin_block("abandonallartichokes_abandonallartichokes", "hand_area");
+        $this->page->insert_block("hand_area", array(
+            "DESCRIPTION" => self::_("This is the player hand."),
         ) );
 
 

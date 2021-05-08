@@ -25,17 +25,23 @@ var jstpl_fake_card = "<div id=\"${id}\" class=\"stockitem\" style=\"top:${top}p
        <div id="played_card"></div>
        <!-- END played_card_area -->
      </div>
-     <div id="hand_area">
-       <!-- BEGIN hand_area -->
+     <div id="displayed_card_area">
+       <!-- BEGIN displayed_card_area -->
        {DESCRIPTION}
-       <div id="hand"></div>
-       <!-- END hand_area -->
+       <div id="displayed_card"></div>
+       <!-- END displayed_card_area -->
      </div>
      <div id="compost_area">
        <!-- BEGIN compost_area -->
        {DESCRIPTION}
        <div id="compost"></div>
        <!-- END compost_area -->
+     </div>
+     <div id="hand_area">
+       <!-- BEGIN hand_area -->
+       {DESCRIPTION}
+       <div id="hand"></div>
+       <!-- END hand_area -->
      </div>
 </div>
 
