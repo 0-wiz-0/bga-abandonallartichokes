@@ -69,8 +69,26 @@
 
 
 
+#table {
+    padding: 1em;
+}
+
+#table > div{
+    margin-bottom: 1em;
+}
 
 #common_area {
     display: flex;
     justify-content: space-between;
 }
+
+/***** PLAYER PANEL ****/
+.deck_board {
+    display: flex;
+    justify-content: space-around;
+}
+
+.label {
+    margin-right: 5px;
+}
+

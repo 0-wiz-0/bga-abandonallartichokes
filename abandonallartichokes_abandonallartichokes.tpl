@@ -3,9 +3,9 @@
 <script type="text/javascript">
 
 var jstpl_player_board = '<div class="deck_board">\
-    <span>deck</span><span id="deck_${id}">0</span>\
-    <span>hand</span><span id="hand_${id}">0</span>\
-    <span>discard</span><span id="discard_${id}">0</span>\
+    <div><span class="label">deck</span><span id="deck_${id}">0</span></div>\
+    <div><span class="label">hand</span><span id="hand_${id}">0</span></div>\
+    <div><span class="label">discard</span><span id="discard_${id}">0</span></div>\
 </div>';
 
 var jstpl_fake_card = "<div id=\"${id}\" class=\"stockitem\" style=\"top:${top}px;left:${left}px;width:${width}px;height:${height}px;z-index:${position};background-image:url('${image}');\"></div>";
