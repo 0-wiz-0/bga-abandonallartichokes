@@ -77,18 +77,25 @@ function (dojo, declare) {
 
 	    // TODO: remove
             console.log(gamedatas);
+
+	    this.counter = {};
             // Setting up player boards
             for( var player_id in gamedatas.players )
             {
                 var player = gamedatas.players[player_id];
 		var player_board_div = $('player_board_' + player_id);
-		var parameters = {
-		    id: player_id,
-		    deck_count: gamedatas.deck_count,
-		    hand_count: gamedatas.hand_count,
-		    discard_count: gamedatas.discard_count,
-		};
-		dojo.place(this.format_block('jstpl_player_board', parameters), player_board_div);
+		dojo.place(this.format_block('jstpl_player_board', { id: player_id }), player_board_div);
+
+		this.counter[player_id] = {};
+		this.counter[player_id]['hand'] = new ebg.counter();
+		this.counter[player_id]['hand'].create("hand_" + player_id);
+		this.counter[player_id]['hand'].setValue(gamedatas.hand_count);
+		this.counter[player_id]['deck'] = new ebg.counter();
+		this.counter[player_id]['deck'].create("deck_" + player_id);
+		this.counter[player_id]['deck'].setValue(gamedatas.deck_count);
+		this.counter[player_id]['discard'] = new ebg.counter();
+		this.counter[player_id]['discard'].create("discard_" + player_id);
+		this.counter[player_id]['discard'].setValue(gamedatas.discard_count);
             }
 
 	    const stock_constructor = [
@@ -233,7 +240,7 @@ function (dojo, declare) {
         onUpdateActionButtons: function(stateName, args) {
             console.log('onUpdateActionButtons: ' + stateName);
 
-            if(this.isCurrentPlayerActive()) {
+            if (this.isCurrentPlayerActive()) {
                 switch (stateName) {
 		case this.AjaxActions.PlayCard:
 		    this.addActionButton('pass', _('Pass'), 'onPass');
@@ -339,9 +346,7 @@ function (dojo, declare) {
 	notif_compostedCard: function(notification) {
 	    console.log(this.Notification.CompostedCard + ' notification');
 	    console.log(notification);
-	    this.stock[this.Stock.Compost].removeAll();
-	    this.stock[this.Stock.Compost].addToStockWithId(notification.args.type, notification.args.card_id, notification.args.origin + '_item_' + notification.args.card_id);
-	    this.stock[notification.args.origin].removeFromStockById(notification.args.card_id, this.Stock.Compost);
+	    this.showCardPlay(notification.args.player_id, notification.args.origin, this.Stock.Compost, notification.args.card, notification.args.counters);
 	},
 
 	notif_drewHand: function(notification) {
@@ -349,24 +354,26 @@ function (dojo, declare) {
 	    console.log(notification);
 	    this.stock[this.Stock.Hand].removeAll();
 	    this.addCardsToStock(this.stock[this.Stock.Hand], notification.args.cards);
+	    this.updateCounter(notification.args.player_id, notification.args.counters);
 	},
 
 	notif_harvestedCard: function(notification) {
 	    console.log(this.Notification.HarvestedCard + ' notification');
 	    console.log(notification);
+	    
 	    if (notification.args.player_id == this.player_id) {
 		this.stock[this.Stock.Hand].addToStockWithId(notification.args.type, notification.args.card_id, this.Stock.GardenRow + '_item_' + notification.args.card_id);
 		this.stock[this.Stock.GardenRow].removeFromStockById(notification.args.card_id, this.Stock.Hand);
 	    } else {
 		this.stock[this.Stock.GardenRow].removeFromStockById(notification.args.card_id);
 	    }
+	    this.updateCounter(notification.args.player_id, notification.args.counters);
 	},
 
 	notif_playedCard: function(notification) {
 	    console.log(this.Notification.PlayedCard + ' notification');
             console.log(notification);
-           this.stock[this.Stock.PlayedCard].addToStockWithId(notification.args.type, notification.args.card_id, notification.args.origin + '_item_' + notification.args.card_id);
-           this.stock[notification.args.origin].removeFromStockById(notification.args.card_id, this.Stock.PlayedCard);
+	    this.showCardPlay(notification.args.player_id, notification.args.origin, this.Stock.PlayedCard, notification.args.card, notification.args.counters);
         },
 
 	notif_refilledGardenRow: function(notification) {
@@ -385,6 +392,34 @@ function (dojo, declare) {
 	    args.lock = true;
             this.ajaxcall("/abandonallartichokes/abandonallartichokes/" + targetState + ".html", args,
 			  this, function(result) {  }, function (is_error) { } );
+	},
+
+	showCardPlay: function(player_id, from, to, card, counters) {
+	    if (to == this.Stock.Compost) {
+		this.stock[to].removeAll();
+	    }
+		
+	    if (this.player_id == player_id) {
+		this.stock[to].addToStockWithId(card.type, card.id, from + '_item_' + card.id);
+		this.stock[from].removeFromStockById(card.id, to);
+	    } else {
+		this.stock[to].addToStockWithId(card.type, card.id, 'player_board_' + player_id);
+		
+		
+//		dojo.place(this.format_block('jstpl_fake_card', card), player_board_div);
+//		this.placeOnObject('cardontable_'+player_id, 'overall_player_board_'+player_id);
+//		this.slideToObject('cardontable_'+player_id, 'playertablecard_'+player_id).play();
+//		this.stock[notification.args.origin].removeFromStockById(notification.args.card_id, this.Stock.PlayedCard);
+	    }
+	    this.updateCounter(player_id, counters);
+	},
+
+	updateCounter: function(player_id, counters) {
+	    if (counters != null) {
+		this.counter[player_id]['hand'].setValue(counters.hand);
+		this.counter[player_id]['deck'].setValue(counters.deck);
+		this.counter[player_id]['discard'].setValue(counters.discard);
+	    }
 	}
    });
 });

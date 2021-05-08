@@ -194,8 +194,10 @@ class AbandonAllArtichokes extends Table
         $this->cards->moveAllCardsInLocation(STOCK_HAND, $this->player_discard($player_id), $player_id, $player_id);
         // draw up to five cards
         $this->cards->pickCards(5, $this->player_deck($player_id), $player_id);
-        self::notifyPlayer($player_id, NOTIFICATION_DREW_HAND, '', array(
-            'cards' => $this->cards->getPlayerHand($player_id)
+        $this->notify_one(NOTIFICATION_DREW_HAND, '', null, array(
+            'cards' => $this->cards->getPlayerHand($player_id),
+            'player_id' => $player_id,
+            'player_name' => self::GetCurrentPlayerName(),
         ));
 
         // check victory
@@ -242,14 +244,7 @@ class AbandonAllArtichokes extends Table
 
         $this->cards->moveCard($id, STOCK_HAND, self::getCurrentPlayerId());
 
-        self::notifyAllPlayers(NOTIFICATION_HARVESTED_CARD, clienttranslate('${player_name} harvested ${vegetable}'), array(
-            // TODO: translate vegetable
-            'vegetable' => $this->vegetables[$card['type']]['name'],
-            'player_name' => self::getActivePlayerName(),
-            'type' => $card['type'],
-            'player_id' => self::getCurrentPlayerId(),
-            'card_id' => $id,
-        ));
+        $this->notify_all(NOTIFICATION_HARVESTED_CARD, '${player_name} harvested ${vegetable}', $card);
 
         $this->gamestate->nextState(STATE_PLAY_CARD);
     }
@@ -292,16 +287,10 @@ class AbandonAllArtichokes extends Table
 
         $this->cards->moveCard($id, STOCK_PLAYED_CARD);
         $card = $this->cards->getCard($id);
-
-        self::notifyAllPlayers(NOTIFICATION_PLAYED_CARD, clienttranslate('${player_name} played ${vegetable}'), array(
-            // TODO: translate vegetable
-            'vegetable' => $this->vegetables[$card['type']]['name'],
-            'player_name' => self::getActivePlayerName(),
-            'type' => $card['type'],
-            'player_id' => self::getCurrentPlayerId(),
-            'card_id' => $id,
-            'origin' => STOCK_HAND,
-            'origin_arg' => self::getCurrentPlayerId(),
+        
+        $this->notify_all(NOTIFICATION_PLAYED_CARD, '${player_name} played ${vegetable}', $card, array(
+                'origin' => STOCK_HAND,
+                'origin_arg' => self::getCurrentPlayerId(),
         ));
 
         // compost them
@@ -493,20 +482,8 @@ class AbandonAllArtichokes extends Table
     }
 
     function move_to_compost($card) {
-        $id = $card['id'];
-        $type = $card['type'];
-
-        $this->cards->moveCard($id, STOCK_COMPOST);
-        self::notifyAllPlayers(NOTIFICATION_COMPOSTED_CARD, clienttranslate('${player_name} composted ${vegetable}'), array(
-            // TODO: translate vegetable
-            'vegetable' => $this->vegetables[$type]['name'],
-            'player_name' => self::getActivePlayerName(),
-            'type' => $type,
-            'player_id' => self::getCurrentPlayerId(),
-            'card_id' => $id,
-            'origin' => $card['location'],
-            'origin_arg' => $card['location_arg'],
-        ));
+        $this->cards->moveCard($card['id'], STOCK_COMPOST);
+        $this->notify_all(NOTIFICATION_COMPOSTED_CARD, '${player_name} composted ${vegetable}', $card);
     }
 
     function player_deck($player_id) {
@@ -518,4 +495,50 @@ class AbandonAllArtichokes extends Table
         $sql = "SELECT player_discard FROM player WHERE player_id = " . $player_id;
         return self::getUniqueValueFromDB($sql);
     }
+
+    function notify_all($type, $message, $card = null, $arguments = array()) {
+        $this->notify_backend(true, $type, $message, $card, $arguments);
+    }
+
+    function notify_one($type, $message, $card = null, $arguments = array()) {
+        $this->notify_backend(false, $type, $message, $card, $arguments);
+    }
+
+    function notify_backend($all, $type, $message, $card, $arguments) {
+        $this->set_if_not_set($arguments, 'player_id', self::getCurrentPlayerId());
+        $this->set_if_not_set($arguments, 'player_name', self::getCurrentPlayerName());
+        if ($card != null) {
+            // TODO: translate vegetable name
+            $this->set_if_not_set($arguments, 'vegetable', $this->vegetables[$card['type']]['name']);
+
+            $this->set_if_not_set($arguments, 'card', $card);
+            // TODO: remove next two
+            $this->set_if_not_set($arguments, 'card_id', $card['id']);
+            $this->set_if_not_set($arguments, 'type', $card['type']);
+
+            $this->set_if_not_set($arguments, 'origin', $card['location']);
+            $this->set_if_not_set($arguments, 'origin_arg', $card['location_arg']);
+        }
+        $arguments['counters'] = $this->get_counters($arguments['player_id']);
+        if ($all) {
+            self::notifyAllPlayers($type, clienttranslate($message), $arguments);
+        } else {
+            self::notifyPlayer($arguments['player_id'], $type, clienttranslate($message), $arguments);
+        }
+    }
+
+    function set_if_not_set(&$array, $key, $value) {
+        if (!array_key_exists($key, $array)) {
+            $array[$key] = $value;
+        }
+    }
+
+    function get_counters($player_id) {
+        return array(
+            'deck' => $this->cards->countCardInLocation($this->player_deck($player_id)),
+            'hand' => $this->cards->countCardInLocation(STOCK_HAND, $player_id),
+            'discard' => $this->cards->countCardInLocation($this->player_discard($player_id)),
+        );
+    }
+        
 }

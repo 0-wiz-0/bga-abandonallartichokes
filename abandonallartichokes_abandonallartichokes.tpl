@@ -3,10 +3,12 @@
 <script type="text/javascript">
 
 var jstpl_player_board = '<div class="deck_board">\
-    <span>deck</span><span id="deck_${id}">\${deck_count}</span>\
-    <span>hand</span><span id="hand_${id}">\${hand_count}</span>\
-    <span>discard</span><span id="discard_${id}">\${discard_count}</span>\
+    <span>deck</span><span id="deck_${id}">0</span>\
+    <span>hand</span><span id="hand_${id}">0</span>\
+    <span>discard</span><span id="discard_${id}">0</span>\
 </div>';
+
+var jstpl_fake_card = "<div id=\"${id}\" class=\"stockitem\" style=\"top:${top}px;left:${left}px;width:${width}px;height:${height}px;z-index:${position};background-image:url('${image}');\"></div>";
 
 </script>
 
