@@ -339,6 +339,9 @@ class AbandonAllArtichokes extends Table
 
         $targets = array();
         foreach ($player_ids as $player_id => $value) {
+            if ($player_id = self::getCurrentPlayerId()) {
+                continue;
+            }
             if ($this->cards->countCardInLocation($this->player_deck($player_id)) + $this->cards->countCardInLocation($this->player_discard($player_id)) > 0) {
                 array_push($targets, $player_id);
                 break;
@@ -357,7 +360,7 @@ class AbandonAllArtichokes extends Table
         ));
 
         if (count($targets) == 1) {
-            $this->notify_all(NOTIFICATION_MESSAGE, '[Automatic] Only one valid target for ${vegetable}', $played_card);
+            $this->notify_all(NOTIFICATION_MESSAGE, '[automatic] Only one valid target player for ${vegetable}', $played_card);
             $target = array_pop($targets);
             $this->gamestate->nextState(STATE_LEEK_CHOOSE_OPPONENT);
             $this->leekChooseOpponent($target);
