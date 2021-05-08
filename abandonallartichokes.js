@@ -38,6 +38,7 @@ function (dojo, declare) {
 		GardenStack: 'garden_stack',
 		GardenRow: 'garden_row',
 		Hand: 'hand',
+		Deck: 'deck',
 		Discard: 'discard',
 		DisplayedCard: 'displayed_card',
 		PlayedCard: 'played_card',
@@ -323,7 +324,10 @@ function (dojo, declare) {
 	notif_cardMoved: function(notification) {
 	    console.log(this.Notification.CardMoved + ' notification');
 	    console.log(notification);
-	    this.showCardPlay(notification.args.player_id, notification.args.origin, notification.args.destination, notification.args.card, notification.args.counters);
+	    this.showCardPlay(notification.args.player_id,
+			      notification.args.origin, notification.args.origin_arg,
+			      notification.args.destination, notification.args.destination_arg,
+			      notification.args.card, notification.args.counters);
 	},
 
 	notif_drewHand: function(notification) {
@@ -350,38 +354,62 @@ function (dojo, declare) {
 			  this, function(result) {  }, function (is_error) { } );
 	},
 
-	showCardPlay: function(player_id, from, to, card, counters) {
+	showCardPlay: function(player_id, from, from_arg, to, to_arg, card, counters) {
 	    if (to == this.Stock.Compost) {
-		// only last card visible
+		// only last card of compost visible
 		this.stock[to].removeAll();
 	    }
-	    // TODO: handle this.Stock.Discard (move to player board)
-	    if (this.player_id == player_id) {
-		this.stock[to].addToStockWithId(card.type, card.id, from + '_item_' + card.id);
-		this.stock[from].removeFromStockById(card.id, to);
+
+	    if (this.isVisible(from, from_arg)) {
+		if (this.isVisible(to, to_arg)) {
+		    this.moveVisibleToVisible(from, to, card);
+		} else {
+		    this.moveVisibleToPanel(from, player_id, card);
+		}
 	    } else {
-		// not my turn
-		switch (to) {
-		case this.Stock.Hand:
-		    this.slideToObject(from + '_item_' + card.id, 'player_board_' + player_id);
-		    this.stock[from].removeFromStockById(card.id, 'player_board_' + player_id);
-		    break;
-		case this.Stock.PlayedCard:
-		    this.stock[to].addToStockWithId(card.type, card.id, 'player_board_' + player_id);
-		    break;
-		case this.Stock.Compost:
-		    if (from == this.Stock.PlayedCard) {
-			this.stock[to].addToStockWithId(card.type, card.id, from + '_item_' + card.id);
-			this.stock[from].removeFromStockById(card.id, to);
-		    } else {
-			this.stock[to].addToStockWithId(card.type, card.id, 'player_board_' + player_id);
-		    }
-		    break;
+		if (this.isVisible(to, to_arg)) {
+		    this.movePanelToVisible(player_id, to, card);
 		}
 	    }
+		    
 	    this.updateCounter(player_id, counters);
 	},
 
+	isVisible: function(location, location_arg) {
+	    switch (location) {
+	    case this.Stock.Deck:
+	    case this.Stock.Discard:
+	    case this.Stock.GardenStack:
+		return false;
+	    case this.Stock.GardenRow:
+	    case this.Stock.DisplayedCard:
+	    case this.Stock.PlayedCard:
+	    case this.Stock.Compost:
+		return true;
+	    case this.Stock.Hand:
+		if (location_arg == this.player_id) {
+		    return true;
+		}
+	    default:
+		console.log("unhandled case in isVisible()");
+		return false;
+	    }
+	},
+
+	moveVisibleToVisible: function(from, to, card) {
+	    this.stock[to].addToStockWithId(card.type, card.id, from + '_item_' + card.id);
+	    this.stock[from].removeFromStockById(card.id, to);
+	},
+
+	moveVisibleToPanel: function(from, player_id, card) {
+	    this.slideToObject(from + '_item_' + card.id, 'player_board_' + player_id);
+	    this.stock[from].removeFromStockById(card.id, 'player_board_' + player_id);
+	},
+
+	movePanelToVisible: function(player_id, to, card) {
+	    this.stock[to].addToStockWithId(card.type, card.id, 'player_board_' + player_id);
+	},
+  
 	updateCounter: function(player_id, counters) {
 	    if (counters != null) {
 		this.counter[player_id]['hand'].setValue(counters.hand);

@@ -13,4 +13,6 @@
 - tooltips (translated card texts)
 - notifications for multiple players
   - moves from/to other player's hands don't work because there is no Stock for them
+- auto pass if no options left?
+- don't allow playing carrot after other cards
 

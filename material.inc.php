@@ -53,6 +53,7 @@ if (!defined('STOCK_GARDEN_ROW')) { // ensure this block is only invoked once, s
    define("STOCK_HAND", 'hand'); // this must be called "hand" for some automatic handling of the Deck component
    define("STOCK_PLAYED_CARD", 'played_card');
    define("STOCK_DISPLAYED_CARD", 'displayed_card');
+   define("STOCK_DECK", 'deck');
    define("STOCK_DISCARD", 'discard');
    define("STOCK_COMPOST", 'compost');
 }

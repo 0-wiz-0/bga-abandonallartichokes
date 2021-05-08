@@ -108,7 +108,7 @@ class AbandonAllArtichokes extends Table
             } else {
                 //$cards[] = array('type' => $vegetable_id, 'type_arg' => 0, 'nbr' => 6);
                 $cards[] = array('type' => VEGETABLE_CARROT, 'type_arg' => 0, 'nbr' => 6);
-                //$cards[] = array('type' => VEGETABLE_POTATO, 'type_arg' => 0, 'nbr' => 6);
+                $cards[] = array('type' => VEGETABLE_POTATO, 'type_arg' => 0, 'nbr' => 6);
             }
 
         }
@@ -326,22 +326,30 @@ class AbandonAllArtichokes extends Table
         if ($picked_card == null) {
             throw new feException(self::_("You must have cards in your deck to play a potato"), true);
         }
-        $this->notify_all(NOTIFICATION_CARD_MOVED, '${player_name} played ${vegetable}', $card, array(
-                'origin' => STOCK_HAND,
-                'origin_arg' => self::getCurrentPlayerId(),
-                'destination' => STOCK_PLAYED_CARD,
-        ));
-        $this->notify_all(NOTIFICATION_CARD_MOVED, '${player_name} revealed ${vegetable} from their deck', $picked_card);
+
         $this->cards->moveCard($id, STOCK_PLAYED_CARD);
-        $card = $this->cards->getCard($id);
+        $played_card = $this->cards->getCard($id);
+        $this->notify_all(NOTIFICATION_CARD_MOVED, '${player_name} played ${vegetable}', $played_card, array(
+            'origin' => STOCK_HAND,
+            'origin_arg' => self::getCurrentPlayerId(),
+            'destination' => STOCK_PLAYED_CARD,
+        )); 
+
+        $this->notify_all(NOTIFICATION_CARD_MOVED, '${player_name} revealed ${vegetable} from their deck', $picked_card, array(
+            'origin' => STOCK_DECK,
+            'origin_arg' => self::getCurrentPlayerId(),
+            'destination' => STOCK_DISPLAYED_CARD,
+        ));
 
         if ($picked_card['type'] == VEGETABLE_ARTICHOKE) {
-            $this->move_to_compost($picked_card);
+            $this->cards->moveCard($picked_card['id'], STOCK_COMPOST);
             $this->notify_all(NOTIFICATION_CARD_MOVED, '${player_name} composted ${vegetable}', $picked_card, array( 'destination' => STOCK_COMPOST ));
         } else {
-            $this->moveCard($picked_card['id'], $this->player_discard($player_id));
+            $this->cards->moveCard($picked_card['id'], $this->player_discard($player_id));
             $this->notify_all(NOTIFICATION_CARD_MOVED, '${player_name} discarded ${vegetable}', $picked_card, array( 'destination' => STOCK_DISCARD ));
         }
+        $this->cards->moveCard($played_card['id'], $this->player_discard($player_id));
+        $this->notify_all(NOTIFICATION_CARD_MOVED, '${player_name} discarded ${vegetable}', $played_card, array( 'destination' => STOCK_DISCARD ));
 
         return STATE_PLAY_CARD;
     }
