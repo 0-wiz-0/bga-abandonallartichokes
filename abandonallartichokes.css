@@ -70,3 +70,7 @@
 
 
 
+#common_area {
+    display: flex;
+    justify-content: space-between;
+}
