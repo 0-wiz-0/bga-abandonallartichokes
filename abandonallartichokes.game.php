@@ -316,7 +316,7 @@ class AbandonAllArtichokes extends Table
 
         $this->cards->moveCard($id, STOCK_PLAYED_CARD);
         $card = $this->cards->getCard($id);
-        
+
         $this->notify_all(NOTIFICATION_CARD_MOVED, '${player_name} played ${vegetable}', $card, array(
                 'origin' => STOCK_HAND,
                 'origin_arg' => self::getCurrentPlayerId(),
@@ -354,7 +354,7 @@ class AbandonAllArtichokes extends Table
             'origin' => STOCK_HAND,
             'origin_arg' => self::getCurrentPlayerId(),
             'destination' => STOCK_PLAYED_CARD,
-        )); 
+        ));
 
         if (count($targets) == 1) {
             $this->notify_all(NOTIFICATION_MESSAGE, '[Automatic] Only one valid target for ${vegetable}', $played_card);
@@ -437,7 +437,7 @@ class AbandonAllArtichokes extends Table
             'origin' => STOCK_HAND,
             'origin_arg' => self::getCurrentPlayerId(),
             'destination' => STOCK_PLAYED_CARD,
-        )); 
+        ));
 
         $this->notify_all(NOTIFICATION_CARD_MOVED, '${player_name} revealed ${vegetable} from their deck', $picked_card, array(
             'origin' => STOCK_DECK,
@@ -457,8 +457,8 @@ class AbandonAllArtichokes extends Table
 
         return STATE_PLAY_CARD;
     }
-        
-        
+
+
 //////////////////////////////////////////////////////////////////////////////
 //////////// Utility functions
 ////////////
@@ -698,5 +698,5 @@ class AbandonAllArtichokes extends Table
             'discard' => $this->cards->countCardInLocation($this->player_discard($player_id)),
         );
     }
-        
+
 }
