@@ -38,19 +38,16 @@ function (dojo, declare) {
 		GardenStack: 'garden_stack',
 		GardenRow: 'garden_row',
 		Hand: 'hand',
-		DeckPrefix: 'deck_',
-		DiscardPrefix: 'discard_',
+		Discard: 'discard',
+		DisplayedCard: 'displayed_card',
 		PlayedCard: 'played_card',
 		Compost: 'compost',
 	    };
 	    // this needs to match the names in material.inc.php
 	    this.Notification = {
-		PlayedCard: "played_card",
-		HarvestedCard: "harvested_card",
-		CompostedCard: "composted_card",
+		CardMoved: "card_moved",
 		DrewHand: "drew_hand",
 		RefilledGardenRow: "refilled_garden_row",
-		Info: "info",
 	    };
 	    // this needs to match the values in abandonallartichokes.action.php
 	    this.AjaxActions = {
@@ -89,18 +86,19 @@ function (dojo, declare) {
 		this.counter[player_id] = {};
 		this.counter[player_id]['hand'] = new ebg.counter();
 		this.counter[player_id]['hand'].create("hand_" + player_id);
-		this.counter[player_id]['hand'].setValue(gamedatas.hand_count);
+		this.counter[player_id]['hand'].setValue(gamedatas.counters.hand);
 		this.counter[player_id]['deck'] = new ebg.counter();
 		this.counter[player_id]['deck'].create("deck_" + player_id);
-		this.counter[player_id]['deck'].setValue(gamedatas.deck_count);
+		this.counter[player_id]['deck'].setValue(gamedatas.counters.deck);
 		this.counter[player_id]['discard'] = new ebg.counter();
 		this.counter[player_id]['discard'].create("discard_" + player_id);
-		this.counter[player_id]['discard'].setValue(gamedatas.discard_count);
+		this.counter[player_id]['discard'].setValue(gamedatas.counters.discard);
             }
 
 	    const stock_constructor = [
 		{ name: this.Stock.GardenRow, callback: 'onGardenRowSelect', selectionMode: 1 },
-		{ name: this.Stock.Hand, callback: 'onPlayerHandSelectionChanged', selectionMode: 1 },
+		{ name: this.Stock.Hand, callback: 'onPlayerHandSelect', selectionMode: 1 },
+		{ name: this.Stock.DisplayedCard, callback: 'onDisplayedCardSelect', selectionMode: 0 },
 		{ name: this.Stock.PlayedCard, callback: null, selectionMode: 0 },
 		{ name: this.Stock.Compost, callback: null, selectionMode: 0 },
 	    ];
@@ -114,12 +112,6 @@ function (dojo, declare) {
 		this.addCardsToStock(this.stock[stock_entry.name], this.gamedatas[stock_entry.name]);
 	    }
 
-	    console.log("stock");
-	    console.log(this.stock);
-            // TODO: Set up your game interface here, according to "gamedatas"
-
-
-            // Setup game notifications to handle (see "setupNotifications" method below)
             this.setupNotifications();
 
             console.log( "Ending game setup" );
@@ -151,7 +143,21 @@ function (dojo, declare) {
             });
 	},
 
-	onPlayerHandSelectionChanged: function(control_name, item_id) {
+	onDisplayedCardSelect: function(control_name, item_id) {
+	    var items = this.stock[this.Stock.DisplayedCard].getSelectedItems();
+	    debugger
+	    if (items.length > 0) {
+                //if( this.checkAction('playCard', true)) {
+                //var card_id = items[0].id;
+		//this.changeState(this.AjaxActions.PlayCard, { id: card_id });
+                //}
+		//else {
+		this.showMessage(_("You can't select cards from the display area now."), "error");
+                this.stock[this.Stock.DisplayedCard].unselectAll();
+	    }
+	},
+
+	onPlayerHandSelect: function(control_name, item_id) {
 	    var items = this.stock[this.Stock.Hand].getSelectedItems();
 
 	    if (items.length > 0) {
@@ -249,16 +255,9 @@ function (dojo, declare) {
 	    }
         },
 
-        ///////////////////////////////////////////////////
-        //// Utility methods
-
-        /*
-
-            Here, you can defines some utility methods that you can use everywhere in your javascript
-            script.
-
-        */
-
+	onPass: function() {
+	    this.changeState(this.AjaxActions.Pass);
+	},
 
         ///////////////////////////////////////////////////
         //// Player's action
@@ -309,48 +308,22 @@ function (dojo, declare) {
         */
 
 
-        ///////////////////////////////////////////////////
-        //// Reaction to cometD notifications
-
-        /*
-            setupNotifications:
-
-            In this method, you associate each of your game notifications with your local method to handle it.
-
-            Note: game notification names correspond to "notifyAllPlayers" and "notifyPlayer" calls in
-                  your abandonallartichokes.game.php file.
-
-        */
+	// Notifications
         setupNotifications: function()
         {
             console.log( 'notifications subscriptions setup' );
 
-            // TODO: here, associate your game notifications with local methods
-
-            // Example 1: standard notification handling
-            // dojo.subscribe( 'cardPlayed', this, "notif_cardPlayed" );
-
-            // Example 2: standard notification handling + tell the user interface to wait
-            //            during 3 seconds after calling the method in order to let the players
-            //            see what is happening in the game.
-            // dojo.subscribe( 'cardPlayed', this, "notif_cardPlayed" );
-            // this.notifqueue.setSynchronous( 'cardPlayed', 3000 );
-            //
-	    dojo.subscribe(this.Notification.CompostedCard, this, "notif_compostedCard");
-	    // delay shortly after each card composted
-	    this.notifqueue.setSynchronous(this.Notification.CompostedCard, 500);
+	    dojo.subscribe(this.Notification.CardMoved, this, "notif_cardMoved");
 	    dojo.subscribe(this.Notification.DrewHand, this, "notif_drewHand");
-	    dojo.subscribe(this.Notification.HarvestedCard, this, "notif_harvestedCard");
-	    dojo.subscribe(this.Notification.PlayedCard, this, "notif_playedCard");
-	    // delay a bit after each card played
-	    this.notifqueue.setSynchronous(this.Notification.PlayedCard, 800);
 	    dojo.subscribe(this.Notification.RefilledGardenRow, this, "notif_refilledGardenRow");
+
+	    this.notifqueue.setSynchronous(this.Notification.CardMoved, 800);
         },
 
-	notif_compostedCard: function(notification) {
-	    console.log(this.Notification.CompostedCard + ' notification');
+	notif_cardMoved: function(notification) {
+	    console.log(this.Notification.CardMoved + ' notification');
 	    console.log(notification);
-	    this.showCardPlay(notification.args.player_id, notification.args.origin, this.Stock.Compost, notification.args.card, notification.args.counters);
+	    this.showCardPlay(notification.args.player_id, notification.args.origin, notification.args.destination, notification.args.card, notification.args.counters);
 	},
 
 	notif_drewHand: function(notification) {
@@ -361,18 +334,6 @@ function (dojo, declare) {
 	    this.updateCounter(notification.args.player_id, notification.args.counters);
 	},
 
-	notif_harvestedCard: function(notification) {
-	    console.log(this.Notification.HarvestedCard + ' notification');
-	    console.log(notification);
-	    this.showCardPlay(notification.args.player_id, notification.args.origin, this.Stock.Hand, notification.args.card, notification.args.counters);
-	},
-
-	notif_playedCard: function(notification) {
-	    console.log(this.Notification.PlayedCard + ' notification');
-            console.log(notification);
-	    this.showCardPlay(notification.args.player_id, notification.args.origin, this.Stock.PlayedCard, notification.args.card, notification.args.counters);
-        },
-
 	notif_refilledGardenRow: function(notification) {
 	    console.log(this.Notification.RefilledGardenRow + ' notification');
 	    console.log(notification);
@@ -381,9 +342,7 @@ function (dojo, declare) {
 	    }
 	},
 
-	onPass: function() {
-	    this.changeState(this.AjaxActions.Pass);
-	},
+	// Utility functions
 
 	changeState: function(targetState, args = {}) {
 	    args.lock = true;
@@ -396,6 +355,7 @@ function (dojo, declare) {
 		// only last card visible
 		this.stock[to].removeAll();
 	    }
+	    // TODO: handle this.Stock.Discard (move to player board)
 	    if (this.player_id == player_id) {
 		this.stock[to].addToStockWithId(card.type, card.id, from + '_item_' + card.id);
 		this.stock[from].removeFromStockById(card.id, to);

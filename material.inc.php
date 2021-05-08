@@ -46,20 +46,20 @@ if (!defined('VEGETABLE_BEET')) { // ensure this block is only invoked once, sin
    define("VEGETABLE_ARTICHOKE", 11);
 }
 
-// these definitions need to match the ones in the constructor in the JavaScript code
+// these definitions need to match the ones in the constructor in the JavaScript code and the ids in the template file
 if (!defined('STOCK_GARDEN_ROW')) { // ensure this block is only invoked once, since it is included multiple times
    define("STOCK_GARDEN_STACK", 'garden_stack');
    define("STOCK_GARDEN_ROW", 'garden_row');
    define("STOCK_HAND", 'hand'); // this must be called "hand" for some automatic handling of the Deck component
    define("STOCK_PLAYED_CARD", 'played_card');
+   define("STOCK_DISPLAYED_CARD", 'displayed_card');
+   define("STOCK_DISCARD", 'discard');
    define("STOCK_COMPOST", 'compost');
 }
 
 // these definitions need to match the ones in the constructor in the JavaScript code
-if (!defined('NOTIFICATION_PLAYED_CARD')) { // ensure this block is only invoked once, since it is included multiple times
-    define("NOTIFICATION_PLAYED_CARD", "played_card");
-    define("NOTIFICATION_HARVESTED_CARD", "harvested_card");
-    define("NOTIFICATION_COMPOSTED_CARD", "composted_card");
+if (!defined('NOTIFICATION_CARD_MOVED')) { // ensure this block is only invoked once, since it is included multiple times
+    define("NOTIFICATION_CARD_MOVED", "card_moved");
     define("NOTIFICATION_DREW_HAND", "drew_hand");
     define("NOTIFICATION_REFILLED_GARDEN_ROW", "refilled_garden_row");
     define("NOTIFICATION_MESSAGE", "message"); // provided by framework, no subscription necessary

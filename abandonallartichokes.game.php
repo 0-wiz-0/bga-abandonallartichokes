@@ -103,11 +103,14 @@ class AbandonAllArtichokes extends Table
         $cards = array();
         foreach ($this->vegetables as $vegetable_id => $vegetable)
         {
-            if ($vegetable_id != VEGETABLE_ARTICHOKE) {
-                $cards[] = array('type' => VEGETABLE_CARROT, 'type_arg' => 0, 'nbr' => 6);
-            } else {
+            if ($vegetable_id == VEGETABLE_ARTICHOKE) {
                 $cards[] = array('type' => $vegetable_id, 'type_arg' => 0, 'nbr' => 10 * count($players));
+            } else {
+                //$cards[] = array('type' => $vegetable_id, 'type_arg' => 0, 'nbr' => 6);
+                $cards[] = array('type' => VEGETABLE_CARROT, 'type_arg' => 0, 'nbr' => 6);
+                //$cards[] = array('type' => VEGETABLE_POTATO, 'type_arg' => 0, 'nbr' => 6);
             }
+
         }
         $this->cards->createCards($cards, STOCK_GARDEN_STACK);
 
@@ -162,11 +165,9 @@ class AbandonAllArtichokes extends Table
         $result[STOCK_PLAYED_CARD] = $this->cards->getCardsInLocation(STOCK_PLAYED_CARD);
         $compost = $this->cards->getCardOnTop(STOCK_COMPOST);
         $result[STOCK_COMPOST] = $compost ? array($compost) : array();
+        $result[STOCK_DISPLAYED_CARD] = array();
 
-        // for overview panel
-        $result['deck_count'] = $this->cards->countCardInLocation($this->player_deck($player_id));
-        $result['hand_count'] = $this->cards->countCardInLocation(STOCK_HAND, $player_id);
-        $result['discard_count'] = $this->cards->countCardInLocation($this->player_discard($player_id));
+        $result['counters'] = $this->get_counters($player_id);
 
         return $result;
     }
@@ -244,7 +245,10 @@ class AbandonAllArtichokes extends Table
 
         $this->cards->moveCard($id, STOCK_HAND, self::getCurrentPlayerId());
 
-        $this->notify_all(NOTIFICATION_HARVESTED_CARD, '${player_name} harvested ${vegetable}', $card);
+        $this->notify_all(NOTIFICATION_CARD_MOVED, '${player_name} harvested ${vegetable}', $card, array(
+            'destination' => STOCK_HAND,
+            'destination_arg' => self::getCurrentPlayerId(),
+        ));
 
         $this->gamestate->nextState(STATE_PLAY_CARD);
     }
@@ -263,45 +267,86 @@ class AbandonAllArtichokes extends Table
             throw new feException(self::_("You must play a card from your hand"), true);
         }
 
-        if ($card['type'] != VEGETABLE_CARROT) {
-            throw new feException(self::_("You must play a carrot from your hand"), true);
+        switch($card['type']) {
+        case VEGETABLE_CARROT:
+            $next_state = $this->playCarrot($id);
+            break;
+        case VEGETABLE_POTATO:
+            $next_state = $this->playPotato($id);
+            break;
+        default:
+            throw new feException(self::_("This vegetable is not supported yet"), true);
         }
 
+        $this->gamestate->nextState($next_state);
+    }
+
+    function playCarrot($id) {
         // find artichokes to compost
         $hand = $this->cards->getPlayerHand(self::getCurrentPlayerId());
-        $art1 = null;
-        $art2 = null;
+        $artichoke_1 = null;
+        $artichoke_2 = null;
         foreach ($hand as $card) {
             if ($card['type'] == VEGETABLE_ARTICHOKE) {
-                if ($art1 == null) {
-                    $art1 = $card;
+                if ($artichoke_1 == null) {
+                    $artichoke_1 = $card;
                 } else {
-                    $art2 = $card;
+                    $artichoke_2 = $card;
                     break;
                 }
             }
         }
-        if ($art2 == null) {
+        if ($artichoke_2 == null) {
             throw new feException(self::_("You must have two artichokes in hand to play a carrot"), true);
         }
 
         $this->cards->moveCard($id, STOCK_PLAYED_CARD);
         $card = $this->cards->getCard($id);
         
-        $this->notify_all(NOTIFICATION_PLAYED_CARD, '${player_name} played ${vegetable}', $card, array(
+        $this->notify_all(NOTIFICATION_CARD_MOVED, '${player_name} played ${vegetable}', $card, array(
                 'origin' => STOCK_HAND,
                 'origin_arg' => self::getCurrentPlayerId(),
+                'destination' => STOCK_PLAYED_CARD,
         ));
-
         // compost them
-        $this->move_to_compost($art1);
-        $this->move_to_compost($art2);
-        $this->move_to_compost($card);
+        $this->cards->moveCard($artichoke_1['id'], STOCK_COMPOST);
+        $this->notify_all(NOTIFICATION_CARD_MOVED, '${player_name} composted ${vegetable}', $artichoke_1, array( 'destination' => STOCK_COMPOST ));
+        $this->cards->moveCard($artichoke_2['id'], STOCK_COMPOST);
+        $this->notify_all(NOTIFICATION_CARD_MOVED, '${player_name} composted ${vegetable}', $artichoke_2, array( 'destination' => STOCK_COMPOST ));
+        $this->cards->moveCard($card['id'], STOCK_COMPOST);
+        $this->notify_all(NOTIFICATION_CARD_MOVED, '${player_name} composted ${vegetable}', $card, array( 'destination' => STOCK_COMPOST ));
 
-        $this->gamestate->nextState(STATE_NEXT_PLAYER);
-        //$this->gamestate->nextState("playCard");
+        return STATE_NEXT_PLAYER;
     }
 
+    function playPotato($id) {
+        // look at top card of deck
+        $player_id = self::getCurrentPlayerId();
+        $picked_card = $this->cards->pickCardForLocation($this->player_deck($player_id), STOCK_DISPLAYED_CARD);
+        if ($picked_card == null) {
+            throw new feException(self::_("You must have cards in your deck to play a potato"), true);
+        }
+        $this->notify_all(NOTIFICATION_CARD_MOVED, '${player_name} played ${vegetable}', $card, array(
+                'origin' => STOCK_HAND,
+                'origin_arg' => self::getCurrentPlayerId(),
+                'destination' => STOCK_PLAYED_CARD,
+        ));
+        $this->notify_all(NOTIFICATION_CARD_MOVED, '${player_name} revealed ${vegetable} from their deck', $picked_card);
+        $this->cards->moveCard($id, STOCK_PLAYED_CARD);
+        $card = $this->cards->getCard($id);
+
+        if ($picked_card['type'] == VEGETABLE_ARTICHOKE) {
+            $this->move_to_compost($picked_card);
+            $this->notify_all(NOTIFICATION_CARD_MOVED, '${player_name} composted ${vegetable}', $picked_card, array( 'destination' => STOCK_COMPOST ));
+        } else {
+            $this->moveCard($picked_card['id'], $this->player_discard($player_id));
+            $this->notify_all(NOTIFICATION_CARD_MOVED, '${player_name} discarded ${vegetable}', $picked_card, array( 'destination' => STOCK_DISCARD ));
+        }
+
+        return STATE_PLAY_CARD;
+    }
+        
+        
 //////////////////////////////////////////////////////////////////////////////
 //////////// Utility functions
 ////////////
@@ -510,12 +555,7 @@ class AbandonAllArtichokes extends Table
         if ($card != null) {
             // TODO: translate vegetable name
             $this->set_if_not_set($arguments, 'vegetable', $this->vegetables[$card['type']]['name']);
-
             $this->set_if_not_set($arguments, 'card', $card);
-            // TODO: remove next two
-            $this->set_if_not_set($arguments, 'card_id', $card['id']);
-            $this->set_if_not_set($arguments, 'type', $card['type']);
-
             $this->set_if_not_set($arguments, 'origin', $card['location']);
             $this->set_if_not_set($arguments, 'origin_arg', $card['location_arg']);
         }
