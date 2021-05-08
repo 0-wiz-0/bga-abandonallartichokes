@@ -360,14 +360,7 @@ function (dojo, declare) {
 	notif_harvestedCard: function(notification) {
 	    console.log(this.Notification.HarvestedCard + ' notification');
 	    console.log(notification);
-	    
-	    if (notification.args.player_id == this.player_id) {
-		this.stock[this.Stock.Hand].addToStockWithId(notification.args.type, notification.args.card_id, this.Stock.GardenRow + '_item_' + notification.args.card_id);
-		this.stock[this.Stock.GardenRow].removeFromStockById(notification.args.card_id, this.Stock.Hand);
-	    } else {
-		this.stock[this.Stock.GardenRow].removeFromStockById(notification.args.card_id);
-	    }
-	    this.updateCounter(notification.args.player_id, notification.args.counters);
+	    this.showCardPlay(notification.args.player_id, notification.args.origin, this.Stock.Hand, notification.args.card, notification.args.counters);
 	},
 
 	notif_playedCard: function(notification) {
@@ -398,19 +391,27 @@ function (dojo, declare) {
 	    if (to == this.Stock.Compost) {
 		this.stock[to].removeAll();
 	    }
-		
+
 	    if (this.player_id == player_id) {
 		this.stock[to].addToStockWithId(card.type, card.id, from + '_item_' + card.id);
 		this.stock[from].removeFromStockById(card.id, to);
 	    } else {
-		this.stock[to].addToStockWithId(card.type, card.id, 'player_board_' + player_id);
-		
+		// not my turn
+		switch (to) {
+		case this.Stock.Hand:
+		    this.slideToObject(from + '_item_' + card.id, 'player_board_' + player_id);
+		    this.stock[from].removeFromStockById(card.id, 'player_board_' + player_id);
+		    break;
+		case this.Stock.PlayedCard:
+		    this.stock[to].addToStockWithId(card.type, card.id, 'player_board_' + player_id);
+		    break;
+		}
+	    }
 		
 //		dojo.place(this.format_block('jstpl_fake_card', card), player_board_div);
 //		this.placeOnObject('cardontable_'+player_id, 'overall_player_board_'+player_id);
 //		this.slideToObject('cardontable_'+player_id, 'playertablecard_'+player_id).play();
 //		this.stock[notification.args.origin].removeFromStockById(notification.args.card_id, this.Stock.PlayedCard);
-	    }
 	    this.updateCounter(player_id, counters);
 	},
 
