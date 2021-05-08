@@ -1,8 +1,12 @@
-- moving cards for other players (played cards, composted cards)
-- javascript report errors
 - this.Stock is ugly
-- add play areas for other players
-- all vegetables except carrots
+- missing vegetables
+  - beet
+  - broccoli
+  - corn
+  - eggplant
+  - onion
+  - peas
+  - pepper
 - statistics (final deck contents per type?, perhaps played cards per type?)
 - translations
 - HTML Seiten:
@@ -11,8 +15,4 @@
 - add proper graphics
 - check usage of getCurrentPlayerId vs. getActivePlayerId
 - tooltips (translated card texts)
-- notifications for multiple players
-  - moves from/to other player's hands don't work because there is no Stock for them
-- auto pass if no options left?
-- don't allow playing carrot after other cards
-
+- perhaps: auto pass if no playable cards left? in general, hard, but perhaps for artichoke-only hands

@@ -53,6 +53,8 @@ function (dojo, declare) {
 	    // this needs to match the values in abandonallartichokes.action.php
 	    this.AjaxActions = {
 		Harvest: 'harvestCard',
+		LeekChooseOpponent: 'leekChooseOpponent',
+		LeekTakeCard: 'leekTakeCard',
 		PlayCard: 'playCard',
 		Pass: 'pass',
 	    };
@@ -78,7 +80,7 @@ function (dojo, declare) {
 
 	    this.counter = {};
             // Setting up player boards
-            for( var player_id in gamedatas.players )
+            for (var player_id in gamedatas.players)
             {
                 var player = gamedatas.players[player_id];
 		var player_board_div = $('player_board_' + player_id);
@@ -87,13 +89,13 @@ function (dojo, declare) {
 		this.counter[player_id] = {};
 		this.counter[player_id]['hand'] = new ebg.counter();
 		this.counter[player_id]['hand'].create("hand_" + player_id);
-		this.counter[player_id]['hand'].setValue(gamedatas.counters.hand);
+		this.counter[player_id]['hand'].setValue(gamedatas.counters[player_id].hand);
 		this.counter[player_id]['deck'] = new ebg.counter();
 		this.counter[player_id]['deck'].create("deck_" + player_id);
-		this.counter[player_id]['deck'].setValue(gamedatas.counters.deck);
+		this.counter[player_id]['deck'].setValue(gamedatas.counters[player_id].deck);
 		this.counter[player_id]['discard'] = new ebg.counter();
 		this.counter[player_id]['discard'].create("discard_" + player_id);
-		this.counter[player_id]['discard'].setValue(gamedatas.counters.discard);
+		this.counter[player_id]['discard'].setValue(gamedatas.counters[player_id].discard);
             }
 
 	    const stock_constructor = [
@@ -252,14 +254,65 @@ function (dojo, declare) {
 		case this.AjaxActions.PlayCard:
 		    this.addActionButton('pass', _('Pass'), 'onPass');
 		    break;
+		case this.AjaxActions.LeekChooseOpponent:
+		    for (var player_id in this.gamedatas.players) {
+			if (player_id == this.player_id) {
+			    continue;
+			}
+			if (this.hasCards(player_id) == 0) {
+			    continue;
+			}
+			this.addActionButton('player_' + this.gamedatas.players[player_id].player_no, _('Choose ') + this.gamedatas.players[player_id].name, 'onLeekChooseOpponent_' + this.gamedatas.players[player_id].player_no);
+		    }
+		    break;
+		case this.AjaxActions.LeekTakeCard:
+		    this.addActionButton('leekTake', _('Take card'), 'onLeekTake');
+		    this.addActionButton('leekLeave', _('Give card back'), 'onLeekDecline');
+		    break;
 		}
 	    }
         },
+
+	onLeekChooseOpponent_1: function() {
+	    this.changeState(this.AjaxActions.LeekChooseOpponent, { opponent_id: this.player_no_to_id(1) });
+	},
+
+	onLeekChooseOpponent_2: function() {
+	    this.changeState(this.AjaxActions.LeekChooseOpponent, { opponent_id: this.player_no_to_id(2) });
+	},
+
+	onLeekChooseOpponent_3: function() {
+	    this.changeState(this.AjaxActions.LeekChooseOpponent, { opponent_id: this.player_no_to_id(3) });
+	},
+
+	onLeekChooseOpponent_4: function() {
+	    this.changeState(this.AjaxActions.LeekChooseOpponent, { opponent_id: this.player_no_to_id(4) });
+	},
+
+	hasCards: function(player_id) {
+	    return this.counter[player_id]['deck'].getValue() + this.counter[player_id]['discard'].getValue();
+	},
+
+	player_no_to_id: function(player_no) {
+	    for (var player_id in this.gamedatas.players) {
+		if (this.gamedatas.players[player_id].player_no == player_no) {
+		    return player_id;
+		}
+	    }
+	},
 
 	onPass: function() {
 	    this.changeState(this.AjaxActions.Pass);
 	},
 
+	onLeekTake: function() {
+	    this.changeState(this.AjaxActions.LeekTakeCard, { take_card: true });
+	},
+
+	onLeekDecline: function() {
+	    this.changeState(this.AjaxActions.LeekTakeCard, { take_card: false });
+	},
+	
         ///////////////////////////////////////////////////
         //// Player's action
 
@@ -335,7 +388,7 @@ function (dojo, declare) {
 	    console.log(notification);
 	    this.stock[this.Stock.Hand].removeAll();
 	    this.addCardsToStock(this.stock[this.Stock.Hand], notification.args.cards);
-	    this.updateCounter(notification.args.player_id, notification.args.counters);
+	    this.updateCounter(notification.args.counters);
 	},
 
 	notif_refilledGardenRow: function(notification) {
@@ -372,7 +425,7 @@ function (dojo, declare) {
 		}
 	    }
 		    
-	    this.updateCounter(player_id, counters);
+	    this.updateCounter(counters);
 	},
 
 	isVisible: function(location, location_arg) {
@@ -391,7 +444,7 @@ function (dojo, declare) {
 		    return true;
 		}
 	    default:
-		console.log("unhandled case in isVisible()");
+		console.log("unhandled case '" + location + "' in isVisible()");
 		return false;
 	    }
 	},
@@ -410,11 +463,11 @@ function (dojo, declare) {
 	    this.stock[to].addToStockWithId(card.type, card.id, 'player_board_' + player_id);
 	},
   
-	updateCounter: function(player_id, counters) {
-	    if (counters != null) {
-		this.counter[player_id]['hand'].setValue(counters.hand);
-		this.counter[player_id]['deck'].setValue(counters.deck);
-		this.counter[player_id]['discard'].setValue(counters.discard);
+	updateCounter: function(counters) {
+	    for (var player_id in counters) {
+		this.counter[player_id].hand.setValue(counters[player_id].hand);
+		this.counter[player_id].deck.setValue(counters[player_id].deck);
+		this.counter[player_id].discard.setValue(counters[player_id].discard);
 	    }
 	}
    });

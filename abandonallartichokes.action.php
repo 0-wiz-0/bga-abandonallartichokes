@@ -83,6 +83,22 @@
           $this->game->playCard($id);
           self::ajaxResponse();
       }
+
+      public function leekChooseOpponent() {
+          self::setAjaxMode();
+          $opponent_id = self::getArg("opponent_id", AT_posint, true);
+
+          $this->game->leekChooseOpponent($opponent_id);
+          self::ajaxResponse();
+      }          
+          
+      public function leekTakeCard() {
+          self::setAjaxMode();
+          $take_card = self::getArg("take_card", AT_bool, true);
+
+          $this->game->leekTakeCard($take_card);
+          self::ajaxResponse();
+      }          
   }
   
 
