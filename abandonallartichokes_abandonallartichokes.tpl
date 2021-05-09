@@ -14,48 +14,29 @@ var jstpl_fake_card = "<div id=\"${id}\" class=\"stockitem\" style=\"top:${top}p
 
 <div id="table">
      <div id="garden_area">
-       <!-- BEGIN garden_area -->
-       {DESCRIPTION}
        <div id="garden_row"></div>
-       <!-- END garden_area -->
      </div>
      <div id="common_area" class="flex_row">
        <div id="played_card_area">
-	 <!-- BEGIN played_card_area -->
-	 {DESCRIPTION}
-	 <div id="played_card"></div>
-	 <!-- END played_card_area -->
+           <div id="played_card"></div>
        </div>
        <div id="displayed_card_area">
-	 <!-- BEGIN displayed_card_area -->
-	 {DESCRIPTION}
-	 <div id="displayed_card"></div>
-	 <!-- END displayed_card_area -->
+	        <div id="displayed_card"></div>
        </div>
        <div id="compost_area">
-	 <!-- BEGIN compost_area -->
-	 {DESCRIPTION}
-	 <div id="compost"></div>
-	 <!-- END compost_area -->
+	         <div id="compost"></div>
        </div>
      </div>
      <div id="hand_area">
-       <!-- BEGIN hand_area -->
-       {DESCRIPTION}
        <div id="hand"></div>
-       <!-- END hand_area -->
      </div>
      <div id="player_area" class="flex_row">
-       <!-- BEGIN player_area -->
        <div id="draw_pile_area">
-	 {DESCRIPTION_DECK}
-	 <div id="deck"></div>
+	        <div id="deck"></div>
        </div>
        <div id="discard_area">
-	 {DESCRIPTION_DISCARD}
-	 <div id="discard"></div>
+	        <div id="discard"></div>
        </div>
-       <!-- END player_area -->
      </div>
 </div>
 

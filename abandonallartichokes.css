@@ -67,13 +67,17 @@
     }
 */
 
+:root {
+    --garden: #3bc83b;
+    --cardBack: 172, 203, 70;
+}
 
 /***** GENERAL LAYOUT ****/
 #table {
     padding: 1em;
 }
 
-#table > div{
+#table > div {
     margin-bottom: 1em;
 }
 
@@ -84,6 +88,13 @@
 
 .label {
     margin-right: 5px;
+}
+
+#garden_area {
+    background-color: var(--garden);
+    padding: 10px 0 10px 55px;
+    border-radius: 10px;
+    max-width: 780px;
 }
 
 /***** PLAYER PANEL ****/
@@ -107,8 +118,8 @@
 }
 
 .deck_face_down {
-    box-shadow: 3px 3px 0 #accb46,
+    box-shadow: 3px 3px 0 rgba(var(--cardBack)),
     4px 4px 0 black,
-    5px 5px 0 #accb46,
+    5px 5px 0 rgba(var(--cardBack)),
     6px 6px 0 black;
 }
