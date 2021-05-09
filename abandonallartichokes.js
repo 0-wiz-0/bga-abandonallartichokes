@@ -389,6 +389,9 @@ function (dojo, declare) {
 	notif_refilledGardenRow: function(notification) {
 	    console.log(this.Notification.RefilledGardenRow + ' notification');
 	    console.log(notification);
+	    if (notification.args.new_cards.length >= 5) {
+		this.stock[this.Stock.GardenRow].removeAll();
+	    }
 	    for (var card of notification.args.new_cards) {
 		this.stock[this.Stock.GardenRow].addToStockWithId(card.type, card.id);
 	    }

@@ -111,7 +111,7 @@ class AbandonAllArtichokes extends Table
                 //$cards[] = array('type' => $vegetable_id, 'type_arg' => 0, 'nbr' => 6);
                 $cards[] = array('type' => VEGETABLE_CARROT, 'type_arg' => 0, 'nbr' => 6);
                 $cards[] = array('type' => VEGETABLE_POTATO, 'type_arg' => 0, 'nbr' => 6);
-                $cards[] = array('type' => VEGETABLE_LEEK, 'type_arg' => 0, 'nbr' => 6);
+                //                $cards[] = array('type' => VEGETABLE_LEEK, 'type_arg' => 0, 'nbr' => 6);
             }
 
         }
@@ -121,15 +121,16 @@ class AbandonAllArtichokes extends Table
         $i = 0;
         foreach ($players as $player_id => $player)
         {
-            $get_id = function($n) { return $n['id']; };
             $player_artichokes = array_slice($artichokes, 10 * $i, 10);
-            $artichoke_ids = array_map($get_id, $player_artichokes);
+            $artichoke_ids = array_map(function($n) { return $n['id']; }, $player_artichokes);
             $this->cards->moveCards($artichoke_ids, $this->player_deck($player_id), 0);
             $i++;
         }
 
         // garden row
         $this->cards->shuffle(STOCK_GARDEN_STACK);
+        // TODO
+        // $this->refreshGardenRow();
         $this->cards->pickCardsForLocation(5, STOCK_GARDEN_STACK, STOCK_GARDEN_ROW);
         // player hands
         foreach ($players as $player_id => $player) {
@@ -220,21 +221,8 @@ class AbandonAllArtichokes extends Table
         }
 
         // refill garden row
-        $row_before = $this->cards->getCardsInLocation(STOCK_GARDEN_ROW);
-        // This condition should always be true
-        if (count($row_before) < 5) {
-            $this->cards->pickCardsForLocation(5 - count($row_before), STOCK_GARDEN_STACK, STOCK_GARDEN_ROW);
-        }
-        $row_after = $this->cards->getCardsInLocation(STOCK_GARDEN_ROW);
-        $new_cards = array();
-        foreach ($row_after as $key => $value) {
-            if (!array_key_exists($key, $row_before)) {
-                $new_cards[] = $value;
-            }
-        }
+        $new_cards = $this->refreshGardenRow();
         self::notifyAllPlayers(NOTIFICATION_REFILLED_GARDEN_ROW, '', array (
-            'before' => $row_before,
-            'after' => $row_after,
             'new_cards' => $new_cards,
         ));
 
@@ -244,6 +232,44 @@ class AbandonAllArtichokes extends Table
         self::setGameStateInitialValue(GAME_STATE_CARDS_PLAYED_THIS_TURN, 0);
 
         $this->gamestate->nextState(STATE_HARVEST);
+    }
+
+    function refreshGardenRow() {
+        $finished = false;
+        $had_to_reshuffle = false;
+        $row_before = $this->cards->getCardsInLocation(STOCK_GARDEN_ROW);
+        while (!$finished) {
+            $finished = true;
+            $count = $this->cards->countCardInLocation(STOCK_GARDEN_ROW);
+            if ($count < 5) {
+                $this->cards->pickCardsForLocation(5 - $count, STOCK_GARDEN_STACK, STOCK_GARDEN_ROW);
+            }
+            $row_after = $this->cards->getCardsInLocation(STOCK_GARDEN_ROW);
+            $counts = array_count_values(array_column($row_after, 'type'));
+            $this->notify_all(NOTIFICATION_UPDATE_COUNTERS , '', null, array ( 'counts' => $counts ));
+            foreach ($counts as $type => $count) {
+                if ($count >= 4) {
+                    $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('4 or more vegetables of the same type during refresh, replacing garden row'));
+                    $card_ids = array_map(function($n) { return $n['id']; }, $this->cards->getCardsInLocation(STOCK_GARDEN_ROW));
+                    $this->cards->moveCards($card_ids, STOCK_GARDEN_STACK);
+                    $this->cards->shuffle(STOCK_GARDEN_STACK);
+                    $had_to_reshuffle = true;
+                    $finished = false;
+                    break;
+                }
+            }
+        }
+        if ($had_to_reshuffle) {
+            $new_cards_object = $this->cards->getCardsInLocation(STOCK_GARDEN_ROW);
+            return array_values($new_cards_object);
+        }
+        $new_cards = [];
+        foreach ($row_after as $key => $value) {
+            if (!array_key_exists($key, $row_before)) {
+                array_push($new_cards, $value);
+            }
+        }
+        return $new_cards;
     }
 
     function harvestCard($id) {
