@@ -255,7 +255,7 @@ class AbandonAllArtichokes extends Table
 
         $this->cards->moveCard($id, STOCK_HAND, self::getCurrentPlayerId());
 
-        $this->notify_all(NOTIFICATION_CARD_MOVED, '${player_name} harvested ${vegetable}', $card, array(
+        $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} harvests ${vegetable}'), $card, array(
             'destination' => STOCK_HAND,
             'destination_arg' => self::getCurrentPlayerId(),
         ));
@@ -265,7 +265,7 @@ class AbandonAllArtichokes extends Table
 
     function pass() {
         $this->gamestate->nextState(STATE_NEXT_PLAYER);
-        self::notifyAllPlayers(NOTIFICATION_MESSAGE, clienttranslate('${player_name} passed.'), array(
+        self::notifyAllPlayers(NOTIFICATION_MESSAGE, clienttranslate('${player_name} ends turn'), array(
             'player_name' => self::getActivePlayerName(),
         ));
     }
@@ -287,6 +287,8 @@ class AbandonAllArtichokes extends Table
         case VEGETABLE_POTATO:
             $next_state = $this->playPotato($id);
             break;
+        case VEGETABLE_ARTICHOKE:
+            throw new feException(self::_("Artichokes can't be played"), true);
         default:
             throw new feException(self::_("This vegetable is not supported yet"), true);
         }
@@ -323,18 +325,18 @@ class AbandonAllArtichokes extends Table
         $this->cards->moveCard($id, STOCK_PLAYED_CARD);
         $card = $this->cards->getCard($id);
 
-        $this->notify_all(NOTIFICATION_CARD_MOVED, '${player_name} played ${vegetable}', $card, array(
+        $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} plays ${vegetable}'), $card, array(
                 'origin' => STOCK_HAND,
                 'origin_arg' => self::getCurrentPlayerId(),
                 'destination' => STOCK_PLAYED_CARD,
         ));
         // compost them
         $this->cards->moveCard($artichoke_1['id'], STOCK_COMPOST);
-        $this->notify_all(NOTIFICATION_CARD_MOVED, '${player_name} composted ${vegetable}', $artichoke_1, array( 'destination' => STOCK_COMPOST ));
+        $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} composts ${vegetable}'), $artichoke_1, array( 'destination' => STOCK_COMPOST ));
         $this->cards->moveCard($artichoke_2['id'], STOCK_COMPOST);
-        $this->notify_all(NOTIFICATION_CARD_MOVED, '${player_name} composted ${vegetable}', $artichoke_2, array( 'destination' => STOCK_COMPOST ));
+        $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} composts ${vegetable}'), $artichoke_2, array( 'destination' => STOCK_COMPOST ));
         $this->cards->moveCard($card['id'], STOCK_COMPOST);
-        $this->notify_all(NOTIFICATION_CARD_MOVED, '${player_name} composted ${vegetable}', $card, array( 'destination' => STOCK_COMPOST ));
+        $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} composts ${vegetable}'), $card, array( 'destination' => STOCK_COMPOST ));
 
         return STATE_NEXT_PLAYER;
     }
@@ -358,14 +360,14 @@ class AbandonAllArtichokes extends Table
 
         $this->cards->moveCard($id, STOCK_PLAYED_CARD);
         $played_card = $this->cards->getCard($id);
-        $this->notify_all(NOTIFICATION_CARD_MOVED, '${player_name} played ${vegetable}', $played_card, array(
+        $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} plays ${vegetable}'), $played_card, array(
             'origin' => STOCK_HAND,
             'origin_arg' => self::getCurrentPlayerId(),
             'destination' => STOCK_PLAYED_CARD,
         ));
 
         if (count($targets) == 1) {
-            $this->notify_all(NOTIFICATION_MESSAGE, '[automatic] Only one valid target player for ${vegetable}', $played_card);
+            $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('[automatic] Only one valid target player for ${vegetable}'), $played_card);
             $target = array_pop($targets);
             $this->gamestate->nextState(STATE_LEEK_CHOOSE_OPPONENT);
             $this->leekChooseOpponent($target);
@@ -382,7 +384,7 @@ class AbandonAllArtichokes extends Table
         }
 
         $players = self::loadPlayersBasicInfos();
-        $this->notify_all(NOTIFICATION_CARD_MOVED, '${player_name} revealed ${vegetable} from the deck of ${opponent_name}', $picked_card, array(
+        $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} reveals ${vegetable} from the deck of ${opponent_name}'), $picked_card, array(
             'origin' => STOCK_DECK,
             'origin_arg' => $opponent_id,
             'destination' => STOCK_DISPLAYED_CARD,
@@ -403,7 +405,7 @@ class AbandonAllArtichokes extends Table
         $player_id = self::getCurrentPlayerId();
         if ($take_card) {
             $picked_card = $this->cards->pickCard(STOCK_DISPLAYED_CARD, $player_id);
-            $this->notify_all(NOTIFICATION_CARD_MOVED, '${player_name} took ${vegetable}', $picked_card, array(
+            $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} takes ${vegetable}'), $picked_card, array(
                 'origin' => STOCK_DISPLAYED_CARD,
                 'destination' => STOCK_HAND,
                 'destination_arg' => $player_id
@@ -411,7 +413,7 @@ class AbandonAllArtichokes extends Table
         } else {
             $card = array_pop($cards);
             $this->cards->moveCard($card['id'], $this->player_discard($opponent_id));
-            $this->notify_all(NOTIFICATION_CARD_MOVED, '${player_name} declined to take ${vegetable}', $card, array(
+            $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} declines to take ${vegetable}'), $card, array(
                 'origin' => STOCK_DISPLAYED_CARD,
                 'destination' => STOCK_DISCARD,
                 'destination_arg' => $opponent_id,
@@ -424,7 +426,7 @@ class AbandonAllArtichokes extends Table
         }
         $played_card = array_pop($played_cards);
         $this->cards->moveCard($played_card['id'], $this->player_discard($player_id));
-        $this->notify_all(NOTIFICATION_CARD_MOVED, '${player_name} discarded ${vegetable}', $played_card, array(
+        $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} discards ${vegetable}'), $played_card, array(
             'origin' => STOCK_PLAYED_CARD,
             'destination' => STOCK_DISCARD,
             'destination_arg' => $player_id,
@@ -445,13 +447,13 @@ class AbandonAllArtichokes extends Table
 
         $this->cards->moveCard($id, STOCK_PLAYED_CARD);
         $played_card = $this->cards->getCard($id);
-        $this->notify_all(NOTIFICATION_CARD_MOVED, '${player_name} played ${vegetable}', $played_card, array(
+        $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} plays ${vegetable}'), $played_card, array(
             'origin' => STOCK_HAND,
             'origin_arg' => self::getCurrentPlayerId(),
             'destination' => STOCK_PLAYED_CARD,
         ));
 
-        $this->notify_all(NOTIFICATION_CARD_MOVED, '${player_name} revealed ${vegetable} from their deck', $picked_card, array(
+        $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} reveals ${vegetable} from their deck'), $picked_card, array(
             'origin' => STOCK_DECK,
             'origin_arg' => self::getCurrentPlayerId(),
             'destination' => STOCK_DISPLAYED_CARD,
@@ -459,13 +461,13 @@ class AbandonAllArtichokes extends Table
 
         if ($picked_card['type'] == VEGETABLE_ARTICHOKE) {
             $this->cards->moveCard($picked_card['id'], STOCK_COMPOST);
-            $this->notify_all(NOTIFICATION_CARD_MOVED, '${player_name} composted ${vegetable}', $picked_card, array( 'destination' => STOCK_COMPOST ));
+            $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} composts ${vegetable}'), $picked_card, array( 'destination' => STOCK_COMPOST ));
         } else {
             $this->cards->moveCard($picked_card['id'], $this->player_discard($player_id));
-            $this->notify_all(NOTIFICATION_CARD_MOVED, '${player_name} discarded ${vegetable}', $picked_card, array( 'destination' => STOCK_DISCARD, 'destination_arg' => $player_id ));
+            $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} discards ${vegetable}'), $picked_card, array( 'destination' => STOCK_DISCARD, 'destination_arg' => $player_id ));
         }
         $this->cards->moveCard($played_card['id'], $this->player_discard($player_id));
-        $this->notify_all(NOTIFICATION_CARD_MOVED, '${player_name} discarded ${vegetable}', $played_card, array( 'destination' => STOCK_DISCARD, 'destination_arg' => $player_id ));
+        $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} discards ${vegetable}'), $played_card, array( 'destination' => STOCK_DISCARD, 'destination_arg' => $player_id ));
 
         return STATE_PLAY_CARD;
     }
@@ -691,9 +693,9 @@ class AbandonAllArtichokes extends Table
             $arguments['counters'][$player_id] = $this->get_counters($player_id);
         }
         if ($all) {
-            self::notifyAllPlayers($type, clienttranslate($message), $arguments);
+            self::notifyAllPlayers($type, $message, $arguments);
         } else {
-            self::notifyPlayer($arguments['player_id'], $type, clienttranslate($message), $arguments);
+            self::notifyPlayer($arguments['player_id'], $type, $message, $arguments);
         }
     }
 

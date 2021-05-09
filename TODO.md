@@ -1,4 +1,6 @@
 - this.Stock is ugly
+- refresh garden row if 4 same vegetables
+- zombie player
 - missing vegetables
   - beet
   - broccoli
@@ -16,3 +18,5 @@
 - check usage of getCurrentPlayerId vs. getActivePlayerId
 - tooltips (translated card texts)
 - perhaps: auto pass if no playable cards left? in general, hard, but perhaps for artichoke-only hands
+- use BgaUserExceptions
+- animation sometimes looks like multiple cards even if there is only one
