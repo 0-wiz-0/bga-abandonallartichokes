@@ -53,6 +53,8 @@ if (!defined('STATE_END_GAME')) { // ensure this block is only invoked once, sin
    define("STATE_NEXT_PLAYER", 2);
    define("STATE_HARVEST", 3);
    define("STATE_PLAY_CARD", 4);
+   define("STATE_LEEK_CHOOSE_OPPONENT", 5);
+   define("STATE_LEEK_TAKE_CARD", 6);
    define("STATE_END_GAME", 99);
 }
  
@@ -87,12 +89,34 @@ $machinestates = array(
     STATE_PLAY_CARD => array(
         "name" => "playCard",
         "description" => clienttranslate('${actplayer} must play a card or pass'),
-        "descriptionmyturn" => clienttranslate('${you} must play a card  or pass'),
+        "descriptionmyturn" => clienttranslate('${you} must play a card or pass'),
         "type" => "activeplayer",
-        "possibleactions" => array("playCard", "pass"), // TODO
-        "transitions" => array(STATE_PLAY_CARD => STATE_PLAY_CARD, STATE_NEXT_PLAYER => STATE_NEXT_PLAYER),
+        "possibleactions" => array("playCard", "pass"),
+        "transitions" => array(STATE_PLAY_CARD => STATE_PLAY_CARD,
+                               STATE_NEXT_PLAYER => STATE_NEXT_PLAYER,
+                               STATE_LEEK_CHOOSE_OPPONENT => STATE_LEEK_CHOOSE_OPPONENT,
+                               STATE_LEEK_TAKE_CARD => STATE_LEEK_TAKE_CARD),
     ),
-/*
+
+    STATE_LEEK_CHOOSE_OPPONENT => array(
+        "name" => "leekChooseOpponent",
+        "description" => clienttranslate('${actplayer} must choose an opponent'),
+        "descriptionmyturn" => clienttranslate('${you} must choose an opponent'),
+        "type" => "activeplayer",
+        "possibleactions" => array("leekChooseOpponent"),
+        "transitions" => array(STATE_LEEK_TAKE_CARD => STATE_LEEK_TAKE_CARD),
+    ),
+
+    STATE_LEEK_TAKE_CARD => array(
+        "name" => "leekTakeCard",
+        "description" => clienttranslate('${actplayer} must take card or decline to take it'),
+        "descriptionmyturn" => clienttranslate('${you} must take card or decline to take it'),
+        "type" => "activeplayer",
+        "possibleactions" => array("leekTakeCard"),
+        "transitions" => array(STATE_PLAY_CARD => STATE_PLAY_CARD),
+    ),
+
+    /*
     Examples:
     
     2 => array(

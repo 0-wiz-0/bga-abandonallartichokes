@@ -93,7 +93,12 @@
         ) );
         $this->page->begin_block("abandonallartichokes_abandonallartichokes", "hand_area");
         $this->page->insert_block("hand_area", array(
-            "DESCRIPTION" => self::_("This is the player hand."),
+            "DESCRIPTION" => self::_("This is the player's hand."),
+        ) );
+        $this->page->begin_block("abandonallartichokes_abandonallartichokes", "player_area");
+        $this->page->insert_block("player_area", array(
+            "DESCRIPTION_DECK" => self::_("This is the player's draw pile."),
+            "DESCRIPTION_DISCARD" => self::_("This is the player's discard pile."),
         ) );
 
 

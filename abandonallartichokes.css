@@ -77,7 +77,7 @@
     margin-bottom: 1em;
 }
 
-#common_area {
+.flex_row {
     display: flex;
     justify-content: space-between;
 }
@@ -92,3 +92,6 @@
     margin-right: 5px;
 }
 
+.scale-image {
+    background-size: contain;
+}

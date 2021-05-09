@@ -26,8 +26,8 @@ function (dojo, declare) {
 	constructor: function() {
             console.log('abandonallartichokes constructor');
 
-            this.cardwidth = 150;
-            this.cardheight = 200;
+            this.cardwidth = 140;
+            this.cardheight = 210;
 	    // the values must be the same in
 	    // - gamedatas
 	    // - HTML *.tpl file (div id)
@@ -38,26 +38,28 @@ function (dojo, declare) {
 		GardenStack: 'garden_stack',
 		GardenRow: 'garden_row',
 		Hand: 'hand',
-		DeckPrefix: 'deck_',
-		DiscardPrefix: 'discard_',
+		Deck: 'deck',
+		Discard: 'discard',
+		DisplayedCard: 'displayed_card',
 		PlayedCard: 'played_card',
 		Compost: 'compost',
 	    };
 	    // this needs to match the names in material.inc.php
 	    this.Notification = {
-		PlayedCard: "played_card",
-		HarvestedCard: "harvested_card",
-		CompostedCard: "composted_card",
+		CardMoved: "card_moved",
 		DrewHand: "drew_hand",
 		RefilledGardenRow: "refilled_garden_row",
-		Info: "info",
+		UpdateCounters: "update_counters",
 	    };
 	    // this needs to match the values in abandonallartichokes.action.php
 	    this.AjaxActions = {
 		Harvest: 'harvestCard',
+		LeekChooseOpponent: 'leekChooseOpponent',
+		LeekTakeCard: 'leekTakeCard',
 		PlayCard: 'playCard',
 		Pass: 'pass',
 	    };
+	    this.CardBackId = 1;
         },
         /*
             setup:
@@ -80,51 +82,53 @@ function (dojo, declare) {
 
 	    this.counter = {};
             // Setting up player boards
-            for( var player_id in gamedatas.players )
+            for (var player_id in gamedatas.players)
             {
                 var player = gamedatas.players[player_id];
 		var player_board_div = $('player_board_' + player_id);
 		dojo.place(this.format_block('jstpl_player_board', { id: player_id }), player_board_div);
 
 		this.counter[player_id] = {};
-		this.counter[player_id]['hand'] = new ebg.counter();
-		this.counter[player_id]['hand'].create("hand_" + player_id);
-		this.counter[player_id]['hand'].setValue(gamedatas.hand_count);
-		this.counter[player_id]['deck'] = new ebg.counter();
-		this.counter[player_id]['deck'].create("deck_" + player_id);
-		this.counter[player_id]['deck'].setValue(gamedatas.deck_count);
-		this.counter[player_id]['discard'] = new ebg.counter();
-		this.counter[player_id]['discard'].create("discard_" + player_id);
-		this.counter[player_id]['discard'].setValue(gamedatas.discard_count);
+		this.createCounter(player_id, 'hand');
+		this.createCounter(player_id, 'deck');
+		this.createCounter(player_id, 'discard');
             }
 
 	    const stock_constructor = [
 		{ name: this.Stock.GardenRow, callback: 'onGardenRowSelect', selectionMode: 1 },
-		{ name: this.Stock.Hand, callback: 'onPlayerHandSelectionChanged', selectionMode: 1 },
+		{ name: this.Stock.Hand, callback: 'onPlayerHandSelect', selectionMode: 1 },
+		{ name: this.Stock.DisplayedCard, callback: 'onDisplayedCardSelect', selectionMode: 0 },
 		{ name: this.Stock.PlayedCard, callback: null, selectionMode: 0 },
+		{ name: this.Stock.Discard, callback: null, selectionMode: 0 },
 		{ name: this.Stock.Compost, callback: null, selectionMode: 0 },
 	    ];
 
 	    this.stock = new Object();
 	    for (var stock_entry of stock_constructor) {
-		console.log(this.stock);
-		console.log(stock_entry);
 		this.stock[stock_entry.name] = this.setupCardStocks(stock_entry.name, stock_entry.callback);
 		this.stock[stock_entry.name].setSelectionMode(stock_entry.selectionMode);
+		this.stock[stock_entry.name].extraClasses='scale-image';
 		this.addCardsToStock(this.stock[stock_entry.name], this.gamedatas[stock_entry.name]);
 	    }
+	    // draw deck is special, we only show card backs
+	    this.stock[this.Stock.Deck] = new ebg.stock();
+	    this.stock[this.Stock.Deck].create(this, $(this.Stock.Deck), this.cardwidth, this.cardheight);
+	    this.stock[this.Stock.Deck].setSelectionMode(0); 
+	    this.stock[this.Stock.Deck].extraClasses='scale-image';
+            this.stock[this.Stock.Deck].addItemType(this.CardBackId, this.CardBackId, g_gamethemeurl + 'img/back.jpg', 0);
+	    this.updateDecks();
 
-	    console.log("stock");
-	    console.log(this.stock);
-            // TODO: Set up your game interface here, according to "gamedatas"
-
-
-            // Setup game notifications to handle (see "setupNotifications" method below)
             this.setupNotifications();
 
+	    console.log(this);
             console.log( "Ending game setup" );
         },
 
+	createCounter: function(player_id, name) {
+	    this.counter[player_id][name] = new ebg.counter();
+	    this.counter[player_id][name].create(name + "_" + player_id);
+	    this.counter[player_id][name].setValue(this.gamedatas.counters[player_id][name]);
+	},
 
         ///////////////////////////////////////////////////
         //// Game & client states
@@ -134,9 +138,10 @@ function (dojo, declare) {
         setupCardStocks: function(id, selectionChangeFunctionName) {
             var stock = new ebg.stock();
             stock.create(this, $(id), this.cardwidth, this.cardheight);
-            for (var vegetable_id = 1; vegetable_id < 12; vegetable_id++) {
+            for (var vegetable_id = 1; vegetable_id < 11; vegetable_id++) {
                 stock.addItemType(vegetable_id, vegetable_id, g_gamethemeurl + 'img/' + vegetable_id + '.png', vegetable_id);
             }
+	    stock.addItemType(11, 11, g_gamethemeurl + 'img/artichoke1.jpg', 11);
 	    if (selectionChangeFunctionName != null) {
 		dojo.connect(stock, 'onChangeSelection', this, selectionChangeFunctionName);
 	    }
@@ -151,7 +156,21 @@ function (dojo, declare) {
             });
 	},
 
-	onPlayerHandSelectionChanged: function(control_name, item_id) {
+	onDisplayedCardSelect: function(control_name, item_id) {
+	    var items = this.stock[this.Stock.DisplayedCard].getSelectedItems();
+	    debugger
+	    if (items.length > 0) {
+                //if( this.checkAction('playCard', true)) {
+                //var card_id = items[0].id;
+		//this.changeState(this.AjaxActions.PlayCard, { id: card_id });
+                //}
+		//else {
+		this.showMessage(_("You can't select cards from the display area now."), "error");
+                this.stock[this.Stock.DisplayedCard].unselectAll();
+	    }
+	},
+
+	onPlayerHandSelect: function(control_name, item_id) {
 	    var items = this.stock[this.Stock.Hand].getSelectedItems();
 
 	    if (items.length > 0) {
@@ -245,21 +264,47 @@ function (dojo, declare) {
 		case this.AjaxActions.PlayCard:
 		    this.addActionButton('pass', _('Pass'), 'onPass');
 		    break;
+		case this.AjaxActions.LeekChooseOpponent:
+		    for (var player_id in this.gamedatas.players) {
+			if (player_id == this.player_id) {
+			    continue;
+			}
+			if (!this.hasCards(player_id)) {
+			    continue;
+			}
+			this.addActionButton('player_' + this.gamedatas.players[player_id].player_no,
+					     _('Choose ') + this.gamedatas.players[player_id].name,
+					     this.onLeekChooseOpponent.bind(this, player_id));
+		    }
+		    break;
+		case this.AjaxActions.LeekTakeCard:
+		    this.addActionButton('leekTake', _('Take card'), 'onLeekTake');
+		    this.addActionButton('leekLeave', _('Give card back'), 'onLeekDecline');
+		    break;
 		}
 	    }
         },
 
-        ///////////////////////////////////////////////////
-        //// Utility methods
+	onLeekChooseOpponent: function(opponent_id) {
+	    this.changeState(this.AjaxActions.LeekChooseOpponent, { opponent_id: opponent_id });
+	},
 
-        /*
+	hasCards: function(player_id) {
+	    return this.counter[player_id]['deck'].getValue() > 0 || this.counter[player_id]['discard'].getValue() > 0;
+	},
 
-            Here, you can defines some utility methods that you can use everywhere in your javascript
-            script.
+	onPass: function() {
+	    this.changeState(this.AjaxActions.Pass);
+	},
 
-        */
+	onLeekTake: function() {
+	    this.changeState(this.AjaxActions.LeekTakeCard, { take_card: true });
+	},
 
-
+	onLeekDecline: function() {
+	    this.changeState(this.AjaxActions.LeekTakeCard, { take_card: false });
+	},
+	
         ///////////////////////////////////////////////////
         //// Player's action
 
@@ -309,48 +354,26 @@ function (dojo, declare) {
         */
 
 
-        ///////////////////////////////////////////////////
-        //// Reaction to cometD notifications
-
-        /*
-            setupNotifications:
-
-            In this method, you associate each of your game notifications with your local method to handle it.
-
-            Note: game notification names correspond to "notifyAllPlayers" and "notifyPlayer" calls in
-                  your abandonallartichokes.game.php file.
-
-        */
+	// Notifications
         setupNotifications: function()
         {
             console.log( 'notifications subscriptions setup' );
 
-            // TODO: here, associate your game notifications with local methods
-
-            // Example 1: standard notification handling
-            // dojo.subscribe( 'cardPlayed', this, "notif_cardPlayed" );
-
-            // Example 2: standard notification handling + tell the user interface to wait
-            //            during 3 seconds after calling the method in order to let the players
-            //            see what is happening in the game.
-            // dojo.subscribe( 'cardPlayed', this, "notif_cardPlayed" );
-            // this.notifqueue.setSynchronous( 'cardPlayed', 3000 );
-            //
-	    dojo.subscribe(this.Notification.CompostedCard, this, "notif_compostedCard");
-	    // delay shortly after each card composted
-	    this.notifqueue.setSynchronous(this.Notification.CompostedCard, 500);
+	    dojo.subscribe(this.Notification.CardMoved, this, "notif_cardMoved");
 	    dojo.subscribe(this.Notification.DrewHand, this, "notif_drewHand");
-	    dojo.subscribe(this.Notification.HarvestedCard, this, "notif_harvestedCard");
-	    dojo.subscribe(this.Notification.PlayedCard, this, "notif_playedCard");
-	    // delay a bit after each card played
-	    this.notifqueue.setSynchronous(this.Notification.PlayedCard, 800);
 	    dojo.subscribe(this.Notification.RefilledGardenRow, this, "notif_refilledGardenRow");
+	    dojo.subscribe(this.Notification.UpdateCounters, this, "notif_updateCounters");
+
+	    this.notifqueue.setSynchronous(this.Notification.CardMoved, 800);
         },
 
-	notif_compostedCard: function(notification) {
-	    console.log(this.Notification.CompostedCard + ' notification');
+	notif_cardMoved: function(notification) {
+	    console.log(this.Notification.CardMoved + ' notification');
 	    console.log(notification);
-	    this.showCardPlay(notification.args.player_id, notification.args.origin, this.Stock.Compost, notification.args.card, notification.args.counters);
+	    this.showCardPlay(notification.args.player_id,
+			      notification.args.origin, notification.args.origin_arg,
+			      notification.args.destination, notification.args.destination_arg,
+			      notification.args.card, notification.args.counters);
 	},
 
 	notif_drewHand: function(notification) {
@@ -358,20 +381,8 @@ function (dojo, declare) {
 	    console.log(notification);
 	    this.stock[this.Stock.Hand].removeAll();
 	    this.addCardsToStock(this.stock[this.Stock.Hand], notification.args.cards);
-	    this.updateCounter(notification.args.player_id, notification.args.counters);
+	    this.updateCounter(notification.args.counters);
 	},
-
-	notif_harvestedCard: function(notification) {
-	    console.log(this.Notification.HarvestedCard + ' notification');
-	    console.log(notification);
-	    this.showCardPlay(notification.args.player_id, notification.args.origin, this.Stock.Hand, notification.args.card, notification.args.counters);
-	},
-
-	notif_playedCard: function(notification) {
-	    console.log(this.Notification.PlayedCard + ' notification');
-            console.log(notification);
-	    this.showCardPlay(notification.args.player_id, notification.args.origin, this.Stock.PlayedCard, notification.args.card, notification.args.counters);
-        },
 
 	notif_refilledGardenRow: function(notification) {
 	    console.log(this.Notification.RefilledGardenRow + ' notification');
@@ -381,9 +392,13 @@ function (dojo, declare) {
 	    }
 	},
 
-	onPass: function() {
-	    this.changeState(this.AjaxActions.Pass);
+	notif_updateCounters: function(notification) {
+	    console.log(this.Notification.UpdateCounters + ' notification');
+	    console.log(notification);
+	    this.updateCounter(notification.args.counters);
 	},
+
+	// Utility functions
 
 	changeState: function(targetState, args = {}) {
 	    args.lock = true;
@@ -391,44 +406,92 @@ function (dojo, declare) {
 			  this, function(result) {  }, function (is_error) { } );
 	},
 
-	showCardPlay: function(player_id, from, to, card, counters) {
-	    if (to == this.Stock.Compost) {
-		// only last card visible
+	showCardPlay: function(player_id, from, from_arg, to, to_arg, card, counters) {
+	    if (to == this.Stock.Compost || (to == this.Stock.Discard && to_arg == this.player_id)) {
+		// only last card of compost visible
 		this.stock[to].removeAll();
 	    }
-	    if (this.player_id == player_id) {
-		this.stock[to].addToStockWithId(card.type, card.id, from + '_item_' + card.id);
-		this.stock[from].removeFromStockById(card.id, to);
+
+	    if (this.isVisible(from, from_arg)) {
+		if (this.isVisible(to, to_arg)) {
+		    this.moveVisibleToVisible(from, to, card);
+		} else {
+		    this.moveVisibleToPanel(from, player_id, card);
+		}
 	    } else {
-		// not my turn
-		switch (to) {
-		case this.Stock.Hand:
-		    this.slideToObject(from + '_item_' + card.id, 'player_board_' + player_id);
-		    this.stock[from].removeFromStockById(card.id, 'player_board_' + player_id);
-		    break;
-		case this.Stock.PlayedCard:
-		    this.stock[to].addToStockWithId(card.type, card.id, 'player_board_' + player_id);
-		    break;
-		case this.Stock.Compost:
-		    if (from == this.Stock.PlayedCard) {
-			this.stock[to].addToStockWithId(card.type, card.id, from + '_item_' + card.id);
-			this.stock[from].removeFromStockById(card.id, to);
-		    } else {
-			this.stock[to].addToStockWithId(card.type, card.id, 'player_board_' + player_id);
-		    }
-		    break;
+		if (this.isVisible(to, to_arg)) {
+		    this.movePanelToVisible(player_id, to, card);
 		}
 	    }
-	    this.updateCounter(player_id, counters);
+		    
+	    this.updateCounter(counters);
 	},
 
-	updateCounter: function(player_id, counters) {
-	    if (counters != null) {
-		this.counter[player_id]['hand'].setValue(counters.hand);
-		this.counter[player_id]['deck'].setValue(counters.deck);
-		this.counter[player_id]['discard'].setValue(counters.discard);
+	isVisible: function(location, location_arg) {
+	    switch (location) {
+	    case this.Stock.GardenStack:
+		return false;
+	    case this.Stock.GardenRow:
+	    case this.Stock.DisplayedCard:
+	    case this.Stock.PlayedCard:
+	    case this.Stock.Compost:
+		return true;
+	    case this.Stock.Deck:
+	    case this.Stock.Discard:
+	    case this.Stock.Hand:
+		if (location_arg == this.player_id) {
+		    return true;
+		}
+		return false;
+	    default:
+		console.log("unhandled case '" + location + "' in isVisible()");
+		return false;
 	    }
-	}
+	},
+
+	moveVisibleToVisible: function(from, to, card) {
+	    if (from == this.Stock.Deck) {
+		// the draw deck only shows a card back, so we can not move from a specific card
+		// also, we don't have to remove it
+		this.stock[to].addToStockWithId(card.type, card.id, from);
+	    } else {
+		this.stock[to].addToStockWithId(card.type, card.id, from + '_item_' + card.id);
+		this.stock[from].removeFromStockById(card.id, to);
+	    }
+	},
+
+	moveVisibleToPanel: function(from, player_id, card) {
+	    this.slideToObject(from + '_item_' + card.id, 'player_board_' + player_id);
+	    this.stock[from].removeFromStockById(card.id, 'player_board_' + player_id);
+	},
+
+	movePanelToVisible: function(player_id, to, card) {
+	    this.stock[to].addToStockWithId(card.type, card.id, 'player_board_' + player_id);
+	},
+  
+	updateCounter: function(counters) {
+	    for (var player_id in counters) {
+		this.counter[player_id].hand.setValue(counters[player_id].hand);
+		this.counter[player_id].deck.setValue(counters[player_id].deck);
+		this.counter[player_id].discard.setValue(counters[player_id].discard);
+	    }
+	    this.updateDecks();
+	},
+
+	updateDecks: function() {
+	    // hide/show draw deck
+	    if (this.counter[this.player_id].deck.getValue() == 0) {
+		this.stock[this.Stock.Deck].removeAll();
+	    } else {
+		if (this.stock[this.Stock.Deck].count() == 0) {
+		    this.stock[this.Stock.Deck].addToStock(this.CardBackId);
+		}
+	    }
+	    // clean out discard if no cards there
+	    if (this.counter[this.player_id].discard.getValue() == 0) {
+		this.stock[this.Stock.Discard].removeAll();
+	    }
+	},
    });
 });
 
