@@ -129,9 +129,7 @@ class AbandonAllArtichokes extends Table
 
         // garden row
         $this->cards->shuffle(STOCK_GARDEN_STACK);
-        // TODO
-        // $this->refreshGardenRow();
-        $this->cards->pickCardsForLocation(5, STOCK_GARDEN_STACK, STOCK_GARDEN_ROW);
+        $this->refreshGardenRow(false);
         // player hands
         foreach ($players as $player_id => $player) {
             $this->cards->pickCards(5, $this->player_deck($player_id), $player_id);
@@ -221,7 +219,7 @@ class AbandonAllArtichokes extends Table
         }
 
         // refill garden row
-        $new_cards = $this->refreshGardenRow();
+        $new_cards = $this->refreshGardenRow(true);
         self::notifyAllPlayers(NOTIFICATION_REFILLED_GARDEN_ROW, '', array (
             'new_cards' => $new_cards,
         ));
@@ -234,7 +232,7 @@ class AbandonAllArtichokes extends Table
         $this->gamestate->nextState(STATE_HARVEST);
     }
 
-    function refreshGardenRow() {
+    function refreshGardenRow($notify) {
         $finished = false;
         $had_to_reshuffle = false;
         $row_before = $this->cards->getCardsInLocation(STOCK_GARDEN_ROW);
@@ -246,10 +244,11 @@ class AbandonAllArtichokes extends Table
             }
             $row_after = $this->cards->getCardsInLocation(STOCK_GARDEN_ROW);
             $counts = array_count_values(array_column($row_after, 'type'));
-            $this->notify_all(NOTIFICATION_UPDATE_COUNTERS , '', null, array ( 'counts' => $counts ));
             foreach ($counts as $type => $count) {
                 if ($count >= 4) {
-                    $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('4 or more vegetables of the same type during refresh, replacing garden row'));
+                    if ($notify) {
+                        $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('4 or more vegetables of the same type during refresh, replacing garden row'));
+                    }
                     $card_ids = array_map(function($n) { return $n['id']; }, $this->cards->getCardsInLocation(STOCK_GARDEN_ROW));
                     $this->cards->moveCards($card_ids, STOCK_GARDEN_STACK);
                     $this->cards->shuffle(STOCK_GARDEN_STACK);
