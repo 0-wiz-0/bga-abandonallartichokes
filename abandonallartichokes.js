@@ -140,9 +140,9 @@ function (dojo, declare) {
             var stock = new ebg.stock();
             stock.create(this, $(id), this.cardwidth, this.cardheight);
             for (var vegetable_id = 1; vegetable_id < 11; vegetable_id++) {
-                stock.addItemType(vegetable_id, vegetable_id, g_gamethemeurl + 'img/' + vegetable_id + '.png', vegetable_id);
+                stock.addItemType(vegetable_id, vegetable_id, g_gamethemeurl + 'img/' + vegetable_id + '.jpg', vegetable_id);
             }
-	    stock.addItemType(11, 11, g_gamethemeurl + 'img/artichoke1.jpg', 11);
+	    stock.addItemType(11, 11, g_gamethemeurl + 'img/artichoke4.jpg', 11);
 	    if (selectionChangeFunctionName != null) {
 		dojo.connect(stock, 'onChangeSelection', this, selectionChangeFunctionName);
 	    }

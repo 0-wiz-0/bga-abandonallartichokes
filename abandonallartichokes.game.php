@@ -275,7 +275,7 @@ class AbandonAllArtichokes extends Table
         self::checkAction("harvestCard");
         $card = $this->cards->getCard($id);
         if ($card == null || $card['location'] != STOCK_GARDEN_ROW) {
-            throw new feException(self::_("You must select a card from the garden row"), true);
+            throw new BgaUserException(self::_("You must select a card from the garden row"));
         }
 
         $this->cards->moveCard($id, STOCK_HAND, self::getCurrentPlayerId());
@@ -299,7 +299,7 @@ class AbandonAllArtichokes extends Table
         self::checkAction("playCard");
         $card = $this->cards->getCard($id);
         if ($card == null || $card['location'] != STOCK_HAND || $card['location_arg'] != self::getCurrentPlayerId()) {
-            throw new feException(self::_("You must play a card from your hand"), true);
+            throw new BgaUserException(self::_("You must play a card from your hand"));
         }
 
         switch($card['type']) {
@@ -313,9 +313,9 @@ class AbandonAllArtichokes extends Table
             $next_state = $this->playPotato($id);
             break;
         case VEGETABLE_ARTICHOKE:
-            throw new feException(self::_("Artichokes can't be played"), true);
+            throw new BgaUserException(self::_("Artichokes can't be played"));
         default:
-            throw new feException(self::_("This vegetable is not supported yet"), true);
+            throw new BgaUserException(self::_("This vegetable is not supported yet"));
         }
 
         self::incGameStateValue(GAME_STATE_CARDS_PLAYED_THIS_TURN, 1);
@@ -329,7 +329,7 @@ class AbandonAllArtichokes extends Table
         // find artichokes to compost
         $hand = $this->cards->getPlayerHand(self::getCurrentPlayerId());
         if (self::getGameStateValue(GAME_STATE_CARDS_PLAYED_THIS_TURN) > 0) {
-            throw new feException(self::_("You can't play a carrot after playing another card."), true);
+            throw new BgaUserException(self::_("You can't play a carrot after playing another card."));
         }
         $artichoke_1 = null;
         $artichoke_2 = null;
@@ -344,7 +344,7 @@ class AbandonAllArtichokes extends Table
             }
         }
         if ($artichoke_2 == null) {
-            throw new feException(self::_("You must have two artichokes in hand to play a carrot"), true);
+            throw new BgaUserException(self::_("You must have two artichokes in hand to play a carrot"));
         }
 
         $this->cards->moveCard($id, STOCK_PLAYED_CARD);
@@ -380,7 +380,7 @@ class AbandonAllArtichokes extends Table
             }
         }
         if (count($targets) < 1) {
-            throw new feException(self::_("Leek can only be played if an opponent has cards in the deck"), true);
+            throw new BgaUserException(self::_("Leek can only be played if an opponent has cards in the deck"));
         }
 
         $this->cards->moveCard($id, STOCK_PLAYED_CARD);
@@ -405,7 +405,7 @@ class AbandonAllArtichokes extends Table
         self::checkAction("leekChooseOpponent");
         $picked_card = $this->cards->pickCardForLocation($this->player_deck($opponent_id), STOCK_DISPLAYED_CARD);
         if ($picked_card == null) {
-            throw new feException(self::_("Leek can only be played on an opponent with cards in the deck"), true);
+            throw new BgaUserException(self::_("Leek can only be played on an opponent with cards in the deck"));
         }
 
         $players = self::loadPlayersBasicInfos();
@@ -425,7 +425,7 @@ class AbandonAllArtichokes extends Table
         $cards = $this->cards->getCardsInLocation(STOCK_DISPLAYED_CARD);
         $opponent_id = self::getGameStateValue(GAME_STATE_TARGET_PLAYER);
         if (count($cards) != 1) {
-            throw new feException(self::_("Incorrect number of displayed cards for leek"), false);
+            throw new BgaVisibleSystemException(self::_("Incorrect number of displayed cards for leek"));
         }
         $player_id = self::getCurrentPlayerId();
         if ($take_card) {
@@ -447,7 +447,7 @@ class AbandonAllArtichokes extends Table
 
         $played_cards = $this->cards->getCardsInLocation(STOCK_PLAYED_CARD);
         if (count($played_cards) != 1) {
-            throw new feException(self::_("Incorrect number of played cards for leek"), false);
+            throw new BgaVisibleSystemException(self::_("Incorrect number of played cards for leek"));
         }
         $played_card = array_pop($played_cards);
         $this->cards->moveCard($played_card['id'], $this->player_discard($player_id));
@@ -467,7 +467,7 @@ class AbandonAllArtichokes extends Table
         $player_id = self::getCurrentPlayerId();
         $picked_card = $this->cards->pickCardForLocation($this->player_deck($player_id), STOCK_DISPLAYED_CARD);
         if ($picked_card == null) {
-            throw new feException(self::_("You must have cards in your deck to play a potato"), true);
+            throw new BgaUserException(self::_("You must have cards in your deck to play a potato"));
         }
 
         $this->cards->moveCard($id, STOCK_PLAYED_CARD);
@@ -631,7 +631,7 @@ class AbandonAllArtichokes extends Table
             return;
         }
 
-        throw new feException("Zombie mode not supported at this game state: ".$statename);
+        throw new BgaVisibleSystemException("Zombie mode not supported at this game state: ".$statename);
     }
 
 ///////////////////////////////////////////////////////////////////////////////////:

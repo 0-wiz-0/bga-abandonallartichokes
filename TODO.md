@@ -1,6 +1,5 @@
-- this.Stock is ugly
-- refresh garden row if 4 same vegetables
-- zombie player
+Basic Features
+===
 - missing vegetables
   - beet
   - broccoli
@@ -9,14 +8,24 @@
   - onion
   - peas
   - pepper
+- add proper graphics
+
+Nice Features
+===
+- zombie player
 - statistics (final deck contents per type?, perhaps played cards per type?)
-- translations
-- HTML Seiten:
+- tooltips (translated card texts)
+- HTML pages:
   - How to Play
   - Developed by
-- add proper graphics
-- check usage of getCurrentPlayerId vs. getActivePlayerId
-- tooltips (translated card texts)
-- perhaps: auto pass if no playable cards left? in general, hard, but perhaps for artichoke-only hands
-- use BgaUserExceptions
+
+To Investigate
+===
 - animation sometimes looks like multiple cards even if there is only one
+
+Topics
+===
+- translations
+- check usage of getCurrentPlayerId vs. getActivePlayerId
+- more auto play?
+  -auto pass if no playable cards left? in general, hard, but perhaps for artichoke-only hands
