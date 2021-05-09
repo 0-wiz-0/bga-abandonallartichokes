@@ -437,8 +437,6 @@ function (dojo, declare) {
 	    case this.Stock.Compost:
 		return true;
 	    case this.Stock.Deck:
-		// TODO
-		return false;
 	    case this.Stock.Discard:
 	    case this.Stock.Hand:
 		if (location_arg == this.player_id) {
@@ -452,8 +450,14 @@ function (dojo, declare) {
 	},
 
 	moveVisibleToVisible: function(from, to, card) {
-	    this.stock[to].addToStockWithId(card.type, card.id, from + '_item_' + card.id);
-	    this.stock[from].removeFromStockById(card.id, to);
+	    if (from == this.Stock.Deck) {
+		// the draw deck only shows a card back, so we can not move from a specific card
+		// also, we don't have to remove it
+		this.stock[to].addToStockWithId(card.type, card.id, from);
+	    } else {
+		this.stock[to].addToStockWithId(card.type, card.id, from + '_item_' + card.id);
+		this.stock[from].removeFromStockById(card.id, to);
+	    }
 	},
 
 	moveVisibleToPanel: function(from, player_id, card) {
