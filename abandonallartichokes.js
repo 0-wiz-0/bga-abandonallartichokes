@@ -26,8 +26,8 @@ function (dojo, declare) {
 	constructor: function() {
             console.log('abandonallartichokes constructor');
 
-            this.cardwidth = 150;
-            this.cardheight = 200;
+            this.cardwidth = 140;
+            this.cardheight = 210;
 	    // the values must be the same in
 	    // - gamedatas
 	    // - HTML *.tpl file (div id)
@@ -107,13 +107,15 @@ function (dojo, declare) {
 	    for (var stock_entry of stock_constructor) {
 		this.stock[stock_entry.name] = this.setupCardStocks(stock_entry.name, stock_entry.callback);
 		this.stock[stock_entry.name].setSelectionMode(stock_entry.selectionMode);
+		this.stock[stock_entry.name].extraClasses='scale-image';
 		this.addCardsToStock(this.stock[stock_entry.name], this.gamedatas[stock_entry.name]);
 	    }
 	    // draw deck is special, we only show card backs
 	    this.stock[this.Stock.Deck] = new ebg.stock();
 	    this.stock[this.Stock.Deck].create(this, $(this.Stock.Deck), this.cardwidth, this.cardheight);
-	    this.stock[this.Stock.Deck].setSelectionMode(0);
-            this.stock[this.Stock.Deck].addItemType(this.CardBackId, this.CardBackId, g_gamethemeurl + 'img/back.png', 0);
+	    this.stock[this.Stock.Deck].setSelectionMode(0); 
+	    this.stock[this.Stock.Deck].extraClasses='scale-image';
+            this.stock[this.Stock.Deck].addItemType(this.CardBackId, this.CardBackId, g_gamethemeurl + 'img/back.jpg', 0);
 	    this.updateDecks();
 
             this.setupNotifications();
@@ -136,9 +138,10 @@ function (dojo, declare) {
         setupCardStocks: function(id, selectionChangeFunctionName) {
             var stock = new ebg.stock();
             stock.create(this, $(id), this.cardwidth, this.cardheight);
-            for (var vegetable_id = 1; vegetable_id < 12; vegetable_id++) {
+            for (var vegetable_id = 1; vegetable_id < 11; vegetable_id++) {
                 stock.addItemType(vegetable_id, vegetable_id, g_gamethemeurl + 'img/' + vegetable_id + '.png', vegetable_id);
             }
+	    stock.addItemType(11, 11, g_gamethemeurl + 'img/artichoke1.jpg', 11);
 	    if (selectionChangeFunctionName != null) {
 		dojo.connect(stock, 'onChangeSelection', this, selectionChangeFunctionName);
 	    }

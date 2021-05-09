@@ -92,3 +92,6 @@
     margin-right: 5px;
 }
 
+.scale-image {
+    background-size: contain;
+}
