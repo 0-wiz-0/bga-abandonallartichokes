@@ -68,7 +68,7 @@
 */
 
 
-
+/***** GENERAL LAYOUT ****/
 #table {
     padding: 1em;
 }
@@ -82,16 +82,33 @@
     justify-content: space-between;
 }
 
+.label {
+    margin-right: 5px;
+}
+
 /***** PLAYER PANEL ****/
 .deck_board {
     display: flex;
     justify-content: space-around;
 }
 
-.label {
-    margin-right: 5px;
+/***** CUSTOM CARD DESIGN ****/
+.card {
+    background-size: contain;
+    border-radius: 10px;
+    border: 1px grey solid;
 }
 
-.scale-image {
-    background-size: contain;
+.deck_face_up {
+    box-shadow: 3px 3px 0 white,
+    4px 4px 0 black,
+    5px 5px 0 white,
+    6px 6px 0 black;
+}
+
+.deck_face_down {
+    box-shadow: 3px 3px 0 #accb46,
+    4px 4px 0 black,
+    5px 5px 0 #accb46,
+    6px 6px 0 black;
 }

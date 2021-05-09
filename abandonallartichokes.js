@@ -95,26 +95,27 @@ function (dojo, declare) {
             }
 
 	    const stock_constructor = [
-		{ name: this.Stock.GardenRow, callback: 'onGardenRowSelect', selectionMode: 1 },
-		{ name: this.Stock.Hand, callback: 'onPlayerHandSelect', selectionMode: 1 },
-		{ name: this.Stock.DisplayedCard, callback: 'onDisplayedCardSelect', selectionMode: 0 },
-		{ name: this.Stock.PlayedCard, callback: null, selectionMode: 0 },
-		{ name: this.Stock.Discard, callback: null, selectionMode: 0 },
-		{ name: this.Stock.Compost, callback: null, selectionMode: 0 },
+		{ name: this.Stock.GardenRow, callback: 'onGardenRowSelect', selectionMode: 1},
+		{ name: this.Stock.Hand, callback: 'onPlayerHandSelect', selectionMode: 1},
+		{ name: this.Stock.DisplayedCard, callback: 'onDisplayedCardSelect', selectionMode: 0},
+		{ name: this.Stock.PlayedCard, callback: null, selectionMode: 0},
+		{ name: this.Stock.Discard, callback: null, selectionMode: 0, extraClasses: 'deck_face_up'},
+		{ name: this.Stock.Compost, callback: null, selectionMode: 0, extraClasses: 'deck_face_up'},
 	    ];
 
+		const extraClasses = 'card';
 	    this.stock = new Object();
 	    for (var stock_entry of stock_constructor) {
 		this.stock[stock_entry.name] = this.setupCardStocks(stock_entry.name, stock_entry.callback);
 		this.stock[stock_entry.name].setSelectionMode(stock_entry.selectionMode);
-		this.stock[stock_entry.name].extraClasses='scale-image';
+		this.stock[stock_entry.name].extraClasses = extraClasses + ' ' + stock_entry.extraClasses;
 		this.addCardsToStock(this.stock[stock_entry.name], this.gamedatas[stock_entry.name]);
 	    }
 	    // draw deck is special, we only show card backs
 	    this.stock[this.Stock.Deck] = new ebg.stock();
 	    this.stock[this.Stock.Deck].create(this, $(this.Stock.Deck), this.cardwidth, this.cardheight);
 	    this.stock[this.Stock.Deck].setSelectionMode(0); 
-	    this.stock[this.Stock.Deck].extraClasses='scale-image';
+	    this.stock[this.Stock.Deck].extraClasses = extraClasses + ' ' + 'deck_face_down';
             this.stock[this.Stock.Deck].addItemType(this.CardBackId, this.CardBackId, g_gamethemeurl + 'img/back.jpg', 0);
 	    this.updateDecks();
 
