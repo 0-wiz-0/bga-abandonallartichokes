@@ -49,6 +49,7 @@ function (dojo, declare) {
 		CardMoved: "card_moved",
 		DrewHand: "drew_hand",
 		RefilledGardenRow: "refilled_garden_row",
+		UpdateCounters: "update_counters",
 	    };
 	    // this needs to match the values in abandonallartichokes.action.php
 	    this.AjaxActions = {
@@ -58,6 +59,7 @@ function (dojo, declare) {
 		PlayCard: 'playCard',
 		Pass: 'pass',
 	    };
+	    this.CardBackId = 1;
         },
         /*
             setup:
@@ -87,15 +89,9 @@ function (dojo, declare) {
 		dojo.place(this.format_block('jstpl_player_board', { id: player_id }), player_board_div);
 
 		this.counter[player_id] = {};
-		this.counter[player_id]['hand'] = new ebg.counter();
-		this.counter[player_id]['hand'].create("hand_" + player_id);
-		this.counter[player_id]['hand'].setValue(gamedatas.counters[player_id].hand);
-		this.counter[player_id]['deck'] = new ebg.counter();
-		this.counter[player_id]['deck'].create("deck_" + player_id);
-		this.counter[player_id]['deck'].setValue(gamedatas.counters[player_id].deck);
-		this.counter[player_id]['discard'] = new ebg.counter();
-		this.counter[player_id]['discard'].create("discard_" + player_id);
-		this.counter[player_id]['discard'].setValue(gamedatas.counters[player_id].discard);
+		this.createCounter(player_id, 'hand');
+		this.createCounter(player_id, 'deck');
+		this.createCounter(player_id, 'discard');
             }
 
 	    const stock_constructor = [
@@ -103,23 +99,34 @@ function (dojo, declare) {
 		{ name: this.Stock.Hand, callback: 'onPlayerHandSelect', selectionMode: 1 },
 		{ name: this.Stock.DisplayedCard, callback: 'onDisplayedCardSelect', selectionMode: 0 },
 		{ name: this.Stock.PlayedCard, callback: null, selectionMode: 0 },
+		{ name: this.Stock.Discard, callback: null, selectionMode: 0 },
 		{ name: this.Stock.Compost, callback: null, selectionMode: 0 },
 	    ];
 
 	    this.stock = new Object();
 	    for (var stock_entry of stock_constructor) {
-		console.log(this.stock);
-		console.log(stock_entry);
 		this.stock[stock_entry.name] = this.setupCardStocks(stock_entry.name, stock_entry.callback);
 		this.stock[stock_entry.name].setSelectionMode(stock_entry.selectionMode);
 		this.addCardsToStock(this.stock[stock_entry.name], this.gamedatas[stock_entry.name]);
 	    }
+	    // draw deck is special, we only show card backs
+	    this.stock[this.Stock.Deck] = new ebg.stock();
+	    this.stock[this.Stock.Deck].create(this, $(this.Stock.Deck), this.cardwidth, this.cardheight);
+	    this.stock[this.Stock.Deck].setSelectionMode(0);
+            this.stock[this.Stock.Deck].addItemType(this.CardBackId, this.CardBackId, g_gamethemeurl + 'img/back.png', 0);
+	    this.updateDecks();
 
             this.setupNotifications();
 
+	    console.log(this);
             console.log( "Ending game setup" );
         },
 
+	createCounter: function(player_id, name) {
+	    this.counter[player_id][name] = new ebg.counter();
+	    this.counter[player_id][name].create(name + "_" + player_id);
+	    this.counter[player_id][name].setValue(this.gamedatas.counters[player_id][name]);
+	},
 
         ///////////////////////////////////////////////////
         //// Game & client states
@@ -259,10 +266,12 @@ function (dojo, declare) {
 			if (player_id == this.player_id) {
 			    continue;
 			}
-			if (this.hasCards(player_id) == 0) {
+			if (!this.hasCards(player_id)) {
 			    continue;
 			}
-			this.addActionButton('player_' + this.gamedatas.players[player_id].player_no, _('Choose ') + this.gamedatas.players[player_id].name, 'onLeekChooseOpponent_' + this.gamedatas.players[player_id].player_no);
+			this.addActionButton('player_' + this.gamedatas.players[player_id].player_no,
+					     _('Choose ') + this.gamedatas.players[player_id].name,
+					     this.onLeekChooseOpponent.bind(this, player_id));
 		    }
 		    break;
 		case this.AjaxActions.LeekTakeCard:
@@ -273,32 +282,12 @@ function (dojo, declare) {
 	    }
         },
 
-	onLeekChooseOpponent_1: function() {
-	    this.changeState(this.AjaxActions.LeekChooseOpponent, { opponent_id: this.player_no_to_id(1) });
-	},
-
-	onLeekChooseOpponent_2: function() {
-	    this.changeState(this.AjaxActions.LeekChooseOpponent, { opponent_id: this.player_no_to_id(2) });
-	},
-
-	onLeekChooseOpponent_3: function() {
-	    this.changeState(this.AjaxActions.LeekChooseOpponent, { opponent_id: this.player_no_to_id(3) });
-	},
-
-	onLeekChooseOpponent_4: function() {
-	    this.changeState(this.AjaxActions.LeekChooseOpponent, { opponent_id: this.player_no_to_id(4) });
+	onLeekChooseOpponent: function(opponent_id) {
+	    this.changeState(this.AjaxActions.LeekChooseOpponent, { opponent_id: opponent_id });
 	},
 
 	hasCards: function(player_id) {
-	    return this.counter[player_id]['deck'].getValue() + this.counter[player_id]['discard'].getValue();
-	},
-
-	player_no_to_id: function(player_no) {
-	    for (var player_id in this.gamedatas.players) {
-		if (this.gamedatas.players[player_id].player_no == player_no) {
-		    return player_id;
-		}
-	    }
+	    return this.counter[player_id]['deck'].getValue() > 0 || this.counter[player_id]['discard'].getValue() > 0;
 	},
 
 	onPass: function() {
@@ -370,6 +359,7 @@ function (dojo, declare) {
 	    dojo.subscribe(this.Notification.CardMoved, this, "notif_cardMoved");
 	    dojo.subscribe(this.Notification.DrewHand, this, "notif_drewHand");
 	    dojo.subscribe(this.Notification.RefilledGardenRow, this, "notif_refilledGardenRow");
+	    dojo.subscribe(this.Notification.UpdateCounters, this, "notif_updateCounters");
 
 	    this.notifqueue.setSynchronous(this.Notification.CardMoved, 800);
         },
@@ -399,6 +389,12 @@ function (dojo, declare) {
 	    }
 	},
 
+	notif_updateCounters: function(notification) {
+	    console.log(this.Notification.UpdateCounters + ' notification');
+	    console.log(notification);
+	    this.updateCounter(notification.args.counters);
+	},
+
 	// Utility functions
 
 	changeState: function(targetState, args = {}) {
@@ -408,7 +404,7 @@ function (dojo, declare) {
 	},
 
 	showCardPlay: function(player_id, from, from_arg, to, to_arg, card, counters) {
-	    if (to == this.Stock.Compost) {
+	    if (to == this.Stock.Compost || (to == this.Stock.Discard && to_arg == this.player_id)) {
 		// only last card of compost visible
 		this.stock[to].removeAll();
 	    }
@@ -430,8 +426,6 @@ function (dojo, declare) {
 
 	isVisible: function(location, location_arg) {
 	    switch (location) {
-	    case this.Stock.Deck:
-	    case this.Stock.Discard:
 	    case this.Stock.GardenStack:
 		return false;
 	    case this.Stock.GardenRow:
@@ -439,10 +433,15 @@ function (dojo, declare) {
 	    case this.Stock.PlayedCard:
 	    case this.Stock.Compost:
 		return true;
+	    case this.Stock.Deck:
+		// TODO
+		return false;
+	    case this.Stock.Discard:
 	    case this.Stock.Hand:
 		if (location_arg == this.player_id) {
 		    return true;
 		}
+		return false;
 	    default:
 		console.log("unhandled case '" + location + "' in isVisible()");
 		return false;
@@ -469,7 +468,23 @@ function (dojo, declare) {
 		this.counter[player_id].deck.setValue(counters[player_id].deck);
 		this.counter[player_id].discard.setValue(counters[player_id].discard);
 	    }
-	}
+	    this.updateDecks();
+	},
+
+	updateDecks: function() {
+	    // hide/show draw deck
+	    if (this.counter[this.player_id].deck.getValue() == 0) {
+		this.stock[this.Stock.Deck].removeAll();
+	    } else {
+		if (this.stock[this.Stock.Deck].count() == 0) {
+		    this.stock[this.Stock.Deck].addToStock(this.CardBackId);
+		}
+	    }
+	    // clean out discard if no cards there
+	    if (this.counter[this.player_id].discard.getValue() == 0) {
+		this.stock[this.Stock.Discard].removeAll();
+	    }
+	},
    });
 });
 

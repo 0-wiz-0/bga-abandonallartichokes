@@ -69,6 +69,7 @@ if (!defined('NOTIFICATION_CARD_MOVED')) { // ensure this block is only invoked 
     define("NOTIFICATION_CARD_MOVED", "card_moved");
     define("NOTIFICATION_DREW_HAND", "drew_hand");
     define("NOTIFICATION_REFILLED_GARDEN_ROW", "refilled_garden_row");
+    define("NOTIFICATION_UPDATE_COUNTERS", "update_counters");
     define("NOTIFICATION_MESSAGE", "message"); // provided by framework, no subscription necessary
 }
 
