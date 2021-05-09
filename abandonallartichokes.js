@@ -381,6 +381,8 @@ function (dojo, declare) {
 	    console.log(notification);
 	    this.stock[this.Stock.Hand].removeAll();
 	    this.addCardsToStock(this.stock[this.Stock.Hand], notification.args.cards);
+	    this.stock[this.Stock.Discard].removeAll();
+	    this.addCardsToStock(this.stock[this.Stock.Discard], notification.args.discard);
 	    this.updateCounter(notification.args.counters);
 	},
 

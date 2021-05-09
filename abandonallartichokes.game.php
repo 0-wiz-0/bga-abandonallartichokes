@@ -200,8 +200,10 @@ class AbandonAllArtichokes extends Table
         $this->cards->moveAllCardsInLocation(STOCK_HAND, $this->player_discard($player_id), $player_id, $player_id);
         // draw up to five cards
         $this->cards->pickCards(5, $this->player_deck($player_id), $player_id);
+        $discard = $this->cards->getCardOnTop($this->player_discard($player_id));
         $this->notify_one(NOTIFICATION_DREW_HAND, '', null, array(
             'cards' => $this->cards->getPlayerHand($player_id),
+            'discard' => $discard ? array($discard) : array(),
             'player_id' => $player_id,
             'player_name' => self::GetCurrentPlayerName(),
         ));
