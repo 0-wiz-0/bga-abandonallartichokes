@@ -58,6 +58,7 @@ if (!defined('STATE_END_GAME')) { // ensure this block is only invoked once, sin
    define("STATE_LEEK_TAKE_CARD", 6);
    define("STATE_EGGPLANT_CHOOSE_CARDS", 7);
    define("STATE_EGGPLANT_DONE", 8);
+   define("STATE_PEPPER_TAKE_CARD", 9);
    define("STATE_END_GAME", 99);
 }
  
@@ -95,11 +96,14 @@ $machinestates = array(
         "descriptionmyturn" => clienttranslate('${you} must play a card or end your turn'),
         "type" => "activeplayer",
         "possibleactions" => array("playCard", "pass"),
-        "transitions" => array(STATE_PLAY_CARD => STATE_PLAY_CARD,
-                               STATE_NEXT_PLAYER => STATE_NEXT_PLAYER,
-                               STATE_LEEK_CHOOSE_OPPONENT => STATE_LEEK_CHOOSE_OPPONENT,
-                               STATE_LEEK_TAKE_CARD => STATE_LEEK_TAKE_CARD,
-                               STATE_EGGPLANT_CHOOSE_CARDS => STATE_EGGPLANT_CHOOSE_CARDS),
+        "transitions" => array(
+            STATE_EGGPLANT_CHOOSE_CARDS => STATE_EGGPLANT_CHOOSE_CARDS,
+            STATE_LEEK_CHOOSE_OPPONENT => STATE_LEEK_CHOOSE_OPPONENT,
+            STATE_LEEK_TAKE_CARD => STATE_LEEK_TAKE_CARD,
+            STATE_NEXT_PLAYER => STATE_NEXT_PLAYER,
+            STATE_PEPPER_TAKE_CARD => STATE_PEPPER_TAKE_CARD,
+            STATE_PLAY_CARD => STATE_PLAY_CARD,
+        ),
     ),
 
     STATE_LEEK_CHOOSE_OPPONENT => array(
@@ -138,6 +142,14 @@ $machinestates = array(
         "transitions" => array(STATE_PLAY_CARD => STATE_PLAY_CARD),
     ),
 
+    STATE_PEPPER_TAKE_CARD => array(
+        "name" => "pepperTakeCard",
+        "description" => clienttranslate('${actplayer} must pick card to put on deck'),
+        "descriptionmyturn" => clienttranslate('${you} must pick card to put on deck'),
+        "type" => "activeplayer",
+        "possibleactions" => array("pepperTakeCard"),
+        "transitions" => array(STATE_PLAY_CARD => STATE_PLAY_CARD),
+    ),
     /*
     Examples:
     

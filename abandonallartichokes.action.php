@@ -100,6 +100,14 @@
           self::ajaxResponse();
       }          
 
+      public function pepperTakeCard() {
+          self::setAjaxMode();
+          $id = self::getArg("id", AT_posint, true);
+
+          $this->game->pepperTakeCard($id);
+          self::ajaxResponse();
+      }          
+
       public function eggplantChooseCards() {
           self::setAjaxMode();
           $card1 = self::getArg("card1", AT_posint, false);

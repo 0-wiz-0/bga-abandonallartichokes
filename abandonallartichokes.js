@@ -57,8 +57,9 @@ function (dojo, declare) {
 		Harvest: 'harvestCard',
 		LeekChooseOpponent: 'leekChooseOpponent',
 		LeekTakeCard: 'leekTakeCard',
-		PlayCard: 'playCard',
 		Pass: 'pass',
+		PepperTakeCard: 'pepperTakeCard',
+		PlayCard: 'playCard',
 	    };
 	    // this needs to match the values in states.inc.php; only copy the necessary ones
 	    this.State = {
@@ -67,19 +68,19 @@ function (dojo, declare) {
 	    this.CardBackId = 1;
 
 	    //vegetable types => numbers match define in material.inc.php
-		this.Vegetables = {
-			BEET: 1,
-			BROCCOLI: 2,
-			CARROT: 3,
-			CORN: 4,
-			EGGPLANT: 5,
-			LEEK: 6,
-			ONION: 7,
-			PEAS: 8,
-			PEPPER: 9,
-			POTATO: 10,
-			ARTICHOKE: 11,
-		};
+	    this.Vegetables = {
+		BEET: 1,
+		BROCCOLI: 2,
+		CARROT: 3,
+		CORN: 4,
+		EGGPLANT: 5,
+		LEEK: 6,
+		ONION: 7,
+		PEAS: 8,
+		PEPPER: 9,
+		POTATO: 10,
+		ARTICHOKE: 11,
+	    };
 	},
 
         /*
@@ -106,14 +107,14 @@ function (dojo, declare) {
             for (var player_id in gamedatas.players)
             {
                 var player = gamedatas.players[player_id];
-				var player_board_div = $('player_board_' + player_id);
-				dojo.place(this.format_block('jstpl_player_board', { id: player_id }), player_board_div);
+		var player_board_div = $('player_board_' + player_id);
+		dojo.place(this.format_block('jstpl_player_board', { id: player_id }), player_board_div);
 
-				this.counter[player_id] = {};
-				this.createCounter(player_id, 'hand');
-				this.createCounter(player_id, 'deck');
-				this.createCounter(player_id, 'discard');
-			}
+		this.counter[player_id] = {};
+		this.createCounter(player_id, 'hand');
+		this.createCounter(player_id, 'deck');
+		this.createCounter(player_id, 'discard');
+	    }
 
 	    const stock_constructor = [
 		{ name: this.Stock.GardenRow, callback: 'onGardenRowSelect', selectionMode: 1},
@@ -127,12 +128,12 @@ function (dojo, declare) {
 	    const extraClasses = 'card';
 	    this.stock = {};
 	    for (var stock_entry of stock_constructor) {
-			this.stock[stock_entry.name] = this.setupCardStocks(stock_entry.name, stock_entry.callback);
-			this.stock[stock_entry.name].setSelectionMode(stock_entry.selectionMode);
-			this.stock[stock_entry.name].setSelectionAppearance('class');
-			this.stock[stock_entry.name].extraClasses = extraClasses + ' ' + (stock_entry.extraClasses? stock_entry.extraClasses: '');
-			this.stock[stock_entry.name].autowidth = true;
-			this.addCardsToStock(this.stock[stock_entry.name], this.gamedatas[stock_entry.name]);
+		this.stock[stock_entry.name] = this.setupCardStocks(stock_entry.name, stock_entry.callback);
+		this.stock[stock_entry.name].setSelectionMode(stock_entry.selectionMode);
+		this.stock[stock_entry.name].setSelectionAppearance('class');
+		this.stock[stock_entry.name].extraClasses = extraClasses + ' ' + (stock_entry.extraClasses? stock_entry.extraClasses: '');
+		this.stock[stock_entry.name].autowidth = true;
+		this.addCardsToStock(this.stock[stock_entry.name], this.gamedatas[stock_entry.name]);
 	    }
 	    this.updateAllVisibleTooltips();
 
@@ -142,10 +143,10 @@ function (dojo, declare) {
 	    this.stock[this.Stock.Deck].setSelectionMode(0); 
 	    this.stock[this.Stock.Deck].extraClasses = extraClasses + ' ' + 'deck_face_down';
 	    this.stock[this.Stock.Deck].autowidth = true;
-		this.stock[this.Stock.Deck].addItemType(this.CardBackId, this.CardBackId, g_gamethemeurl + 'img/back.jpg', 0);
+	    this.stock[this.Stock.Deck].addItemType(this.CardBackId, this.CardBackId, g_gamethemeurl + 'img/back.jpg', 0);
 	    this.updateDecks();
 
-		this.setupNotifications();
+	    this.setupNotifications();
 
 	    console.log(this);
             console.log( "Ending game setup" );
@@ -187,9 +188,11 @@ function (dojo, declare) {
 	    var items = this.stock[this.Stock.DisplayedCard].getSelectedItems();
 	    if (items.length > 0) {
 		if (this.isCurrentPlayerActive()) {
-		    if (this.checkAction('leekTakeCard')) {
+		    if (this.checkAction('leekTakeCard', true)) {
 			// usability feature: click on displayed card to take it after playing leek
 			this.changeState(this.AjaxActions.LeekTakeCard, { take_card: true });
+		    } else if (this.checkAction('pepperTakeCard', true)) {
+			this.changeState(this.AjaxActions.PepperTakeCard, { id: items[0].id });
 		    }
                 } else {
 		    this.showMessage(_("You can't select cards from the display area now."), "error");
@@ -440,11 +443,11 @@ function (dojo, declare) {
 	    console.log(this.Notification.RefilledGardenRow + ' notification');
 	    console.log(notification);
 	    if (notification.args.new_cards.length >= 5) {
-			this.stock[this.Stock.GardenRow].removeAll();
+		this.stock[this.Stock.GardenRow].removeAll();
 	    }
 	    for (var card of notification.args.new_cards) {
-			this.stock[this.Stock.GardenRow].addToStockWithId(card.type, card.id);
-			this.addToolTipToCard(this.Stock.GardenRow, card);
+		this.stock[this.Stock.GardenRow].addToStockWithId(card.type, card.id);
+		this.addToolTipToCard(this.Stock.GardenRow, card);
 	    }
 	},
 
@@ -469,19 +472,19 @@ function (dojo, declare) {
 	    }
 
 	    if (this.isVisible(from, from_arg)) {
-			if (this.isVisible(to, to_arg)) {
-				this.moveVisibleToVisible(from, to, card);
-				this.updateToolTipsAfterCardPlay(to);
-			} else {
-				this.moveVisibleToPanel(from, player_id, card);
-			}
+		if (this.isVisible(to, to_arg)) {
+		    this.moveVisibleToVisible(from, to, card);
+		    this.updateToolTipsAfterCardPlay(to);
+		} else {
+		    this.moveVisibleToPanel(from, player_id, card);
+		}
 	    } else {
-			if (this.isVisible(to, to_arg)) {
-				this.movePanelToVisible(player_id, to, card);
-				this.updateToolTipsAfterCardPlay(to);
-			}
+		if (this.isVisible(to, to_arg)) {
+		    this.movePanelToVisible(player_id, to, card);
+		    this.updateToolTipsAfterCardPlay(to);
+		}
 	    }
-		    
+
 	    this.updateCounter(counters);
 	},
 
@@ -508,10 +511,14 @@ function (dojo, declare) {
 	},
 
 	moveVisibleToVisible: function(from, to, card) {
-	    if (from == this.Stock.Deck) {
+	    if (from == this.Stock.Deck || from == this.Stock.Discard) {
 		// the draw deck only shows a card back, so we can not move from a specific card
 		// also, we don't have to remove it
+		// the discard deck only has one card; let the updateCounters redraw it if it was this one
 		this.stock[to].addToStockWithId(card.type, card.id, from);
+	    } else if (to == this.Stock.Deck) {
+		this.slideToObject(from + '_item_' + card.id, to);
+		this.stock[from].removeFromStockById(card.id, to);
 	    } else {
 		this.stock[to].addToStockWithId(card.type, card.id, from + '_item_' + card.id);
 		this.stock[from].removeFromStockById(card.id, to);
@@ -558,53 +565,54 @@ function (dojo, declare) {
 
 	//----TOOLTIPS-----
 	addToolTipsToStock: function (stockName) {
-		const cards = this.stock[stockName].getAllItems();
-		cards.forEach(card => this.addToolTipToCard(stockName, card));
+	    const cards = this.stock[stockName].getAllItems();
+	    cards.forEach(card => this.addToolTipToCard(stockName, card));
 	},
 
 	addToolTipToCard: function (stockName, card) {
-		this.addTooltip(stockName + '_item_' + card.id, "", _(this.getVegetableInfoText(card.type)));
+	    this.addTooltip(stockName + '_item_' + card.id, "", _(this.getVegetableInfoText(card.type)));
 	},
 
 	updateToolTipsAfterCardPlay: function(stockName) {
-		if (stockName != this.Stock.GardenRow && stockName != this.Stock.Deck) {
-			this.addToolTipsToStock(stockName);
-		}
+	    if (stockName != this.Stock.GardenRow && stockName != this.Stock.Deck) {
+		this.addToolTipsToStock(stockName);
+	    }
 	},
 
 	updateAllVisibleTooltips: function() {
-		Object.values(this.Stock).forEach((stockName) => {
-			if (this.isVisible(stockName, this.player_id) && stockName != this.Stock.Deck) {
-				this.addToolTipsToStock(stockName);
-			}
-		})
+	    Object.values(this.Stock).forEach((stockName) => {
+		if (this.isVisible(stockName, this.player_id) && stockName != this.Stock.Deck) {
+		    this.addToolTipsToStock(stockName);
+		}
+	    })
 	},
 
 	getVegetableInfoText: function(type) {
-		const typeNo = parseInt(type, 10);
-		switch (typeNo) {
+	    const typeNo = parseInt(type, 10);
+	    switch (typeNo) {
             case this.Vegetables.BEET:
             	return "You and an opponent each reveal a random card. " +
-					"Compost both if Artichokes, otherwise swap them."
-			case this.Vegetables.BROCCOLI: return "Compost an Artichoke, if your hand has three or more Artichokes."
+		    "Compost both if Artichokes, otherwise swap them."
+	    case this.Vegetables.BROCCOLI: return "Compost an Artichoke, if your hand has three or more Artichokes."
             case this.Vegetables.CARROT: return "As your only play action, " +
-				"compost exactly two Artichokes along with this card."
+		    "compost exactly two Artichokes along with this card."
             case this.Vegetables.CORN: return "Play this card with an Artichoke. " +
-					"Then put a card from the Garden Row on top of your Deck."
+		    "Then put a card from the Garden Row on top of your Deck."
             case this.Vegetables.EGGPLANT: return "Compost an Artichoke, along with this card. " +
-				"All players pass two cards to the left."
+		    "All players pass two cards to the left."
             case this.Vegetables.LEEK: return "Reveal the top card of an opponent's Deck. " +
-				"Put it into your hand or on top of their Discard Pile. "
+		    "Put it into your hand or on top of their Discard Pile. "
             case this.Vegetables.ONION: return "Compost an Artichoke. " +
-				"Put this card on top of another player's Discard Pile."
+		    "Put this card on top of another player's Discard Pile."
             case this.Vegetables.PEAS: return "Reveal two cards from the Garden Stack. " +
-				"Put one on your Discard pile, the other on an opponent's."
+		    "Put one on your Discard pile, the other on an opponent's."
             case this.Vegetables.PEPPER: return "Put a card from your Discard Pile on top of your Deck."
             case this.Vegetables.POTATO: return "Reveal the top card of your Deck. " +
-				"Compost if Artichoke, otherwise discard it."
+		    "Compost if Artichoke, otherwise discard it."
             case this.Vegetables.ARTICHOKE: return "Looking forward to be abandoned by you!"
-		}
+	    }
 	},
-	});
+    });
 });
+
 
