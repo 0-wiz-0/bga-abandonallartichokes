@@ -5,10 +5,13 @@ Basic Features
   - broccoli
   - corn
   - eggplant
+    - better show selected cards
+	- allow choosing two cards
+	- finish sending the card ids to the server
+	- graphics
   - onion
   - peas
   - pepper
-- add proper graphics
 
 Nice Features
 ===
@@ -18,10 +21,7 @@ Nice Features
 - HTML pages:
   - How to Play
   - Developed by
-
-To Investigate
-===
-- animation sometimes looks like multiple cards even if there is only one
+- replace remaining graphics
 
 Topics
 ===
@@ -29,3 +29,14 @@ Topics
 - check usage of getCurrentPlayerId vs. getActivePlayerId
 - more auto play?
   -auto pass if no playable cards left? in general, hard, but perhaps for artichoke-only hands
+- game progression
+
+Animation issues
+===
+- move to deck - card goes to center, but appears in sorted location
+- moves seem to consist of two cards
+
+
+Cleanups
+===
+- use args function on state change to supply player list to frontend for leek

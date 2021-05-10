@@ -112,6 +112,7 @@ class AbandonAllArtichokes extends Table
                 $cards[] = array('type' => VEGETABLE_CARROT, 'type_arg' => 0, 'nbr' => 6);
                 $cards[] = array('type' => VEGETABLE_POTATO, 'type_arg' => 0, 'nbr' => 6);
                 $cards[] = array('type' => VEGETABLE_LEEK, 'type_arg' => 0, 'nbr' => 6);
+                $cards[] = array('type' => VEGETABLE_EGGPLANT, 'type_arg' => 0, 'nbr' => 6);
             }
 
         }
@@ -191,6 +192,33 @@ class AbandonAllArtichokes extends Table
         // TODO: compute and return the game progression
 
         return 0;
+    }
+
+    function stEggplantInit() {
+        $this->gamestate->setAllPlayersMultiactive();
+    }
+
+    function stEggPlantDone() {
+        // move cards from limbos to player's hands and update state
+        $players = self::loadPlayersBasicInfos();
+
+        foreach ($players as $player_id => $value) {
+            $target = self::getPlayerAfter($player_id);
+            $card_ids = array_map(function($n) { return $n['id']; }, $this->cards->getCardsInLocation(STOCK_LIMBO, $player_id));
+            $this->cards->moveCards($card_ids, STOCK_HAND, $target);
+        }
+        foreach ($players as $player_id => $value) {
+            $discard = $this->cards->getCardOnTop($this->player_discard($player_id));
+            $this->notify_one(NOTIFICATION_DREW_HAND, '', null, array(
+                'cards' => $this->cards->getPlayerHand($player_id),
+                'discard' => $discard ? array($discard) : array(),
+                'player_id' => $player_id,
+                'player_name' => self::GetCurrentPlayerName(),
+            ));
+        }
+
+        $this->compost_played_card();
+        $this->gamestate->nextState(STATE_PLAY_CARD);
     }
 
     function stNextPlayer() {
@@ -306,6 +334,9 @@ class AbandonAllArtichokes extends Table
         case VEGETABLE_CARROT:
             $next_state = $this->playCarrot($id);
             break;
+        case VEGETABLE_EGGPLANT:
+            $next_state = $this->playEggplant($id);
+            break;
         case VEGETABLE_LEEK:
             $next_state = $this->playLeek($id);
             break;
@@ -357,11 +388,11 @@ class AbandonAllArtichokes extends Table
         ));
         // compost them
         $this->cards->moveCard($artichoke_1['id'], STOCK_COMPOST);
-        $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} composts ${vegetable}'), $artichoke_1, array( 'destination' => STOCK_COMPOST ));
+        $this->notify_all(NOTIFICATION_CARD_MOVED, '', $artichoke_1, array( 'destination' => STOCK_COMPOST ));
         $this->cards->moveCard($artichoke_2['id'], STOCK_COMPOST);
-        $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} composts ${vegetable}'), $artichoke_2, array( 'destination' => STOCK_COMPOST ));
+        $this->notify_all(NOTIFICATION_CARD_MOVED, '', $artichoke_2, array( 'destination' => STOCK_COMPOST ));
         $this->cards->moveCard($card['id'], STOCK_COMPOST);
-        $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} composts ${vegetable}'), $card, array( 'destination' => STOCK_COMPOST ));
+        $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} composts carrot and two artichokes'), $card, array( 'destination' => STOCK_COMPOST ));
 
         return STATE_NEXT_PLAYER;
     }
@@ -399,6 +430,66 @@ class AbandonAllArtichokes extends Table
         } else {
             return STATE_LEEK_CHOOSE_OPPONENT;
         }
+    }
+
+    function playEggplant($id) {
+        $players = self::loadPlayersBasicInfos();
+
+        $hand = $this->cards->getPlayerHand(self::getCurrentPlayerId());
+        foreach ($hand as $card) {
+            if ($card['type'] == VEGETABLE_ARTICHOKE) {
+                $artichoke = $card;
+            }
+        }
+        if ($artichoke == null) {
+            throw new BgaUserException(self::_("To play an eggplant you need an artichoke in your hand"));
+        }
+
+        // https://boardgamegeek.com/thread/2438217/eggplant-rule-question
+        // says that no additional cards are needed
+        // if (count($hand) < 4) {
+        // throw new BgaUserException(self::_("To play an eggplant you have to have 3 other cards in your hand"));
+        //}
+
+        $this->cards->moveCard($id, STOCK_PLAYED_CARD);
+        $played_card = $this->cards->getCard($id);
+        $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} plays ${vegetable}'), $played_card, array(
+            'origin' => STOCK_HAND,
+            'origin_arg' => self::getCurrentPlayerId(),
+            'destination' => STOCK_PLAYED_CARD,
+        ));
+
+        $this->cards->moveCard($artichoke['id'], STOCK_COMPOST);
+        $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} composts ${vegetable}'), $artichoke, array( 'destination' => STOCK_COMPOST ));
+
+        return STATE_EGGPLANT_CHOOSE_CARDS;
+    }
+
+    function eggplantChooseCards($card1, $card2) {
+        $this->checkAction('eggplantChooseCards');
+        $card_ids = array($card1, $card2);
+        $player_id = $this->getCurrentPlayerId();
+
+        $count = 0;
+        foreach ($card_ids as $index => $card_id) {
+            if ($card_id != null) {
+                $card = $this->cards->getCard($card_id);
+                if ($card == null || $card['location'] != STOCK_HAND || $card['location_arg'] != $player_id) {
+                    throw BgaUserException(self::_("You must choose two cards from your hand (or as many as you can)"));
+                }
+                $count++;
+            }
+        }
+        if ($count < 2 && $this->cards->countCardInLocation(STOCK_HAND, $player_id) != $count) {
+            throw new BgaUserException(self::_("You must choose two cards from your hand (or as many as you can)"));
+        }
+        // pass to limbo for next player
+        foreach ($card_ids as $index => $card_id) {
+            $passed_cart = $this->cards->moveCard($card_id, STOCK_LIMBO, $player_id);
+        }
+
+        $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('${player_name} passes ${count} cards'), '', array( 'count' => $count ));
+        $this->gamestate->setPlayerNonMultiactive($player_id, STATE_EGGPLANT_DONE);
     }
 
     function leekChooseOpponent($opponent_id) {
@@ -445,17 +536,7 @@ class AbandonAllArtichokes extends Table
             ));
         }
 
-        $played_cards = $this->cards->getCardsInLocation(STOCK_PLAYED_CARD);
-        if (count($played_cards) != 1) {
-            throw new BgaVisibleSystemException(self::_("Incorrect number of played cards for leek"));
-        }
-        $played_card = array_pop($played_cards);
-        $this->cards->moveCard($played_card['id'], $this->player_discard($player_id));
-        $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} discards ${vegetable}'), $played_card, array(
-            'origin' => STOCK_PLAYED_CARD,
-            'destination' => STOCK_DISCARD,
-            'destination_arg' => $player_id,
-        ));
+        $this->discard_played_card();
 
         self::setGameStateValue(GAME_STATE_TARGET_PLAYER, 0);
 
@@ -677,6 +758,37 @@ class AbandonAllArtichokes extends Table
 
     }
 
+    function compost_played_card() {
+        $player_id = self::getActivePlayerId();
+        $played_card = $this->get_played_card_id();
+        $this->cards->moveCard($played_card['id'], STOCK_COMPOST);
+        $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} composts ${vegetable}'), $played_card, array(
+            'player_id' => $player_id,
+            'origin' => STOCK_PLAYED_CARD,
+            'destination' => STOCK_COMPOST,
+        ));
+    }
+
+    function discard_played_card() {
+        $player_id = self::getActivePlayerId();
+        $played_card = $this->get_played_card_id();
+        $this->cards->moveCard($played_card['id'], $this->player_discard($player_id));
+        $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} discards ${vegetable}'), $played_card, array(
+            'player_id' => $player_id,
+            'origin' => STOCK_PLAYED_CARD,
+            'destination' => STOCK_DISCARD,
+            'destination_arg' => $player_id,
+        ));
+    }
+
+    function get_played_card_id() {
+        $played_cards = $this->cards->getCardsInLocation(STOCK_PLAYED_CARD);
+        if (count($played_cards) != 1) {
+            throw new BgaVisibleSystemException(self::_("Incorrect number of played cards"));
+        }
+        return array_pop($played_cards);
+    }
+        
     function player_deck($player_id) {
         return "deck_" . $this->player_no($player_id);
     }
@@ -705,7 +817,7 @@ class AbandonAllArtichokes extends Table
 
     function notify_backend($all, $type, $message, $card, $arguments) {
         $this->set_if_not_set($arguments, 'player_id', self::getCurrentPlayerId());
-        $this->set_if_not_set($arguments, 'player_name', self::getCurrentPlayerName());
+        $this->set_if_not_set($arguments, 'player_name', $this->player_name($arguments['player_id']));
         if ($card != null) {
             // TODO: translate vegetable name
             $this->set_if_not_set($arguments, 'vegetable', $this->vegetables[$card['type']]['name']);
@@ -737,5 +849,4 @@ class AbandonAllArtichokes extends Table
             'discard' => $this->cards->countCardInLocation($this->player_discard($player_id)),
         );
     }
-
 }

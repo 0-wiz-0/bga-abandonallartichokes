@@ -49,12 +49,15 @@
 
 //    !! It is not a good idea to modify this file when a game is running !!
 
+// this needs to match the states in the .js file
 if (!defined('STATE_END_GAME')) { // ensure this block is only invoked once, since it is included multiple times
    define("STATE_NEXT_PLAYER", 2);
    define("STATE_HARVEST", 3);
    define("STATE_PLAY_CARD", 4);
    define("STATE_LEEK_CHOOSE_OPPONENT", 5);
    define("STATE_LEEK_TAKE_CARD", 6);
+   define("STATE_EGGPLANT_CHOOSE_CARDS", 7);
+   define("STATE_EGGPLANT_DONE", 8);
    define("STATE_END_GAME", 99);
 }
  
@@ -88,14 +91,15 @@ $machinestates = array(
 
     STATE_PLAY_CARD => array(
         "name" => "playCard",
-        "description" => clienttranslate('${actplayer} must play a card or pass'),
-        "descriptionmyturn" => clienttranslate('${you} must play a card or pass'),
+        "description" => clienttranslate('${actplayer} must play a card or end your turn'),
+        "descriptionmyturn" => clienttranslate('${you} must play a card or end your turn'),
         "type" => "activeplayer",
         "possibleactions" => array("playCard", "pass"),
         "transitions" => array(STATE_PLAY_CARD => STATE_PLAY_CARD,
                                STATE_NEXT_PLAYER => STATE_NEXT_PLAYER,
                                STATE_LEEK_CHOOSE_OPPONENT => STATE_LEEK_CHOOSE_OPPONENT,
-                               STATE_LEEK_TAKE_CARD => STATE_LEEK_TAKE_CARD),
+                               STATE_LEEK_TAKE_CARD => STATE_LEEK_TAKE_CARD,
+                               STATE_EGGPLANT_CHOOSE_CARDS => STATE_EGGPLANT_CHOOSE_CARDS),
     ),
 
     STATE_LEEK_CHOOSE_OPPONENT => array(
@@ -113,6 +117,24 @@ $machinestates = array(
         "descriptionmyturn" => clienttranslate('${you} must take card or decline to take it'),
         "type" => "activeplayer",
         "possibleactions" => array("leekTakeCard"),
+        "transitions" => array(STATE_PLAY_CARD => STATE_PLAY_CARD),
+    ),
+
+    STATE_EGGPLANT_CHOOSE_CARDS => array(
+        "name" => "eggplantChooseCards",
+        "description" => clienttranslate('${actplayer} must choose two cards to pass on'),
+        "descriptionmyturn" => clienttranslate('${you} must choose two cards to pass on'),
+        "action" => "stEggplantInit",
+        "type" => "multipleactiveplayer",
+        "possibleactions" => array("eggplantChooseCards"),
+        "transitions" => array(STATE_EGGPLANT_DONE => STATE_EGGPLANT_DONE),
+    ),
+
+    STATE_EGGPLANT_DONE => array(
+        "name" => "eggplantDone",
+        "description" => clienttranslate('Passing cards for eggplant'),
+        "type" => "game",
+        "action" => "stEggplantDone",
         "transitions" => array(STATE_PLAY_CARD => STATE_PLAY_CARD),
     ),
 

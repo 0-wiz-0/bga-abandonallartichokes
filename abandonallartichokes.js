@@ -33,7 +33,6 @@ function (dojo, declare) {
 	    // - HTML *.tpl file (div id)
 	    // - stock constructor (below)
 	    // - php code (material.inc.php)
-	    // TODO: make this nicer
 	    this.Stock = {
 		GardenStack: 'garden_stack',
 		GardenRow: 'garden_row',
@@ -43,6 +42,7 @@ function (dojo, declare) {
 		DisplayedCard: 'displayed_card',
 		PlayedCard: 'played_card',
 		Compost: 'compost',
+		// Limbo: 'limbo', // unused in frontend
 	    };
 	    // this needs to match the names in material.inc.php
 	    this.Notification = {
@@ -53,11 +53,16 @@ function (dojo, declare) {
 	    };
 	    // this needs to match the values in abandonallartichokes.action.php
 	    this.AjaxActions = {
+		EggplantChooseCards: 'eggplantChooseCards',
 		Harvest: 'harvestCard',
 		LeekChooseOpponent: 'leekChooseOpponent',
 		LeekTakeCard: 'leekTakeCard',
 		PlayCard: 'playCard',
 		Pass: 'pass',
+	    };
+	    // this needs to match the values in states.inc.php; only copy the necessary ones
+	    this.State = {
+		EggplantChooseCards: 7,
 	    };
 	    this.CardBackId = 1;
         },
@@ -96,19 +101,20 @@ function (dojo, declare) {
 
 	    const stock_constructor = [
 		{ name: this.Stock.GardenRow, callback: 'onGardenRowSelect', selectionMode: 1},
-		{ name: this.Stock.Hand, callback: 'onPlayerHandSelect', selectionMode: 1},
+		{ name: this.Stock.Hand, callback: 'onPlayerHandSelect', selectionMode: 2},
 		{ name: this.Stock.DisplayedCard, callback: 'onDisplayedCardSelect', selectionMode: 0},
 		{ name: this.Stock.PlayedCard, callback: null, selectionMode: 0},
 		{ name: this.Stock.Discard, callback: null, selectionMode: 0, extraClasses: 'deck_face_up'},
 		{ name: this.Stock.Compost, callback: null, selectionMode: 0, extraClasses: 'deck_face_up'},
 	    ];
 
-		const extraClasses = 'card';
+	    const extraClasses = 'card';
 	    this.stock = new Object();
 	    for (var stock_entry of stock_constructor) {
 		this.stock[stock_entry.name] = this.setupCardStocks(stock_entry.name, stock_entry.callback);
 		this.stock[stock_entry.name].setSelectionMode(stock_entry.selectionMode);
 		this.stock[stock_entry.name].extraClasses = extraClasses + ' ' + stock_entry.extraClasses;
+		this.stock[stock_entry.name].autowidth = true;
 		this.addCardsToStock(this.stock[stock_entry.name], this.gamedatas[stock_entry.name]);
 	    }
 	    // draw deck is special, we only show card backs
@@ -116,6 +122,7 @@ function (dojo, declare) {
 	    this.stock[this.Stock.Deck].create(this, $(this.Stock.Deck), this.cardwidth, this.cardheight);
 	    this.stock[this.Stock.Deck].setSelectionMode(0); 
 	    this.stock[this.Stock.Deck].extraClasses = extraClasses + ' ' + 'deck_face_down';
+	    this.stock[this.Stock.Deck].autowidth = true;
             this.stock[this.Stock.Deck].addItemType(this.CardBackId, this.CardBackId, g_gamethemeurl + 'img/back.jpg', 0);
 	    this.updateDecks();
 
@@ -159,7 +166,6 @@ function (dojo, declare) {
 
 	onDisplayedCardSelect: function(control_name, item_id) {
 	    var items = this.stock[this.Stock.DisplayedCard].getSelectedItems();
-	    debugger
 	    if (items.length > 0) {
                 //if( this.checkAction('playCard', true)) {
                 //var card_id = items[0].id;
@@ -175,21 +181,25 @@ function (dojo, declare) {
 	    var items = this.stock[this.Stock.Hand].getSelectedItems();
 
 	    if (items.length > 0) {
-		// TODO: this will break for eggplant
-                if( this.checkAction('playCard', true)) {
+                if (this.checkAction('playCard', true)) {
                     var card_id = items[0].id;
 		    this.changeState(this.AjaxActions.PlayCard, { id: card_id });
+                    this.stock[this.Stock.Hand].unselectAll();
                 }
+		else if (this.checkAction('eggplantChooseCards', true)) {
+		    // just let the user select cards, will be checked on action button press
+		}
 		else {
 		    this.showMessage(_("You can't play cards from your hand now."), "error");
+                    this.stock[this.Stock.Hand].unselectAll();
 		}
-                this.stock[this.Stock.Hand].unselectAll();
 	    }
 	},
 
 	onGardenRowSelect: function(control_name, item_id) {
 	    var items = this.stock[this.Stock.GardenRow].getSelectedItems();
 
+	    // TODO: this will break for corn
 	    if (items.length > 0) {
                 if( this.checkAction('harvestCard', true)) {
                     var card_id = items[0].id;
@@ -205,13 +215,11 @@ function (dojo, declare) {
         // onEnteringState: this method is called each time we are entering into a new game state.
         //                  You can use this method to perform some user interface changes at this moment.
         //
-        onEnteringState: function( stateName, args )
-        {
-            console.log( 'Entering state: '+stateName );
+        onEnteringState: function(stateName, args) {
+            console.log( 'Entering state: ' + stateName);
 
-            switch( stateName )
-            {
-
+            switch (stateName) {
+		
             /* Example:
 
             case 'myGameState':
@@ -231,12 +239,10 @@ function (dojo, declare) {
         // onLeavingState: this method is called each time we are leaving a game state.
         //                 You can use this method to perform some user interface changes at this moment.
         //
-        onLeavingState: function( stateName )
-        {
-            console.log( 'Leaving state: '+stateName );
+        onLeavingState: function(stateName) {
+            console.log('Leaving state: ' + stateName);
 
-            switch( stateName )
-            {
+            switch (stateName) {
 
             /* Example:
 
@@ -263,7 +269,10 @@ function (dojo, declare) {
             if (this.isCurrentPlayerActive()) {
                 switch (stateName) {
 		case this.AjaxActions.PlayCard:
-		    this.addActionButton('pass', _('Pass'), 'onPass');
+		    this.addActionButton('pass', _('End turn'), 'onPass');
+		    break;
+		case this.AjaxActions.EggplantChooseCards:
+		    this.addActionButton('confirm', _('Confirm cards to pass on to next player'), 'onEggplantConfirm');
 		    break;
 		case this.AjaxActions.LeekChooseOpponent:
 		    for (var player_id in this.gamedatas.players) {
@@ -285,6 +294,24 @@ function (dojo, declare) {
 		}
 	    }
         },
+
+	onEggplantConfirm: function() {
+	    selected_cards = this.stock[this.Stock.Hand].getSelectedItems();
+	    all_cards = this.stock[this.Stock.Hand].getAllItems();
+	    if (selected_cards.length == 2 || (selected_cards.length < 2 && selected_cards.length == all_cards.length)) {
+		card_id1 = null;
+		card_id2 = null;
+		if (selected_cards.length > 0) {
+		    card_id1 = selected_cards[0].id;
+		    if (selected_cards.length > 1) {
+			card_id2 = selected_cards[1].id;
+		    }
+		}
+		this.changeState(this.AjaxActions.EggplantChooseCards, { card1: card_id1, card2: card_id2 });
+	    } else { 
+		this.showMessage(_("You must choose two cards from your hand (or as many as you can)"), "error");
+	    }
+	},
 
 	onLeekChooseOpponent: function(opponent_id) {
 	    this.changeState(this.AjaxActions.LeekChooseOpponent, { opponent_id: opponent_id });

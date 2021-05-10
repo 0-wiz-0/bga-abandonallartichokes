@@ -99,6 +99,15 @@
           $this->game->leekTakeCard($take_card);
           self::ajaxResponse();
       }          
+
+      public function eggplantChooseCards() {
+          self::setAjaxMode();
+          $card1 = self::getArg("card1", AT_posint, false);
+          $card2 = self::getArg("card2", AT_posint, false);
+
+          $this->game->eggplantChooseCards($card1, $card2);
+          self::ajaxResponse();
+      }          
   }
   
 

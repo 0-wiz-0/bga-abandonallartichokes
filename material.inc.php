@@ -62,6 +62,7 @@ if (!defined('STOCK_GARDEN_ROW')) { // ensure this block is only invoked once, s
    define("STOCK_DECK", 'deck');
    define("STOCK_DISCARD", 'discard');
    define("STOCK_COMPOST", 'compost');
+   define("STOCK_LIMBO", 'limbo'); // for cards passed during eggplants
 }
 
 // these definitions need to match the ones in the constructor in the JavaScript code
