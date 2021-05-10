@@ -107,7 +107,6 @@
 .card {
     background-size: contain;
     border-radius: 10px;
-    border: 1px grey solid;
 }
 
 .deck_face_up {
