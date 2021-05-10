@@ -538,12 +538,22 @@ define([
 
             updateDecks: function () {
               	//update deck according to counter
-				this.stock[this.Stock.Deck].removeAll();
-				let i = 0;
-				while (i < this.counter[this.player_id].deck.getValue()) {
-					this.stock[this.Stock.Deck].addToStock(this.CardBackId);
-					i++;
-				}
+		deck_target = this.counter[this.player_id].deck.getValue();
+		deck_status = this.stock[this.Stock.Deck].count();
+		while (deck_status < deck_target) {
+		    this.stock[this.Stock.Deck].addToStock(this.CardBackId);
+		    deck_status++;
+		}
+		if (deck_status > deck_target) {
+		    if (deck_target == 0) {
+			this.stock[this.Stock.Deck].removeAll();
+		    } else {
+			while (deck_status > deck_target) {
+			    this.stock[this.Stock.Deck].removeFromStock(this.CardBackId);
+			    deck_status--;
+			}
+		    }
+		}
                 // clean out discard if no cards there
                 if (this.counter[this.player_id].discard.getValue() == 0) {
                     this.stock[this.Stock.Discard].removeAll();

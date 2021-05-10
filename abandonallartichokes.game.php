@@ -208,10 +208,9 @@ class AbandonAllArtichokes extends Table
             $this->cards->moveCards($card_ids, STOCK_HAND, $target);
         }
         foreach ($players as $player_id => $value) {
-            $discard = $this->cards->getCardOnTop($this->player_discard($player_id));
             $this->notify_one($player_id, NOTIFICATION_DREW_HAND, '', null, array(
                 'cards' => $this->cards->getPlayerHand($player_id),
-                'discard' => $discard ? array($discard) : array(),
+                'discard' => $result[STOCK_DISCARD] = $this->cards->getCardsInLocation($this->player_discard($player_id)),
                 'player_id' => $player_id,
                 'player_name' => self::GetCurrentPlayerName(),
             ));
@@ -227,10 +226,9 @@ class AbandonAllArtichokes extends Table
         $this->cards->moveAllCardsInLocation(STOCK_HAND, $this->player_discard($player_id), $player_id, $player_id);
         // draw up to five cards
         $this->cards->pickCards(5, $this->player_deck($player_id), $player_id);
-        $discard = $this->cards->getCardOnTop($this->player_discard($player_id));
         $this->notify_one($player_id, NOTIFICATION_DREW_HAND, '', null, array(
             'cards' => $this->cards->getPlayerHand($player_id),
-            'discard' => $discard ? array($discard) : array(),
+            'discard' => $result[STOCK_DISCARD] = $this->cards->getCardsInLocation($this->player_discard($player_id)),
             'player_id' => $player_id,
             'player_name' => self::GetCurrentPlayerName(),
         ));
@@ -606,9 +604,9 @@ class AbandonAllArtichokes extends Table
         ));
         // move other cards to discard
         $displayed_cards = $this->cards->getCardsInLocation(STOCK_DISPLAYED_CARD);
-        $discard = $this->player_discard($player_id);
+        $player_discard = $this->player_discard($player_id);
         foreach($displayed_cards as $id => $card) {
-            $this->cards->moveCard($id, $discard);
+            $this->cards->moveCard($id, $player_discard);
             $this->notify_all(NOTIFICATION_CARD_MOVED, '', $card, array(
                 'destination' => STOCK_DISCARD,
                 'destination_arg' => $player_id,
