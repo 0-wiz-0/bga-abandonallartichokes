@@ -166,8 +166,7 @@ class AbandonAllArtichokes extends Table
         $result[STOCK_PLAYED_CARD] = $this->cards->getCardsInLocation(STOCK_PLAYED_CARD);
         $compost = $this->cards->getCardOnTop(STOCK_COMPOST);
         $result[STOCK_COMPOST] = $compost ? array($compost) : array();
-        $discard = $this->cards->getCardOnTop($this->player_discard($player_id));
-        $result[STOCK_DISCARD] = $discard ? array($discard) : array();
+        $result[STOCK_DISCARD] = $this->cards->getCardsInLocation($this->player_discard($player_id));
         $result[STOCK_DISPLAYED_CARD] = $this->cards->getCardsInLocation(STOCK_DISPLAYED_CARD);
 
         $result['counters'] = array();

@@ -107,15 +107,7 @@
 .card {
     background-size: contain;
     border-radius: 10px;
-    box-shadow: 1px 1px 0 black;
-}
-
-.deck_face_up {
-    box-shadow: 1px 1px 0 black,
-    3px 3px 0 white,
-    4px 4px 0 black,
-    5px 5px 0 white,
-    6px 6px 0 black;
+    border: 1px solid black;
 }
 
 .deck_face_down {
