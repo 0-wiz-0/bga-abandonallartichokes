@@ -5,7 +5,6 @@ Basic Features
   - broccoli
   - corn
   - onion
-  - peas
 
 Nice Features
 ===
@@ -26,3 +25,4 @@ Topics
 Cleanups
 ===
 - use args function on state change to supply player list to frontend for leek
+- remove console logs and debug logging

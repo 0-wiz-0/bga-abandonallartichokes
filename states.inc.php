@@ -59,6 +59,8 @@ if (!defined('STATE_END_GAME')) { // ensure this block is only invoked once, sin
    define("STATE_EGGPLANT_CHOOSE_CARDS", 7);
    define("STATE_EGGPLANT_DONE", 8);
    define("STATE_PEPPER_TAKE_CARD", 9);
+   define("STATE_PEAS_TAKE_CARD", 10);
+   define("STATE_PEAS_CHOOSE_OPPONENT", 11);
    define("STATE_END_GAME", 99);
 }
  
@@ -101,6 +103,8 @@ $machinestates = array(
             STATE_LEEK_CHOOSE_OPPONENT => STATE_LEEK_CHOOSE_OPPONENT,
             STATE_LEEK_TAKE_CARD => STATE_LEEK_TAKE_CARD,
             STATE_NEXT_PLAYER => STATE_NEXT_PLAYER,
+            STATE_PEAS_TAKE_CARD => STATE_PEAS_TAKE_CARD,
+            STATE_PEAS_CHOOSE_OPPONENT => STATE_PEAS_CHOOSE_OPPONENT,
             STATE_PEPPER_TAKE_CARD => STATE_PEPPER_TAKE_CARD,
             STATE_PLAY_CARD => STATE_PLAY_CARD,
         ),
@@ -150,29 +154,25 @@ $machinestates = array(
         "possibleactions" => array("pepperTakeCard"),
         "transitions" => array(STATE_PLAY_CARD => STATE_PLAY_CARD),
     ),
-    /*
-    Examples:
-    
-    2 => array(
-        "name" => "nextPlayer",
-        "description" => '',
-        "type" => "game",
-        "action" => "stNextPlayer",
-        "updateGameProgression" => true,   
-        "transitions" => array( "endGame" => 99, "nextPlayer" => 10 )
-    ),
-    
-    10 => array(
-        "name" => "playerTurn",
-        "description" => clienttranslate('${actplayer} must play a card or pass'),
-        "descriptionmyturn" => clienttranslate('${you} must play a card or pass'),
-        "type" => "activeplayer",
-        "possibleactions" => array( "playCard", "pass" ),
-        "transitions" => array( "playCard" => 2, "pass" => 2 )
-    ), 
 
-*/    
-   
+    STATE_PEAS_TAKE_CARD => array(
+        "name" => "peasTakeCard",
+        "description" => clienttranslate('${actplayer} must pick a card to keep'),
+        "descriptionmyturn" => clienttranslate('${you} must pick a card to keep'),
+        "type" => "activeplayer",
+        "possibleactions" => array("peasTakeCard"),
+        "transitions" => array(STATE_PEAS_CHOOSE_OPPONENT => STATE_PEAS_CHOOSE_OPPONENT),
+    ),
+
+    STATE_PEAS_CHOOSE_OPPONENT => array(
+        "name" => "peasChooseOpponent",
+        "description" => clienttranslate('${actplayer} must choose who gets the other card'),
+        "descriptionmyturn" => clienttranslate('${you} must choose who gets the other card'),
+        "type" => "activeplayer",
+        "possibleactions" => array("peasChooseOpponent"),
+        "transitions" => array(STATE_PLAY_CARD => STATE_PLAY_CARD),
+    ),
+
     // Final state.
     // Please do not modify (and do not overload action/args methods).
     STATE_END_GAME => array(

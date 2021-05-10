@@ -62,25 +62,20 @@
     }
     
     */
+      public function eggplantChooseCards() {
+          self::setAjaxMode();
+          $card1 = self::getArg("card1", AT_posint, false);
+          $card2 = self::getArg("card2", AT_posint, false);
+
+          $this->game->eggplantChooseCards($card1, $card2);
+          self::ajaxResponse();
+      }          
+
       public function harvestCard() {
           self::setAjaxMode();
           $id = self::getArg("id", AT_posint, true);
 
           $this->game->harvestCard($id);
-          self::ajaxResponse();
-      }
-
-      public function pass() {
-          self::setAjaxMode();
-          $this->game->pass();
-          self::ajaxResponse();
-      }
-
-      public function playCard() {
-          self::setAjaxMode();
-          $id = self::getArg("id", AT_posint, true);
-
-          $this->game->playCard($id);
           self::ajaxResponse();
       }
 
@@ -100,6 +95,28 @@
           self::ajaxResponse();
       }          
 
+      public function pass() {
+          self::setAjaxMode();
+          $this->game->pass();
+          self::ajaxResponse();
+      }
+
+      public function peasChooseOpponent() {
+          self::setAjaxMode();
+          $opponent_id = self::getArg("opponent_id", AT_posint, true);
+
+          $this->game->peasChooseOpponent($opponent_id);
+          self::ajaxResponse();
+      }          
+          
+      public function peasTakeCard() {
+          self::setAjaxMode();
+          $id = self::getArg("id", AT_posint, true);
+
+          $this->game->peasTakeCard($id);
+          self::ajaxResponse();
+      }          
+
       public function pepperTakeCard() {
           self::setAjaxMode();
           $id = self::getArg("id", AT_posint, true);
@@ -108,14 +125,14 @@
           self::ajaxResponse();
       }          
 
-      public function eggplantChooseCards() {
+      public function playCard() {
           self::setAjaxMode();
-          $card1 = self::getArg("card1", AT_posint, false);
-          $card2 = self::getArg("card2", AT_posint, false);
+          $id = self::getArg("id", AT_posint, true);
 
-          $this->game->eggplantChooseCards($card1, $card2);
+          $this->game->playCard($id);
           self::ajaxResponse();
-      }          
+      }
+
   }
   
 

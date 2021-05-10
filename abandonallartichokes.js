@@ -58,6 +58,8 @@ define([
                     LeekChooseOpponent: 'leekChooseOpponent',
                     LeekTakeCard: 'leekTakeCard',
                     Pass: 'pass',
+                    PeasChooseOpponent: 'peasChooseOpponent',
+                    PeasTakeCard: 'peasTakeCard',
                     PepperTakeCard: 'pepperTakeCard',
                     PlayCard: 'playCard',
                 };
@@ -130,8 +132,8 @@ define([
                     this.stock[stock_entry.name] = this.setupCardStocks(stock_entry.name, stock_entry.callback);
                     this.stock[stock_entry.name].setSelectionMode(stock_entry.selectionMode);
                     this.stock[stock_entry.name].setSelectionAppearance('class');
-					this.stock[stock_entry.name].extraClasses = extraClasses;
-					if (stock_entry.overlap) this.stock[stock_entry.name].setOverlap(stock_entry.overlap);
+		    this.stock[stock_entry.name].extraClasses = extraClasses;
+		    if (stock_entry.overlap) this.stock[stock_entry.name].setOverlap(stock_entry.overlap);
                     this.stock[stock_entry.name].autowidth = true;
                     this.addCardsToStock(this.stock[stock_entry.name], this.gamedatas[stock_entry.name]);
                 }
@@ -192,6 +194,8 @@ define([
                         if (this.checkAction('leekTakeCard', true)) {
                             // usability feature: click on displayed card to take it after playing leek
                             this.changeState(this.AjaxActions.LeekTakeCard, {take_card: true});
+                        } else if (this.checkAction('peasTakeCard', true)) {
+                            this.changeState(this.AjaxActions.PeasTakeCard, {id: items[0].id});
                         } else if (this.checkAction('pepperTakeCard', true)) {
                             this.changeState(this.AjaxActions.PepperTakeCard, {id: items[0].id});
                         }
@@ -287,32 +291,45 @@ define([
             //
             onUpdateActionButtons: function (stateName, args) {
                 console.log('onUpdateActionButtons: ' + stateName);
+		console.log(args);
 
                 if (this.isCurrentPlayerActive()) {
                     switch (stateName) {
-                        case this.AjaxActions.PlayCard:
-                            this.addActionButton('pass', _('End turn'), 'onPass');
-                            break;
-                        case this.AjaxActions.EggplantChooseCards:
-                            this.addActionButton('confirm', _('Confirm cards to pass on to next player'), 'onEggplantConfirm');
-                            break;
-                        case this.AjaxActions.LeekChooseOpponent:
-                            for (var player_id in this.gamedatas.players) {
-                                if (player_id == this.player_id) {
-                                    continue;
-                                }
-                                if (!this.hasCards(player_id)) {
-                                    continue;
-                                }
-                                this.addActionButton('player_' + this.gamedatas.players[player_id].player_no,
-                                    _('Choose ') + this.gamedatas.players[player_id].name,
-                                    this.onLeekChooseOpponent.bind(this, player_id));
+                    case this.AjaxActions.PlayCard:
+                        this.addActionButton('pass', _('End turn'), 'onPass');
+                        break;
+                    case this.AjaxActions.EggplantChooseCards:
+                        this.addActionButton('confirm', _('Confirm cards to pass on to next player'), 'onEggplantConfirm');
+                        break;
+                    case this.AjaxActions.LeekChooseOpponent:
+			// TODO:  switch to args
+                        for (var player_id in this.gamedatas.players) {
+                            if (player_id == this.player_id) {
+                                continue;
                             }
-                            break;
-                        case this.AjaxActions.LeekTakeCard:
-                            this.addActionButton('leekTake', _('Take card'), 'onLeekTake');
-                            this.addActionButton('leekLeave', _('Give card back'), 'onLeekDecline');
-                            break;
+                            if (!this.hasCards(player_id)) {
+                                continue;
+                            }
+                            this.addActionButton('player_' + this.gamedatas.players[player_id].player_no,
+						 _('Choose ') + this.gamedatas.players[player_id].name,
+						 this.onChooseOpponent.bind(this, stateName, player_id));
+                        }
+                        break;
+                    case this.AjaxActions.PeasChooseOpponent:
+			// TODO:  switch to args
+                        for (var player_id in this.gamedatas.players) {
+                            if (player_id == this.player_id) {
+                                continue;
+                            }
+                            this.addActionButton('player_' + this.gamedatas.players[player_id].player_no,
+						 _('Choose ') + this.gamedatas.players[player_id].name,
+						 this.onChooseOpponent.bind(this, stateName, player_id));
+                        }
+                        break;
+                    case this.AjaxActions.LeekTakeCard:
+                        this.addActionButton('leekTake', _('Take card'), 'onLeekTake');
+                        this.addActionButton('leekLeave', _('Give card back'), 'onLeekDecline');
+                        break;
                     }
                 }
             },
@@ -335,8 +352,8 @@ define([
                 }
             },
 
-            onLeekChooseOpponent: function (opponent_id) {
-                this.changeState(this.AjaxActions.LeekChooseOpponent, {opponent_id: opponent_id});
+            onChooseOpponent: function (action, opponent_id) {
+                this.changeState(action, { opponent_id: opponent_id});
             },
 
             hasCards: function (player_id) {
@@ -457,9 +474,7 @@ define([
             changeState: function (targetState, args = {}) {
                 args.lock = true;
                 this.ajaxcall("/abandonallartichokes/abandonallartichokes/" + targetState + ".html", args,
-                    this, function (result) {
-                    }, function (is_error) {
-                    });
+			      this, function (result) { }, function (is_error) { });
             },
 
             showCardPlay: function (player_id, from, from_arg, to, to_arg, card, counters) {
