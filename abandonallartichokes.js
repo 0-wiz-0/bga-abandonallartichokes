@@ -129,6 +129,7 @@ function (dojo, declare) {
 	    for (var stock_entry of stock_constructor) {
 			this.stock[stock_entry.name] = this.setupCardStocks(stock_entry.name, stock_entry.callback);
 			this.stock[stock_entry.name].setSelectionMode(stock_entry.selectionMode);
+			this.stock[stock_entry.name].setSelectionAppearance('class');
 			this.stock[stock_entry.name].extraClasses = extraClasses + ' ' + (stock_entry.extraClasses? stock_entry.extraClasses: '');
 			this.stock[stock_entry.name].autowidth = true;
 			this.addCardsToStock(this.stock[stock_entry.name], this.gamedatas[stock_entry.name]);

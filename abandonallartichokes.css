@@ -107,18 +107,26 @@
 .card {
     background-size: contain;
     border-radius: 10px;
+    box-shadow: 1px 1px 0 black;
 }
 
 .deck_face_up {
-    box-shadow: 3px 3px 0 white,
+    box-shadow: 1px 1px 0 black,
+    3px 3px 0 white,
     4px 4px 0 black,
     5px 5px 0 white,
     6px 6px 0 black;
 }
 
 .deck_face_down {
-    box-shadow: 3px 3px 0 rgba(var(--cardBack)),
+    box-shadow: 1px 1px 0 black,
+    3px 3px 0 rgba(var(--cardBack)),
     4px 4px 0 black,
     5px 5px 0 rgba(var(--cardBack)),
     6px 6px 0 black;
+}
+
+.stockitem_selected {
+    opacity: 0.5 !important;
+    border-style: none !important;
 }
