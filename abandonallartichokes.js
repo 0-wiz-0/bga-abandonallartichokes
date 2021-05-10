@@ -144,7 +144,7 @@ define([
                 this.stock[this.Stock.Deck].setOverlap(1);
                 this.stock[this.Stock.Deck].extraClasses = extraClasses;
                 this.stock[this.Stock.Deck].autowidth = true;
-                this.stock[this.Stock.Deck].addItemType(this.CardBackId, this.CardBackId, g_gamethemeurl + 'img/back.jpg', 0);
+                this.stock[this.Stock.Deck].addItemType(this.CardBackId, 0, g_gamethemeurl + 'img/back.jpg', 0);
                 this.updateDecks();
 
                 this.setupNotifications();
@@ -168,9 +168,9 @@ define([
                 var stock = new ebg.stock();
                 stock.create(this, $(id), this.cardwidth, this.cardheight);
                 for (var vegetable_id = 1; vegetable_id < 11; vegetable_id++) {
-                    stock.addItemType(vegetable_id, vegetable_id, g_gamethemeurl + 'img/' + vegetable_id + '.jpg', vegetable_id);
+                    stock.addItemType(vegetable_id, 0, g_gamethemeurl + 'img/' + vegetable_id + '.jpg', vegetable_id);
                 }
-                stock.addItemType(11, 11, g_gamethemeurl + 'img/artichoke4.jpg', 11);
+                stock.addItemType(11, 0, g_gamethemeurl + 'img/artichoke4.jpg', 11);
                 if (selectionChangeFunctionName != null) {
                     dojo.connect(stock, 'onChangeSelection', this, selectionChangeFunctionName);
                 }
