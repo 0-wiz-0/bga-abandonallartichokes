@@ -6,9 +6,6 @@ Basic Features
   - corn
   - eggplant
     - better show selected cards
-	- allow choosing two cards
-	- finish sending the card ids to the server
-	- graphics
   - onion
   - peas
   - pepper
@@ -22,6 +19,8 @@ Nice Features
   - How to Play
   - Developed by
 - replace remaining graphics
+- take displayed card by clicking on it (peas, leek)
+- make more easily visible which cards are selected (eggplant)
 
 Topics
 ===

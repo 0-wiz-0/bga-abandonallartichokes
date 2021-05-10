@@ -309,7 +309,7 @@ function (dojo, declare) {
 		}
 		this.changeState(this.AjaxActions.EggplantChooseCards, { card1: card_id1, card2: card_id2 });
 	    } else { 
-		this.showMessage(_("You must choose two cards from your hand (or as many as you can)"), "error");
+		this.showMessage(_("You must choose two cards from your hand (or as many as you can if you have fewer cards)"), "error");
 	    }
 	},
 

@@ -475,20 +475,35 @@ class AbandonAllArtichokes extends Table
             if ($card_id != null) {
                 $card = $this->cards->getCard($card_id);
                 if ($card == null || $card['location'] != STOCK_HAND || $card['location_arg'] != $player_id) {
-                    throw BgaUserException(self::_("You must choose two cards from your hand (or as many as you can)"));
+                    throw BgaUserException(self::_("You must choose two cards from your hand (or as many as you can if you have fewer cards)"));
                 }
                 $count++;
             }
         }
         if ($count < 2 && $this->cards->countCardInLocation(STOCK_HAND, $player_id) != $count) {
-            throw new BgaUserException(self::_("You must choose two cards from your hand (or as many as you can)"));
+            throw new BgaUserException(self::_("You must choose two cards from your hand (or as many as you can if you have fewer cards)"));
         }
         // pass to limbo for next player
+        // show card as moved to correct player, but for this player only
+        $opponent_id = self::getPlayerAfter($player_id);
+        $opponent_name = $this->player_name($opponent_id);
         foreach ($card_ids as $index => $card_id) {
-            $passed_cart = $this->cards->moveCard($card_id, STOCK_LIMBO, $player_id);
+            $passed_card = $this->cards->getCard($card_id);
+            $this->cards->moveCard($card_id, STOCK_LIMBO, $player_id);
+            $this->notify_one(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} passes ${vegetable} to ${opponent_name}'), $passed_card, array(
+                // 'origin' => STOCK_DECK,
+                // 'origin_arg' => $player_id,
+            'destination' => STOCK_DECK,
+            'destination_arg' => $opponent_id,
+            'opponent_name' => $opponent_name,
+            ));
         }
 
-        $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('${player_name} passes ${count} cards'), '', array( 'count' => $count ));
+        // TODO create and use notify_others instead
+        $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('${player_name} passes ${count} cards to ${opponent_name}'), '', array(
+            'count' => $count,
+            'opponent_name' => $opponent_name
+        ));
         $this->gamestate->setPlayerNonMultiactive($player_id, STATE_EGGPLANT_DONE);
     }
 
