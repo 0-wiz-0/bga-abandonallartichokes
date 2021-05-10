@@ -412,8 +412,6 @@ define([
                 dojo.subscribe(this.Notification.DrewHand, this, "notif_drewHand");
                 dojo.subscribe(this.Notification.RefilledGardenRow, this, "notif_refilledGardenRow");
                 dojo.subscribe(this.Notification.UpdateCounters, this, "notif_updateCounters");
-
-                this.notifqueue.setSynchronous(this.Notification.CardMoved, 800);
             },
 
             notif_cardMoved: function (notification) {
@@ -514,13 +512,13 @@ define([
                     this.stock[from].removeFromStockById(card.id, to);
                 } else {
                     this.stock[to].addToStockWithId(card.type, card.id, from + '_item_' + card.id);
-                    this.stock[from].removeFromStockById(card.id, to);
+                    this.stock[from].removeFromStockById(card.id);
                 }
             },
 
             moveVisibleToPanel: function (from, player_id, card) {
                 this.slideToObject(from + '_item_' + card.id, 'player_board_' + player_id);
-                this.stock[from].removeFromStockById(card.id, 'player_board_' + player_id);
+                this.stock[from].removeFromStockById(card.id);
             },
 
             movePanelToVisible: function (player_id, to, card) {

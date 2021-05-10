@@ -23,12 +23,6 @@ Topics
   - auto pass if no playable cards left? in general, hard, but perhaps for artichoke-only hands
 - game progression
 
-Animation issues
-===
-- move to deck - card goes to center, but appears in sorted location
-- moves seem to consist of two cards
-
-
 Cleanups
 ===
 - use args function on state change to supply player list to frontend for leek
