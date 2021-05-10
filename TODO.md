@@ -17,7 +17,6 @@ Nice Features
   - How to Play
   - Developed by
 - replace remaining graphics
-- take displayed card by clicking on it (peas, leek)
 - make more easily visible which cards are selected (eggplant)
 
 Topics

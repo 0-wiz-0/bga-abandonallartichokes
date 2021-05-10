@@ -118,7 +118,7 @@ function (dojo, declare) {
 	    const stock_constructor = [
 		{ name: this.Stock.GardenRow, callback: 'onGardenRowSelect', selectionMode: 1},
 		{ name: this.Stock.Hand, callback: 'onPlayerHandSelect', selectionMode: 2},
-		{ name: this.Stock.DisplayedCard, callback: 'onDisplayedCardSelect', selectionMode: 0},
+		{ name: this.Stock.DisplayedCard, callback: 'onDisplayedCardSelect', selectionMode: 1},
 		{ name: this.Stock.PlayedCard, callback: null, selectionMode: 0},
 		{ name: this.Stock.Discard, callback: null, selectionMode: 0, extraClasses: 'deck_face_up'},
 		{ name: this.Stock.Compost, callback: null, selectionMode: 0, extraClasses: 'deck_face_up'},
@@ -185,12 +185,14 @@ function (dojo, declare) {
 	onDisplayedCardSelect: function(control_name, item_id) {
 	    var items = this.stock[this.Stock.DisplayedCard].getSelectedItems();
 	    if (items.length > 0) {
-                //if( this.checkAction('playCard', true)) {
-                //var card_id = items[0].id;
-		//this.changeState(this.AjaxActions.PlayCard, { id: card_id });
-                //}
-		//else {
-		this.showMessage(_("You can't select cards from the display area now."), "error");
+		if (this.isCurrentPlayerActive()) {
+		    if (this.checkAction('leekTakeCard')) {
+			// usability feature: click on displayed card to take it after playing leek
+			this.changeState(this.AjaxActions.LeekTakeCard, { take_card: true });
+		    }
+                } else {
+		    this.showMessage(_("You can't select cards from the display area now."), "error");
+		}
                 this.stock[this.Stock.DisplayedCard].unselectAll();
 	    }
 	},
