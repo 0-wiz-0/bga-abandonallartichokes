@@ -812,7 +812,7 @@ class AbandonAllArtichokes extends Table
         $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} plays ${vegetable}'), $played_card, array(
             'destination' => STOCK_PLAYED_CARD,
         ));
-        return $played_card;
+        return $this->cards->getCard($id);
     }
 
     function get_played_card_id() {
