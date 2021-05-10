@@ -209,7 +209,7 @@ class AbandonAllArtichokes extends Table
         }
         foreach ($players as $player_id => $value) {
             $discard = $this->cards->getCardOnTop($this->player_discard($player_id));
-            $this->notify_one(NOTIFICATION_DREW_HAND, '', null, array(
+            $this->notify_one($player_id, NOTIFICATION_DREW_HAND, '', null, array(
                 'cards' => $this->cards->getPlayerHand($player_id),
                 'discard' => $discard ? array($discard) : array(),
                 'player_id' => $player_id,
@@ -228,7 +228,7 @@ class AbandonAllArtichokes extends Table
         // draw up to five cards
         $this->cards->pickCards(5, $this->player_deck($player_id), $player_id);
         $discard = $this->cards->getCardOnTop($this->player_discard($player_id));
-        $this->notify_one(NOTIFICATION_DREW_HAND, '', null, array(
+        $this->notify_one($player_id, NOTIFICATION_DREW_HAND, '', null, array(
             'cards' => $this->cards->getPlayerHand($player_id),
             'discard' => $discard ? array($discard) : array(),
             'player_id' => $player_id,
@@ -490,20 +490,22 @@ class AbandonAllArtichokes extends Table
         foreach ($card_ids as $index => $card_id) {
             $passed_card = $this->cards->getCard($card_id);
             $this->cards->moveCard($card_id, STOCK_LIMBO, $player_id);
-            $this->notify_one(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} passes ${vegetable} to ${opponent_name}'), $passed_card, array(
-                // 'origin' => STOCK_DECK,
-                // 'origin_arg' => $player_id,
-            'destination' => STOCK_DECK,
-            'destination_arg' => $opponent_id,
-            'opponent_name' => $opponent_name,
-            ));
+            // in test solo-mode games, eggplant moves from and to own deck
+            if ($player_id != $opponent_id) {
+                $this->notify_one($player_id, NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} passes ${vegetable} to ${opponent_name}'), $passed_card, array(
+                    // 'origin' => STOCK_DECK,
+                    // 'origin_arg' => $player_id,
+                    'destination' => STOCK_DECK,
+                    'destination_arg' => $opponent_id,
+                    'opponent_name' => $opponent_name,
+                ));
+            }
         }
-
-        // TODO create and use notify_others instead
-        $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('${player_name} passes ${count} cards to ${opponent_name}'), '', array(
+        $this->notify_others($player_id, NOTIFICATION_MESSAGE, clienttranslate('${player_name} passes ${count} cards to ${opponent_name}'), '', array(
             'count' => $count,
             'opponent_name' => $opponent_name
         ));
+
         $this->gamestate->setPlayerNonMultiactive($player_id, STATE_EGGPLANT_DONE);
     }
 
@@ -823,14 +825,24 @@ class AbandonAllArtichokes extends Table
     }
 
     function notify_all($type, $message, $card = null, $arguments = array()) {
-        $this->notify_backend(true, $type, $message, $card, $arguments);
+        $this->notify_backend(null, $type, $message, $card, $arguments);
     }
 
-    function notify_one($type, $message, $card = null, $arguments = array()) {
-        $this->notify_backend(false, $type, $message, $card, $arguments);
+    function notify_one($player_id, $type, $message, $card = null, $arguments = array()) {
+        $this->notify_backend($player_id, $type, $message, $card, $arguments);
     }
 
-    function notify_backend($all, $type, $message, $card, $arguments) {
+    function notify_others($my_player_id, $type, $message, $card = null, $arguments = array()) {
+        $players = self::loadPlayersBasicInfos();
+        foreach ($players as $player_id => $value) {
+            if ($player_id = $my_player_id) {
+                continue;
+            }
+            $this->notify_backend($player_id, $type, $message, $card, $arguments);
+        }
+    }
+
+    function notify_backend($target_player_id, $type, $message, $card, $arguments) {
         $this->set_if_not_set($arguments, 'player_id', self::getCurrentPlayerId());
         $this->set_if_not_set($arguments, 'player_name', $this->player_name($arguments['player_id']));
         if ($card != null) {
@@ -844,10 +856,10 @@ class AbandonAllArtichokes extends Table
         foreach (self::loadPlayersBasicInfos() as $player_id => $player) {
             $arguments['counters'][$player_id] = $this->get_counters($player_id);
         }
-        if ($all) {
-            self::notifyAllPlayers($type, $message, $arguments);
+        if ($target_player_id != null) {
+            self::notifyPlayer($target_player_id, $type, $message, $arguments);
         } else {
-            self::notifyPlayer($arguments['player_id'], $type, $message, $arguments);
+            self::notifyAllPlayers($type, $message, $arguments);
         }
     }
 

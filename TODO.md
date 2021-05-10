@@ -4,8 +4,6 @@ Basic Features
   - beet
   - broccoli
   - corn
-  - eggplant
-    - better show selected cards
   - onion
   - peas
   - pepper
@@ -27,7 +25,7 @@ Topics
 - translations
 - check usage of getCurrentPlayerId vs. getActivePlayerId
 - more auto play?
-  -auto pass if no playable cards left? in general, hard, but perhaps for artichoke-only hands
+  - auto pass if no playable cards left? in general, hard, but perhaps for artichoke-only hands
 - game progression
 
 Animation issues
