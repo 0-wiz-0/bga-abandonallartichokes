@@ -835,7 +835,7 @@ class AbandonAllArtichokes extends Table
     function notify_others($my_player_id, $type, $message, $card = null, $arguments = array()) {
         $players = self::loadPlayersBasicInfos();
         foreach ($players as $player_id => $value) {
-            if ($player_id = $my_player_id) {
+            if ($player_id == $my_player_id) {
                 continue;
             }
             $this->notify_backend($player_id, $type, $message, $card, $arguments);
