@@ -582,9 +582,8 @@ class AbandonAllArtichokes extends Table
         return STATE_EGGPLANT_CHOOSE_CARDS;
     }
 
-    function eggplantChooseCards($card1, $card2) {
+    function eggplantChooseCards($card_ids) {
         $this->checkAction('eggplantChooseCards');
-        $card_ids = array($card1, $card2);
         $player_id = $this->getCurrentPlayerId();
 
         $count = 0;

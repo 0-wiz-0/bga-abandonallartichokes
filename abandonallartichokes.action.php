@@ -59,8 +59,14 @@
           self::setAjaxMode();
           $card1 = self::getArg("card1", AT_posint, false);
           $card2 = self::getArg("card2", AT_posint, false);
-
-          $this->game->eggplantChooseCards($card1, $card2);
+          $cards = array();
+          if ($card1 != null) {
+              $cards[] = $card1;
+          }
+          if ($card2 != null) {
+              $cards[] = $card2;
+          }
+          $this->game->eggplantChooseCards($cards);
           self::ajaxResponse();
       }
 
