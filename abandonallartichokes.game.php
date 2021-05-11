@@ -558,6 +558,7 @@ class AbandonAllArtichokes extends Table
 
     function playEggplant($id) {
         $hand = $this->cards->getPlayerHand(self::getCurrentPlayerId());
+        $artichoke = null;
         foreach ($hand as $card) {
             if ($card['type'] == VEGETABLE_ARTICHOKE) {
                 $artichoke = $card;
