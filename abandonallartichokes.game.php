@@ -384,7 +384,7 @@ class AbandonAllArtichokes extends Table
     function playBeet($id) {
         $target_args = $this->arg_beetOpponents();
         $target_ids = $target_args['target_ids'];
-        if ($this->cards->countCardInLocation(STOCK_HAND, self::getCurrentPlayerId()) == 0) {
+        if ($this->cards->countCardInLocation(STOCK_HAND, self::getCurrentPlayerId()) <= 1) {
             throw new BgaUserException(self::_("Beet can only be played if you have cards in your hand"));
         }
         if (count($target_ids) < 1) {
