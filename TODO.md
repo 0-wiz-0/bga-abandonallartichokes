@@ -21,9 +21,8 @@ Topics
 
 Cleanups
 ===
-- use args function on state change to supply player list to frontend for leek
 - remove console logs and debug logging
 - debug animation issues
   - when moving from visible to visible
-  - onion when auto-choosing opponent moves from hand to played card and disappears, and hand to other player,
-    probably because both animations start at the same time
+- onion when auto-choosing opponent moves from hand to played card and disappears, and hand to other player,
+  probably because both animations start at the same time; same for beet, possibly others
