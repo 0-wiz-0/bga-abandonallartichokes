@@ -83,7 +83,11 @@ define([
                     PEAS: 8,
                     PEPPER: 9,
                     POTATO: 10,
-                    ARTICHOKE: 11,
+                    ARTICHOKE1: 11,
+                    ARTICHOKE2: 12,
+                    ARTICHOKE3: 13,
+                    ARTICHOKE4: 14,
+                    ARTICHOKE5: 15,
                 };
             },
 
@@ -172,10 +176,10 @@ define([
             setupCardStocks: function (id, selectionChangeFunctionName) {
                 var stock = new ebg.stock();
                 stock.create(this, $(id), this.cardwidth, this.cardheight);
-                for (var vegetable_id = 1; vegetable_id < 11; vegetable_id++) {
+                for (var vegetable_id = 1; vegetable_id < 16; vegetable_id++) {
+		    // 1-10: main vegetables, 11-15: artichokes
                     stock.addItemType(vegetable_id, 0, g_gamethemeurl + 'img/' + vegetable_id + '.jpg', vegetable_id);
                 }
-                stock.addItemType(11, 0, g_gamethemeurl + 'img/artichoke4.jpg', 11);
                 if (selectionChangeFunctionName != null) {
                     dojo.connect(stock, 'onChangeSelection', this, selectionChangeFunctionName);
                 }
@@ -186,7 +190,8 @@ define([
             addCardsToStock: function (stock, cards) {
                 stock.removeAll();
                 Object.values(cards).forEach(function (card) {
-                    stock.addToStockWithId(card.type, card.id);
+		    // for five types of artichokes, add type_arg
+                    stock.addToStockWithId(parseInt(card.type) + parseInt(card.type_arg), card.id);
                 });
             },
 
@@ -423,6 +428,8 @@ define([
             notif_cardMoved: function (notification) {
                 console.log(this.Notification.CardMoved + ' notification');
                 console.log(notification);
+		// for five types of artichokes, add type_arg
+		notification.args.card.type = parseInt(notification.args.card.type) + parseInt(notification.args.card.type_arg);
                 this.showCardPlay(notification.args.player_id,
                     notification.args.origin, notification.args.origin_arg,
                     notification.args.destination, notification.args.destination_arg,
@@ -568,15 +575,15 @@ define([
             },
 
 	    setupNewCard: function(card_div, card_type_id, card_id) {
-		if (card_type_id == this.Vegetables.ARTICHOKE) {
+		if (card_type_id >= this.Vegetables.ARTICHOKE1) {
 		    this.addTooltip(card_div.id, this.getVegetableInfoText(card_type_id), "");
 		} else {
 		    this.addTooltip(card_div.id, "", this.getVegetableInfoText(card_type_id));
 		}
 	    },
 
-            getVegetableInfoText: function (type) {
-                const typeNo = parseInt(type, 10);
+            getVegetableInfoText: function(type) {
+		const typeNo = parseInt(type);
                 switch (typeNo) {
                 case this.Vegetables.BEET:
                     return _("You and an opponent each reveal a random card. Compost both if Artichokes, otherwise swap them.")
@@ -598,7 +605,11 @@ define([
                     return _("Put a card from your Discard Pile on top of your Deck.")
                 case this.Vegetables.POTATO:
                     return _("Reveal the top card of your Deck. Compost if Artichoke, otherwise discard it.")
-                case this.Vegetables.ARTICHOKE:
+                case this.Vegetables.ARTICHOKE1:
+                case this.Vegetables.ARTICHOKE2:
+                case this.Vegetables.ARTICHOKE3:
+                case this.Vegetables.ARTICHOKE4:
+                case this.Vegetables.ARTICHOKE5:
                     return _("Looking forward to be abandoned by you!")
                 }
             },

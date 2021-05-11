@@ -105,7 +105,12 @@ class AbandonAllArtichokes extends Table
         foreach ($this->vegetables as $vegetable_id => $vegetable)
         {
             if ($vegetable_id == VEGETABLE_ARTICHOKE) {
-                $cards[] = array('type' => $vegetable_id, 'type_arg' => 0, 'nbr' => 10 * count($players));
+                // type_arg is used for selecting one of the 5 artichoke pictures, see frontend
+                $cards[] = array('type' => $vegetable_id, 'type_arg' => 0, 'nbr' => 2 * count($players));
+                $cards[] = array('type' => $vegetable_id, 'type_arg' => 1, 'nbr' => 2 * count($players));
+                $cards[] = array('type' => $vegetable_id, 'type_arg' => 2, 'nbr' => 2 * count($players));
+                $cards[] = array('type' => $vegetable_id, 'type_arg' => 3, 'nbr' => 2 * count($players));
+                $cards[] = array('type' => $vegetable_id, 'type_arg' => 4, 'nbr' => 2 * count($players));
             } else {
                 //$cards[] = array('type' => $vegetable_id, 'type_arg' => 0, 'nbr' => 6);
                 //$cards[] = array('type' => VEGETABLE_CARROT, 'type_arg' => 0, 'nbr' => 6);
