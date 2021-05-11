@@ -38,6 +38,14 @@
               self::trace( "Complete reinitialization of board game" );
           }
       }
+
+      public function beetChooseOpponent() {
+          self::setAjaxMode();
+          $opponent_id = self::getArg("opponent_id", AT_posint, true);
+
+          $this->game->beetChooseOpponent($opponent_id);
+          self::ajaxResponse();
+      }
   	
       public function cornTakeCard() {
           self::setAjaxMode();

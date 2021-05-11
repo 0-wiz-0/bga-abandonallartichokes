@@ -113,15 +113,16 @@ class AbandonAllArtichokes extends Table
                 $cards[] = array('type' => $vegetable_id, 'type_arg' => 4, 'nbr' => 2 * count($players));
             } else {
                 //$cards[] = array('type' => $vegetable_id, 'type_arg' => 0, 'nbr' => 6);
-                //$cards[] = array('type' => VEGETABLE_CARROT, 'type_arg' => 0, 'nbr' => 6);
+                $cards[] = array('type' => VEGETABLE_BEET, 'type_arg' => 0, 'nbr' => 6);
+                $cards[] = array('type' => VEGETABLE_CARROT, 'type_arg' => 0, 'nbr' => 6);
                 //$cards[] = array('type' => VEGETABLE_POTATO, 'type_arg' => 0, 'nbr' => 6);
-                $cards[] = array('type' => VEGETABLE_ONION, 'type_arg' => 0, 'nbr' => 6);
-                $cards[] = array('type' => VEGETABLE_PEPPER, 'type_arg' => 0, 'nbr' => 6);
+                //$cards[] = array('type' => VEGETABLE_ONION, 'type_arg' => 0, 'nbr' => 6);
+                //$cards[] = array('type' => VEGETABLE_PEPPER, 'type_arg' => 0, 'nbr' => 6);
                 //$cards[] = array('type' => VEGETABLE_PEAS, 'type_arg' => 0, 'nbr' => 6);
-                $cards[] = array('type' => VEGETABLE_CORN, 'type_arg' => 0, 'nbr' => 6);
+                //$cards[] = array('type' => VEGETABLE_CORN, 'type_arg' => 0, 'nbr' => 6);
                 //$cards[] = array('type' => VEGETABLE_LEEK, 'type_arg' => 0, 'nbr' => 6);
-                //$cards[] = array('type' => VEGETABLE_EGGPLANT, 'type_arg' => 0, 'nbr' => 6);
-                $cards[] = array('type' => VEGETABLE_BROCCOLI, 'type_arg' => 0, 'nbr' => 6);
+                $cards[] = array('type' => VEGETABLE_EGGPLANT, 'type_arg' => 0, 'nbr' => 6);
+                //$cards[] = array('type' => VEGETABLE_BROCCOLI, 'type_arg' => 0, 'nbr' => 6);
             }
 
         }
@@ -337,6 +338,9 @@ class AbandonAllArtichokes extends Table
         }
 
         switch($card['type']) {
+        case VEGETABLE_BEET:
+            $next_state = $this->playBeet($id);
+            break;
         case VEGETABLE_BROCCOLI:
             $next_state = $this->playBroccoli($id);
             break;
@@ -374,6 +378,76 @@ class AbandonAllArtichokes extends Table
 
         if ($next_state) {
             $this->gamestate->nextState($next_state);
+        }
+    }
+
+    function playBeet($id) {
+        $target_args = $this->arg_beetOpponents();
+        $target_ids = $target_args['target_ids'];
+        if ($this->cards->countCardInLocation(STOCK_HAND, self::getCurrentPlayerId()) == 0) {
+            throw new BgaUserException(self::_("Beet can only be played if you have cards in your hand"));
+        }
+        if (count($target_ids) < 1) {
+            throw new BgaUserException(self::_("Beet can only be played if an opponent has cards in hand"));
+        }
+
+        $this->play_card($id);
+
+        if (self::getGameStateValue(GAME_STATE_AUTOMATIC_PLAYER_DECISIONS) > 0 && count($target_ids) == 1) {
+            $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('[automatic] Only one valid target player for ${vegetable}'), '',
+                array( 'vegetable' => $this->vegetables[VEGETABLE_BEET]['name']));
+            $target_id = array_pop($target_ids);
+            $this->gamestate->nextState(STATE_BEET_CHOOSE_OPPONENT);
+            $this->beetChooseOpponent($target_id);
+        } else {
+            return STATE_BEET_CHOOSE_OPPONENT;
+        }
+    }
+
+    function beetChooseOpponent($opponent_id) {
+        self::checkAction("beetChooseOpponent");
+        $hand = $this->cards->getPlayerHand(self::getCurrentPlayerId());
+        $card = $this->cards->getCard(array_rand($hand ,  1 ));
+        $opponent_hand = $this->cards->getPlayerHand($opponent_id);
+        $opponent_card = $this->cards->getCard(array_rand($opponent_hand ,  1 ));
+        $this->beetHandleDrawnCards($card,$opponent_card, $opponent_id);
+
+        $this->discard_played_card();
+        $this->gamestate->nextState(STATE_PLAY_CARD);
+    }
+
+    function arg_beetOpponents() {
+        $opponents = $this->get_opponent_ids();
+        $target_ids = array();
+        foreach ($opponents as $index => $opponent_id) {
+            if ($this->cards->countCardInLocation(STOCK_HAND, $opponent_id) > 0) {
+                array_push($target_ids, $opponent_id);
+                break;
+            }
+        }
+        return array ( 'target_ids' => $target_ids );
+    }
+
+    function beetHandleDrawnCards($card, $opponent_card, $opponent_id) {
+        if ($card['type'] == VEGETABLE_ARTICHOKE && $opponent_card['type'] == VEGETABLE_ARTICHOKE) {
+            $this->cards->moveCard($card['id'], STOCK_COMPOST);
+            $this->cards->moveCard($opponent_card['id'], STOCK_COMPOST);
+            $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} composts ${vegetable}'),$card,
+                array( 'destination' => STOCK_COMPOST ));
+            $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${opponent_name} composts ${vegetable}'),
+                $opponent_card, array( 'destination' => STOCK_COMPOST, 'opponent_name' => $this->player_name($opponent_id)));
+        }
+        else {
+            $this->cards->moveCard($card['id'], STOCK_HAND, $opponent_id);
+            $this->cards->moveCard($opponent_card['id'], STOCK_HAND, self::getCurrentPlayerId());
+            $this->notify_all(NOTIFICATION_CARD_MOVED,  clienttranslate('${player_name} gives ${vegetable} to ${opponent_name}'),
+                $card, array( 'destination' => STOCK_HAND,
+                'destination_arg' => $opponent_id,
+                'opponent_name' => $this->player_name($opponent_id)));
+            $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${opponent_name} gives ${vegetable} to ${player_name}'),
+                $opponent_card, array( 'destination' => STOCK_HAND,
+                'destination_arg' => self::getCurrentPlayerId(),
+                'opponent_name' => $this->player_name($opponent_id)));
         }
     }
 

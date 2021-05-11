@@ -63,6 +63,7 @@ if (!defined('STATE_END_GAME')) { // ensure this block is only invoked once, sin
    define("STATE_PEAS_CHOOSE_OPPONENT", 11);
    define("STATE_ONION_CHOOSE_OPPONENT", 12);
    define("STATE_CORN_TAKE_CARD", 13);
+   define("STATE_BEET_CHOOSE_OPPONENT", 14);
    define("STATE_END_GAME", 99);
 }
  
@@ -101,6 +102,7 @@ $machinestates = array(
         "type" => "activeplayer",
         "possibleactions" => array("playCard", "pass"),
         "transitions" => array(
+            STATE_BEET_CHOOSE_OPPONENT => STATE_BEET_CHOOSE_OPPONENT,
             STATE_CORN_TAKE_CARD => STATE_CORN_TAKE_CARD,
             STATE_EGGPLANT_CHOOSE_CARDS => STATE_EGGPLANT_CHOOSE_CARDS,
             STATE_LEEK_CHOOSE_OPPONENT => STATE_LEEK_CHOOSE_OPPONENT,
@@ -195,6 +197,15 @@ $machinestates = array(
         "descriptionmyturn" => clienttranslate('${you} must pick a card from the garden row'),
         "type" => "activeplayer",
         "possibleactions" => array("cornTakeCard"),
+        "transitions" => array(STATE_PLAY_CARD => STATE_PLAY_CARD),
+    ),
+    STATE_BEET_CHOOSE_OPPONENT => array(
+        "name" => "beetChooseOpponent",
+        "description" => clienttranslate('${actplayer} must choose an opponent'),
+        "descriptionmyturn" => clienttranslate('${you} must choose an opponent'),
+        "type" => "activeplayer",
+        "args" => "arg_beetOpponents",
+        "possibleactions" => array("beetChooseOpponent"),
         "transitions" => array(STATE_PLAY_CARD => STATE_PLAY_CARD),
     ),
 

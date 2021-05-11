@@ -54,6 +54,7 @@ define([
                 // this needs to match the values in abandonallartichokes.action.php and states.inc.php
                 this.AjaxActions = {
 		    CornTakeCard: 'cornTakeCard',
+                    BeetChooseOpponent: 'beetChooseOpponent',
                     EggplantChooseCards: 'eggplantChooseCards',
                     Harvest: 'harvestCard',
                     LeekChooseOpponent: 'leekChooseOpponent',
@@ -311,6 +312,7 @@ define([
                     case this.AjaxActions.EggplantChooseCards:
                         this.addActionButton('confirm', _('Confirm cards to pass on to next player'), 'onEggplantConfirm');
                         break;
+                    case this.AjaxActions.BeetChooseOpponent:
                     case this.AjaxActions.LeekChooseOpponent:
                     case this.AjaxActions.OnionChooseOpponent:
                     case this.AjaxActions.PeasChooseOpponent:
