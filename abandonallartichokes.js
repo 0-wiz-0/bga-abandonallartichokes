@@ -515,6 +515,9 @@ define([
                     //this.slideToObject(from + '_item_' + card.id, to);
                     this.stock[from].removeFromStockById(card.id, to);
                 } else {
+		    // TODO: this produces two animations: one from 'from' to 'to' (wanted)
+		    // but the removeFromStockbyid adds another one from the current card location to the left part of the area
+		    // how to remoe the second animation?
                     this.stock[to].addToStockWithId(card.type, card.id, from + '_item_' + card.id);
                     this.stock[from].removeFromStockById(card.id);
                 }
