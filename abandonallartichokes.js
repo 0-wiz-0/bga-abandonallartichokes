@@ -66,10 +66,6 @@ define([
                     PepperTakeCard: 'pepperTakeCard',
                     PlayCard: 'playCard',
                 };
-                // this needs to match the values in states.inc.php; only copy the necessary ones
-                this.State = {
-                    EggplantChooseCards: 7,
-                };
                 this.CardBackId = 1;
 
                 //vegetable types => numbers match define in material.inc.php
@@ -297,9 +293,6 @@ define([
                 }
             },
 
-            // onUpdateActionButtons: in this method you can manage "action buttons" that are displayed in the
-            //                        action status bar (ie: the HTML links in the status bar).
-            //
             onUpdateActionButtons: function (stateName, args) {
                 console.log('onUpdateActionButtons: ' + stateName);
 		console.log(args);
@@ -367,55 +360,6 @@ define([
             onLeekDecline: function () {
                 this.changeState(this.AjaxActions.LeekTakeCard, {take_card: false});
             },
-
-            ///////////////////////////////////////////////////
-            //// Player's action
-
-            /*
-
-                Here, you are defining methods to handle player's action (ex: results of mouse click on
-                game objects).
-
-                Most of the time, these methods:
-                _ check the action is possible at this game state.
-                _ make a call to the game server
-
-            */
-
-            /* Example:
-
-            onMyMethodToCall1: function( evt )
-            {
-                console.log( 'onMyMethodToCall1' );
-
-                // Preventing default browser reaction
-                dojo.stopEvent( evt );
-
-                // Check that this action is possible (see "possibleactions" in states.inc.php)
-                if( ! this.checkAction( 'myAction' ) )
-                {   return; }
-
-                this.ajaxcall( "/abandonallartichokes/abandonallartichokes/myAction.html", {
-                                                                        lock: true,
-                                                                        myArgument1: arg1,
-                                                                        myArgument2: arg2,
-                                                                        ...
-                                                                     },
-                             this, function( result ) {
-
-                                // What to do after the server call if it succeeded
-                                // (most of the time: nothing)
-
-                             }, function( is_error) {
-
-                                // What to do after the server call in anyway (success or failure)
-                                // (most of the time: nothing)
-
-                             } );
-            },
-
-            */
-
 
             // Notifications
             setupNotifications: function () {
