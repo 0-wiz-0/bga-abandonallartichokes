@@ -302,25 +302,14 @@ define([
                         this.addActionButton('confirm', _('Confirm cards to pass on to next player'), 'onEggplantConfirm');
                         break;
                     case this.AjaxActions.LeekChooseOpponent:
-			// TODO:  switch to args
-                        for (var player_id in this.gamedatas.players) {
-                            if (player_id == this.player_id) {
-                                continue;
-                            }
-                            if (!this.hasCards(player_id)) {
-                                continue;
-                            }
+                        for (var player_id of args.target_ids) {
                             this.addActionButton('player_' + this.gamedatas.players[player_id].player_no,
 						 _('Choose ') + this.gamedatas.players[player_id].name,
 						 this.onChooseOpponent.bind(this, stateName, player_id));
                         }
                         break;
                     case this.AjaxActions.PeasChooseOpponent:
-			// TODO:  switch to args
-                        for (var player_id in this.gamedatas.players) {
-                            if (player_id == this.player_id) {
-                                continue;
-                            }
+                        for (var player_id of args.target_ids) {
                             this.addActionButton('player_' + this.gamedatas.players[player_id].player_no,
 						 _('Choose ') + this.gamedatas.players[player_id].name,
 						 this.onChooseOpponent.bind(this, stateName, player_id));
@@ -522,8 +511,8 @@ define([
                     // the draw deck only shows a card back, so we can not move from a specific card
                     // also, we don't have to remove it
                     this.stock[to].addToStockWithId(card.type, card.id, from);
-                } else if (to == this.Stock.Deck) {
-                    this.slideToObject(from + '_item_' + card.id, to);
+                } else if (to == this.Stock.Deck) { // visibility already checked
+                    //this.slideToObject(from + '_item_' + card.id, to);
                     this.stock[from].removeFromStockById(card.id, to);
                 } else {
                     this.stock[to].addToStockWithId(card.type, card.id, from + '_item_' + card.id);
@@ -533,7 +522,7 @@ define([
 
             moveVisibleToPanel: function (from, player_id, card) {
                 this.slideToObject(from + '_item_' + card.id, 'player_board_' + player_id);
-                this.stock[from].removeFromStockById(card.id);
+                this.stock[from].removeFromStockById(card.id, 'player_board_' + player_id);
             },
 
             movePanelToVisible: function (player_id, to, card) {

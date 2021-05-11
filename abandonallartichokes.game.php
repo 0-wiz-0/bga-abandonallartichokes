@@ -34,13 +34,9 @@ class AbandonAllArtichokes extends Table
         self::initGameStateLabels(array(
             "cards_played_this_turn" => 10,
             "target_player" => 11,
-            //    "my_first_global_variable" => 10,
-            //    "my_second_global_variable" => 11,
-            //      ...
-            //    "my_first_game_variant" => 100,
-            //    "my_second_game_variant" => 101,
-            //      ...
-       ));
+            "automatic_card_decisions" => 101,
+            "automatic_player_decisions" => 102,
+        ));
 
         $this->cards = self::getNew("module.common.deck");
         $this->cards->init("card");
@@ -93,7 +89,10 @@ class AbandonAllArtichokes extends Table
 
         // Init global values with their initial values
         self::setGameStateInitialValue(GAME_STATE_CARDS_PLAYED_THIS_TURN, 0);
-
+        // TODO: make it a variant
+        self::setGameStateInitialValue(GAME_STATE_AUTOMATIC_CARD_DECISIONS, 0);
+        self::setGameStateInitialValue(GAME_STATE_AUTOMATIC_PLAYER_DECISIONS, 1);
+        
         // Init game statistics
         // (note: statistics used in this file must be defined in your stats.inc.php file)
         //self::initStat('table', 'table_teststat1', 0);    // Init a table statistics
@@ -110,10 +109,10 @@ class AbandonAllArtichokes extends Table
             } else {
                 //$cards[] = array('type' => $vegetable_id, 'type_arg' => 0, 'nbr' => 6);
                 //$cards[] = array('type' => VEGETABLE_CARROT, 'type_arg' => 0, 'nbr' => 6);
-                $cards[] = array('type' => VEGETABLE_POTATO, 'type_arg' => 0, 'nbr' => 6);
+                //$cards[] = array('type' => VEGETABLE_POTATO, 'type_arg' => 0, 'nbr' => 6);
                 $cards[] = array('type' => VEGETABLE_PEPPER, 'type_arg' => 0, 'nbr' => 6);
                 $cards[] = array('type' => VEGETABLE_PEAS, 'type_arg' => 0, 'nbr' => 6);
-                //$cards[] = array('type' => VEGETABLE_LEEK, 'type_arg' => 0, 'nbr' => 6);
+                $cards[] = array('type' => VEGETABLE_LEEK, 'type_arg' => 0, 'nbr' => 6);
                 //$cards[] = array('type' => VEGETABLE_EGGPLANT, 'type_arg' => 0, 'nbr' => 6);
             }
 
@@ -451,8 +450,6 @@ class AbandonAllArtichokes extends Table
             // in test solo-mode games, eggplant moves from and to own deck
             if ($player_id != $opponent_id) {
                 $this->notify_one($player_id, NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} passes ${vegetable} to ${opponent_name}'), $passed_card, array(
-                    // 'origin' => STOCK_DECK,
-                    // 'origin_arg' => $player_id,
                     'destination' => STOCK_DECK,
                     'destination_arg' => $opponent_id,
                     'opponent_name' => $opponent_name,
@@ -470,31 +467,36 @@ class AbandonAllArtichokes extends Table
     function playLeek($id) {
         $players = self::loadPlayersBasicInfos();
 
-        $targets = array();
-        foreach ($players as $player_id => $value) {
-            if ($player_id == self::getCurrentPlayerId()) {
-                continue;
-            }
-            if ($this->cards->countCardInLocation($this->player_deck($player_id)) + $this->cards->countCardInLocation($this->player_discard($player_id)) > 0) {
-                array_push($targets, $player_id);
-                break;
-            }
-        }
-        if (count($targets) < 1) {
+        $target_args = $this->arg_leekOpponents();
+        $target_ids = $target_args['target_ids'];
+        if (count($target_ids) < 1) {
             throw new BgaUserException(self::_("Leek can only be played if an opponent has cards in the deck"));
         }
 
         $this->play_card($id);
 
-        if (count($targets) == 1) {
+        if (self::getGameStateValue(GAME_STATE_AUTOMATIC_PLAYER_DECISIONS) > 0 && count($target_ids) == 1) {
             $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('[automatic] Only one valid target player for ${vegetable}'), '',
-                              array( 'vegetable' => $this->vegetables[VEGETABLE_PEAS]['name']));
-            $target = array_pop($targets);
+                              array( 'vegetable' => $this->vegetables[VEGETABLE_LEEK]['name']));
+            $target_id = array_pop($target_ids);
             $this->gamestate->nextState(STATE_LEEK_CHOOSE_OPPONENT);
-            $this->leekChooseOpponent($target);
+            $this->leekChooseOpponent($target_id);
         } else {
             return STATE_LEEK_CHOOSE_OPPONENT;
         }
+    }
+
+    function arg_leekOpponents() {
+        $opponents = $this->get_opponent_ids();
+        $target_ids = array();
+        foreach ($opponents as $index => $opponent_id) {
+            if ($this->cards->countCardInLocation($this->player_deck($opponent_id)) > 0 ||
+                $this->cards->countCardInLocation($this->player_discard($opponent_id)) > 0) {
+                array_push($target_ids, $opponent_id);
+                break;
+            }
+        }
+        return array ( 'target_ids' => $target_ids );
     }
 
     function leekChooseOpponent($opponent_id) {
@@ -572,7 +574,7 @@ class AbandonAllArtichokes extends Table
             ));
         }
 
-        if (count($available_types) == 1) {
+        if (self::getGameStateValue(GAME_STATE_AUTOMATIC_CARD_DECISIONS) > 0 && count($available_types) == 1) {
             $types = array_keys($available_types);
             $type = array_pop($types);
             $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('[automatic] Only cards of type ${vegetable} in display area'), '',
@@ -602,16 +604,10 @@ class AbandonAllArtichokes extends Table
             'destination_arg' => $player_id,
         ));
 
-        $players = self::loadPlayersBasicInfos();
-        $target_ids = array();
-        foreach ($players as $opponent_id => $value) {
-            if ($player_id == $opponent_id) {
-                continue;
-            }
-            array_push($target_ids, $opponent_id);
-        }
+        $targets = $this->arg_allOpponents();
+        $target_ids = $targets['target_ids'];
 
-        if (count($target_ids) == 1) {
+        if (self::getGameStateValue(GAME_STATE_AUTOMATIC_PLAYER_DECISIONS) > 0 && count($target_ids) == 1) {
             $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('[automatic] Only one valid target player for ${vegetable}'), '',
                               array( 'vegetable' => $this->vegetables[VEGETABLE_PEAS]['name']));
             $target_id = array_pop($target_ids);
@@ -621,6 +617,11 @@ class AbandonAllArtichokes extends Table
         }
 
         $this->gamestate->nextState(STATE_PEAS_CHOOSE_OPPONENT);
+    }
+
+    function arg_allOpponents() {
+        $target_ids = $this->get_opponent_ids();
+        return array ( 'target_ids' => $target_ids );
     }
 
     function peasChooseOpponent($opponent_id) {
@@ -662,8 +663,9 @@ class AbandonAllArtichokes extends Table
             $available_types[$card['type']] = $id;
         }
 
-        if (count($available_types) == 1) {
-            $type = array_pop(array_keys($available_types));
+        if (self::getGameStateValue(GAME_STATE_AUTOMATIC_CARD_DECISIONS) > 0 && count($available_types) == 1) {
+            $types = array_keys($available_types);
+            $type = array_pop($types);
             $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('[automatic] Only cards of type ${vegetable} in discard pile'), '', 
                               array( 'vegetable' => $this->vegetables[$type]['name']));
             $card_id = array_pop($available_types);
@@ -926,7 +928,21 @@ class AbandonAllArtichokes extends Table
         }
         return array_pop($played_cards);
     }
-        
+    
+    function get_opponent_ids() {
+        $player_id = self::getActivePlayerId();
+        $players = self::loadPlayersBasicInfos();
+        $target_ids = array();
+        foreach ($players as $opponent_id => $opponent) {
+            if ($player_id == $opponent_id) {
+                continue;
+            }
+            array_push($target_ids, $opponent_id);
+        }
+        return $target_ids;
+    }
+
+
     function player_deck($player_id) {
         return "deck_" . $this->player_no($player_id);
     }

@@ -36,6 +36,8 @@ if (!defined('GAME_STATE_CARDS_PLAYED_THIS_TURN')) { // ensure this block is onl
     // must match name in constructor in game.php
     define("GAME_STATE_CARDS_PLAYED_THIS_TURN", "cards_played_this_turn");
     define("GAME_STATE_TARGET_PLAYER", "target_player");
+    define("GAME_STATE_AUTOMATIC_CARD_DECISIONS", "automatic_card_decisions");
+    define("GAME_STATE_AUTOMATIC_PLAYER_DECISIONS", "automatic_player_decisions");
 }
 
 if (!defined('VEGETABLE_BEET')) { // ensure this block is only invoked once, since it is included multiple times
