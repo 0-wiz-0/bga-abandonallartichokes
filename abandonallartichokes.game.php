@@ -112,7 +112,8 @@ class AbandonAllArtichokes extends Table
                 //$cards[] = array('type' => VEGETABLE_POTATO, 'type_arg' => 0, 'nbr' => 6);
                 $cards[] = array('type' => VEGETABLE_ONION, 'type_arg' => 0, 'nbr' => 6);
                 $cards[] = array('type' => VEGETABLE_PEPPER, 'type_arg' => 0, 'nbr' => 6);
-                $cards[] = array('type' => VEGETABLE_PEAS, 'type_arg' => 0, 'nbr' => 6);
+                //$cards[] = array('type' => VEGETABLE_PEAS, 'type_arg' => 0, 'nbr' => 6);
+                $cards[] = array('type' => VEGETABLE_CORN, 'type_arg' => 0, 'nbr' => 6);
                 //$cards[] = array('type' => VEGETABLE_LEEK, 'type_arg' => 0, 'nbr' => 6);
                 //$cards[] = array('type' => VEGETABLE_EGGPLANT, 'type_arg' => 0, 'nbr' => 6);
             }
@@ -333,6 +334,9 @@ class AbandonAllArtichokes extends Table
         case VEGETABLE_CARROT:
             $next_state = $this->playCarrot($id);
             break;
+        case VEGETABLE_CORN:
+            $next_state = $this->playCorn($id);
+            break;
         case VEGETABLE_EGGPLANT:
             $next_state = $this->playEggplant($id);
             break;
@@ -397,6 +401,53 @@ class AbandonAllArtichokes extends Table
         $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} composts carrot and two artichokes'), $card, array( 'destination' => STOCK_COMPOST ));
 
         return STATE_NEXT_PLAYER;
+    }
+
+    function playCorn($id) {
+        if ($this->cards->countCardInLocation(STOCK_GARDEN_ROW) == 0) {
+            throw new BgaUserException(self::_("You can not play corn if there are no cards in the garden row"));
+        }
+        $hand = $this->cards->getPlayerHand(self::getCurrentPlayerId());
+        foreach ($hand as $card) {
+            if ($card['type'] == VEGETABLE_ARTICHOKE) {
+                $artichoke = $card;
+                break;
+            }
+        }
+        if ($artichoke == null) {
+            throw new BgaUserException(self::_("To play an eggplant you need an artichoke in your hand"));
+        }
+
+        $player_id = self::getCurrentPlayerId();
+
+        $this->play_card($id);
+
+        $this->cards->moveCard($artichoke['id'], $this->player_discard($player_id));
+        $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} discards ${vegetable}'), $artichoke, array(
+            'destination' => STOCK_DISCARD,
+            'destination_arg' => $player_id,
+        ));
+
+        return STATE_CORN_TAKE_CARD;
+    }
+
+    function cornTakeCard($id) {
+        self::checkAction("cornTakeCard");
+        $card = $this->cards->getCard($id);
+        if ($card == null || $card['location'] != STOCK_GARDEN_ROW) {
+            throw new BgaVisibleSystemException("Choose a card from the garden row");
+        }
+
+        $player_id = self::getCurrentPlayerId();
+        $this->cards->insertCardOnExtremePosition($id, $this->player_deck($player_id), true);
+        $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} picks ${vegetable}'), $card, array(
+            'destination' => STOCK_DECK,
+            'destination_arg' => $player_id,
+        ));
+
+        $this->discard_played_card();
+
+        $this->gamestate->nextState(STATE_PLAY_CARD);
     }
 
     function playEggplant($id) {

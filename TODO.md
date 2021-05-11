@@ -3,7 +3,6 @@ Basic Features
 - missing vegetables
   - beet
   - broccoli
-  - corn
 
 Nice Features
 ===
@@ -27,4 +26,5 @@ Cleanups
 - remove console logs and debug logging
 - debug animation issues
   - when moving from visible to visible
-  - onion when auto-choosing opponent moves from hand to panel and disappears in played area even though it never was there
+  - onion when auto-choosing opponent moves from hand to played card and disappears, and hand to other player,
+    probably because both animations start at the same time

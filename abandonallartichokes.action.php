@@ -39,6 +39,14 @@
           }
       }
   	
+      public function cornTakeCard() {
+          self::setAjaxMode();
+          $id = self::getArg("id", AT_posint, true);
+
+          $this->game->cornTakeCard($id);
+          self::ajaxResponse();
+      }
+
       public function eggplantChooseCards() {
           self::setAjaxMode();
           $card1 = self::getArg("card1", AT_posint, false);

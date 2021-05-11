@@ -51,8 +51,9 @@ define([
                     RefilledGardenRow: "refilled_garden_row",
                     UpdateCounters: "update_counters",
                 };
-                // this needs to match the values in abandonallartichokes.action.php
+                // this needs to match the values in abandonallartichokes.action.php and states.inc.php
                 this.AjaxActions = {
+		    CornTakeCard: 'cornTakeCard',
                     EggplantChooseCards: 'eggplantChooseCards',
                     Harvest: 'harvestCard',
                     LeekChooseOpponent: 'leekChooseOpponent',
@@ -227,11 +228,13 @@ define([
             onGardenRowSelect: function (control_name, item_id) {
                 var items = this.stock[this.Stock.GardenRow].getSelectedItems();
 
-                // TODO: this will break for corn
                 if (items.length > 0) {
                     if (this.checkAction('harvestCard', true)) {
                         var card_id = items[0].id;
                         this.changeState(this.AjaxActions.Harvest, {id: card_id});
+		    } else if (this.checkAction('cornTakeCard', true)) {
+			var card_id = items[0].id;
+			this.changeState(this.AjaxActions.CornTakeCard, {id: card_id});
                     } else {
                         this.showMessage(_("You can't harvest cards now."), "error");
                     }
