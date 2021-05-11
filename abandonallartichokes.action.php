@@ -78,6 +78,14 @@
           self::ajaxResponse();
       }
 
+      public function onionChooseOpponent() {
+          self::setAjaxMode();
+          $opponent_id = self::getArg("opponent_id", AT_posint, true);
+
+          $this->game->onionChooseOpponent($opponent_id);
+          self::ajaxResponse();
+      }
+
       public function peasChooseOpponent() {
           self::setAjaxMode();
           $opponent_id = self::getArg("opponent_id", AT_posint, true);

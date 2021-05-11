@@ -4,7 +4,6 @@ Basic Features
   - beet
   - broccoli
   - corn
-  - onion
 
 Nice Features
 ===
@@ -26,3 +25,6 @@ Cleanups
 ===
 - use args function on state change to supply player list to frontend for leek
 - remove console logs and debug logging
+- debug animation issues
+  - when moving from visible to visible
+  - onion when auto-choosing opponent moves from hand to panel and disappears in played area even though it never was there

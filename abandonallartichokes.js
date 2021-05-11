@@ -57,6 +57,7 @@ define([
                     Harvest: 'harvestCard',
                     LeekChooseOpponent: 'leekChooseOpponent',
                     LeekTakeCard: 'leekTakeCard',
+                    OnionChooseOpponent: 'onionChooseOpponent',
                     Pass: 'pass',
                     PeasChooseOpponent: 'peasChooseOpponent',
                     PeasTakeCard: 'peasTakeCard',
@@ -302,12 +303,7 @@ define([
                         this.addActionButton('confirm', _('Confirm cards to pass on to next player'), 'onEggplantConfirm');
                         break;
                     case this.AjaxActions.LeekChooseOpponent:
-                        for (var player_id of args.target_ids) {
-                            this.addActionButton('player_' + this.gamedatas.players[player_id].player_no,
-						 _('Choose ') + this.gamedatas.players[player_id].name,
-						 this.onChooseOpponent.bind(this, stateName, player_id));
-                        }
-                        break;
+                    case this.AjaxActions.OnionChooseOpponent:
                     case this.AjaxActions.PeasChooseOpponent:
                         for (var player_id of args.target_ids) {
                             this.addActionButton('player_' + this.gamedatas.players[player_id].player_no,
@@ -516,10 +512,16 @@ define([
                     this.stock[from].removeFromStockById(card.id, to);
                 } else {
 		    // TODO: this produces two animations: one from 'from' to 'to' (wanted)
-		    // but the removeFromStockbyid adds another one from the current card location to the left part of the area
+		    // but the removeFromStockById adds another one from the current card location to the left part of the area
 		    // how to remoe the second animation?
-                    this.stock[to].addToStockWithId(card.type, card.id, from + '_item_' + card.id);
+		    // setting 'to' gives another additional animation
+		    // setting 'noupdate' just leaves the card there (and nothing removes it)
+		    this.stock[to].addToStockWithId(card.type, card.id, from + '_item_' + card.id);
                     this.stock[from].removeFromStockById(card.id);
+		    // This does not look good either, because the target appears before the move animation
+		    //this.stock[from].removeFromStockById(card.id, to);
+		    //this.stock[to].addToStockWithId(card.type, card.id);
+
                 }
             },
 
