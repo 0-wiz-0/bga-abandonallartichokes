@@ -165,7 +165,7 @@ $gameinfos = array(
 
 'custom_buy_button' => array(
      'url' => 'https://gamewright.com/wheretobuy/',
-     'label' => 'Gamewrigth (store locator)'
+     'label' => 'Gamewright (store locator)'
 ),
 
 //////// BGA SANDBOX ONLY PARAMETERS (DO NOT MODIFY)
