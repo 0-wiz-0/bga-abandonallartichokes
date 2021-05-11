@@ -2,7 +2,6 @@ Basic Features
 ===
 - missing vegetables
   - beet
-  - broccoli
 
 Nice Features
 ===

@@ -116,6 +116,7 @@ class AbandonAllArtichokes extends Table
                 $cards[] = array('type' => VEGETABLE_CORN, 'type_arg' => 0, 'nbr' => 6);
                 //$cards[] = array('type' => VEGETABLE_LEEK, 'type_arg' => 0, 'nbr' => 6);
                 //$cards[] = array('type' => VEGETABLE_EGGPLANT, 'type_arg' => 0, 'nbr' => 6);
+                $cards[] = array('type' => VEGETABLE_BROCCOLI, 'type_arg' => 0, 'nbr' => 6);
             }
 
         }
@@ -331,6 +332,9 @@ class AbandonAllArtichokes extends Table
         }
 
         switch($card['type']) {
+        case VEGETABLE_BROCCOLI:
+            $next_state = $this->playBroccoli($id);
+            break;
         case VEGETABLE_CARROT:
             $next_state = $this->playCarrot($id);
             break;
@@ -366,6 +370,29 @@ class AbandonAllArtichokes extends Table
         if ($next_state) {
             $this->gamestate->nextState($next_state);
         }
+    }
+
+    function playBroccoli($id) {
+        $hand = $this->cards->getPlayerHand(self::getCurrentPlayerId());
+        $artichoke_count = 0;
+        foreach ($hand as $card) {
+            if ($card['type'] == VEGETABLE_ARTICHOKE) {
+                $artichoke = $card;
+                $artichoke_count ++;
+            }
+        }
+        if ($artichoke_count < 3) {
+            throw new BgaUserException(self::_("To play a broccoli youT need 3 artichokes in your hand"));
+        }
+
+        $this->play_card($id);
+        $this->cards->moveCard($artichoke['id'], STOCK_COMPOST);
+        $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} discards ${vegetable}'), $artichoke, array(
+            'destination' => STOCK_COMPOST
+        ));
+
+        $this->discard_played_card();
+        return STATE_PLAY_CARD;
     }
 
     function playCarrot($id) {
