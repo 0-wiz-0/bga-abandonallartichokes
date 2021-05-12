@@ -112,16 +112,16 @@ class AbandonAllArtichokes extends Table
                 $cards[] = array('type' => $vegetable_id, 'type_arg' => 3, 'nbr' => 2 * count($players));
                 $cards[] = array('type' => $vegetable_id, 'type_arg' => 4, 'nbr' => 2 * count($players));
             } else {
-                //$cards[] = array('type' => $vegetable_id, 'type_arg' => 0, 'nbr' => 6);
-                $cards[] = array('type' => VEGETABLE_BEET, 'type_arg' => 0, 'nbr' => 6);
-                $cards[] = array('type' => VEGETABLE_CARROT, 'type_arg' => 0, 'nbr' => 6);
+                $cards[] = array('type' => $vegetable_id, 'type_arg' => 0, 'nbr' => 6);
+                //$cards[] = array('type' => VEGETABLE_BEET, 'type_arg' => 0, 'nbr' => 6);
+                //$cards[] = array('type' => VEGETABLE_CARROT, 'type_arg' => 0, 'nbr' => 6);
                 //$cards[] = array('type' => VEGETABLE_POTATO, 'type_arg' => 0, 'nbr' => 6);
                 //$cards[] = array('type' => VEGETABLE_ONION, 'type_arg' => 0, 'nbr' => 6);
                 //$cards[] = array('type' => VEGETABLE_PEPPER, 'type_arg' => 0, 'nbr' => 6);
                 //$cards[] = array('type' => VEGETABLE_PEAS, 'type_arg' => 0, 'nbr' => 6);
                 //$cards[] = array('type' => VEGETABLE_CORN, 'type_arg' => 0, 'nbr' => 6);
                 //$cards[] = array('type' => VEGETABLE_LEEK, 'type_arg' => 0, 'nbr' => 6);
-                $cards[] = array('type' => VEGETABLE_EGGPLANT, 'type_arg' => 0, 'nbr' => 6);
+                //$cards[] = array('type' => VEGETABLE_EGGPLANT, 'type_arg' => 0, 'nbr' => 6);
                 //$cards[] = array('type' => VEGETABLE_BROCCOLI, 'type_arg' => 0, 'nbr' => 6);
             }
 
