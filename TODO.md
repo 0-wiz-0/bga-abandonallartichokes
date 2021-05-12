@@ -1,8 +1,3 @@
-Basic Features
-===
-- missing vegetables
-  - beet
-
 Nice Features
 ===
 - zombie player
