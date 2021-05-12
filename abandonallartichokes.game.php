@@ -407,10 +407,13 @@ class AbandonAllArtichokes extends Table
     function beetChooseOpponent($opponent_id) {
         self::checkAction("beetChooseOpponent");
         $hand = $this->cards->getPlayerHand(self::getCurrentPlayerId());
-        $card = $this->cards->getCard(array_rand($hand ,  1 ));
+        $card = $this->cards->getCard(array_rand($hand, 1));
         $opponent_hand = $this->cards->getPlayerHand($opponent_id);
-        $opponent_card = $this->cards->getCard(array_rand($opponent_hand ,  1 ));
-        $this->beetHandleDrawnCards($card,$opponent_card, $opponent_id);
+        if (count($opponent_hand) < 1) {
+            throw new BgaUserException(self::_("Beet can only be played on an opponent with cards in hand"));
+        }            
+        $opponent_card = $this->cards->getCard(array_rand($opponent_hand, 1));
+        $this->beetHandleDrawnCards($card, $opponent_card, $opponent_id);
 
         $this->discard_played_card();
         $this->gamestate->nextState(STATE_PLAY_CARD);
@@ -432,7 +435,7 @@ class AbandonAllArtichokes extends Table
         if ($card['type'] == VEGETABLE_ARTICHOKE && $opponent_card['type'] == VEGETABLE_ARTICHOKE) {
             $this->cards->moveCard($card['id'], STOCK_COMPOST);
             $this->cards->moveCard($opponent_card['id'], STOCK_COMPOST);
-            $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} composts ${vegetable}'),$card,
+            $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} composts ${vegetable}'), $card,
                 array( 'destination' => STOCK_COMPOST ));
             $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${opponent_name} composts ${vegetable}'),
                 $opponent_card, array( 'destination' => STOCK_COMPOST, 'opponent_name' => $this->player_name($opponent_id)));
@@ -442,12 +445,12 @@ class AbandonAllArtichokes extends Table
             $this->cards->moveCard($opponent_card['id'], STOCK_HAND, self::getCurrentPlayerId());
             $this->notify_all(NOTIFICATION_CARD_MOVED,  clienttranslate('${player_name} gives ${vegetable} to ${opponent_name}'),
                 $card, array( 'destination' => STOCK_HAND,
-                'destination_arg' => $opponent_id,
-                'opponent_name' => $this->player_name($opponent_id)));
+                              'destination_arg' => $opponent_id,
+                              'opponent_name' => $this->player_name($opponent_id)));
             $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${opponent_name} gives ${vegetable} to ${player_name}'),
-                $opponent_card, array( 'destination' => STOCK_HAND,
-                'destination_arg' => self::getCurrentPlayerId(),
-                'opponent_name' => $this->player_name($opponent_id)));
+                              $opponent_card, array( 'destination' => STOCK_HAND,
+                                                     'destination_arg' => self::getCurrentPlayerId(),
+                                                     'opponent_name' => $this->player_name($opponent_id)));
         }
     }
 

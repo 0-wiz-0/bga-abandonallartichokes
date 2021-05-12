@@ -26,8 +26,11 @@ define([
             constructor: function () {
                 console.log('abandonallartichokes constructor');
 
-                this.cardwidth = 140;
-                this.cardheight = 210;
+		// css spritesheet properties
+                this.cardwidth = 150;
+                this.cardheight = 225;
+		this.image_items_per_row = 4;
+		this.spritesheet = 'img/spritesheet150.jpg';
                 // the values must be the same in
                 // - gamedatas
                 // - HTML *.tpl file (div id)
@@ -68,7 +71,7 @@ define([
                 };
                 this.CardBackId = 1;
 
-                //vegetable types => numbers match define in material.inc.php
+                //vegetable types => numbers match define in material.inc.php; this also corresponds to image order in the css sprite
                 this.Vegetables = {
                     BEET: 1,
                     BROCCOLI: 2,
@@ -85,6 +88,7 @@ define([
                     ARTICHOKE3: 13,
                     ARTICHOKE4: 14,
                     ARTICHOKE5: 15,
+		    BACK: 16,
                 };
             },
 
@@ -146,11 +150,12 @@ define([
                 // draw deck is special, we only show card backs
                 this.stock[this.Stock.Deck] = new ebg.stock();
                 this.stock[this.Stock.Deck].create(this, $(this.Stock.Deck), this.cardwidth, this.cardheight);
+		this.stock[this.Stock.Deck].image_items_per_row = this.image_items_per_row;
                 this.stock[this.Stock.Deck].setSelectionMode(0);
                 this.stock[this.Stock.Deck].setOverlap(1);
                 this.stock[this.Stock.Deck].extraClasses = extraClasses;
                 this.stock[this.Stock.Deck].autowidth = true;
-                this.stock[this.Stock.Deck].addItemType(this.CardBackId, 0, g_gamethemeurl + 'img/back.jpg', 0);
+                this.stock[this.Stock.Deck].addItemType(this.CardBackId, 0, g_gamethemeurl + this.spritesheet, this.Vegetables.BACK - 1);
                 this.updateDecks();
 
                 this.setupNotifications();
@@ -173,9 +178,10 @@ define([
             setupCardStocks: function (id, selectionChangeFunctionName) {
                 var stock = new ebg.stock();
                 stock.create(this, $(id), this.cardwidth, this.cardheight);
+		stock.image_items_per_row = this.image_items_per_row;
                 for (var vegetable_id = 1; vegetable_id < 16; vegetable_id++) {
 		    // 1-10: main vegetables, 11-15: artichokes
-                    stock.addItemType(vegetable_id, 0, g_gamethemeurl + 'img/' + vegetable_id + '.jpg', vegetable_id);
+                    stock.addItemType(vegetable_id, 0, g_gamethemeurl + this.spritesheet, vegetable_id - 1);
                 }
                 if (selectionChangeFunctionName != null) {
                     dojo.connect(stock, 'onChangeSelection', this, selectionChangeFunctionName);
