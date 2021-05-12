@@ -558,9 +558,13 @@ define([
                 case this.Vegetables.POTATO:
                     return _("Reveal the top card of your Deck. Compost if Artichoke, otherwise discard it.")
                 case this.Vegetables.ARTICHOKE1:
+                    return _("Don't break my heart!")
                 case this.Vegetables.ARTICHOKE2:
+                    return _("Did you know, I have thorns?!")
                 case this.Vegetables.ARTICHOKE3:
+                    return _("My stem itches!")
                 case this.Vegetables.ARTICHOKE4:
+                    return _("Okey Dokey!")
                 case this.Vegetables.ARTICHOKE5:
                     return _("Looking forward to be abandoned by you!")
                 }
