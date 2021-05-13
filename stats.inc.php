@@ -56,5 +56,6 @@ $stats_type = array(
     "player" => array(
         "number_of_turns" => array("id"=> 10, "name" => totranslate("Number of turns"), "type" => "int" ),
         "artichokes" => array("id"=>11, "name" => totranslate("Remaining artichokes"), "type" => "int"),
+        "card_count" => array("id"=>12, "name" => totranslate("Total number of cards"), "type" => "int"),
     ),
 );

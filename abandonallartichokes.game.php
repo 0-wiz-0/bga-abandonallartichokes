@@ -248,6 +248,7 @@ class AbandonAllArtichokes extends Table
         if (empty($this->cards->getCardsOfTypeInLocation(VEGETABLE_ARTICHOKE, null, STOCK_HAND, $player_id))) {
             // game over, player won!
             self::DbQuery("UPDATE player SET player_score=1 WHERE player_id='" . self::getActivePlayerId() . "'");
+            $this->update_statistics();
             $this->gamestate->nextState(STATE_END_GAME);
             // TODO: notification
             return;
@@ -1163,6 +1164,15 @@ class AbandonAllArtichokes extends Table
         return $target_ids;
     }
 
+    function update_statistics() {
+        $players = self::loadPlayersBasicInfos();
+        foreach ($players as $player_id => $player) {
+            $card_count = $this->cards->countCardInLocation($this->player_deck($player_id)) +
+                        $this->cards->countCardInLocation($this->player_discard($player_id)) +
+                        $this->cards->countCardInLocation(STOCK_HAND, $player_id);
+            self::setStat($card_count, "card_count", $player_id);
+        }
+    }
 
     function player_deck($player_id) {
         return "deck_" . $this->player_no($player_id);
