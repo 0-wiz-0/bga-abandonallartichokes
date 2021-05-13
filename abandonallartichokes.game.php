@@ -147,7 +147,6 @@ class AbandonAllArtichokes extends Table
 
         // activate first player
         $this->activeNextPlayer();
-        // TODO: set turn count in statistics to 1 for active player, how? can't use getCurrentPlayerId in setup
         
         /************ End of the game initialization *****/
     }
@@ -243,6 +242,7 @@ class AbandonAllArtichokes extends Table
         ));
         // to update counters
         $this->notify_all(NOTIFICATION_UPDATE_COUNTERS, '');
+        self::incStat(1, 'number_of_turns', $player_id);
         
         // check victory
         if (empty($this->cards->getCardsOfTypeInLocation(VEGETABLE_ARTICHOKE, null, STOCK_HAND, $player_id))) {
@@ -264,7 +264,6 @@ class AbandonAllArtichokes extends Table
         $player_id = self::activeNextPlayer();
         self::giveExtraTime($player_id);
         self::setGameStateInitialValue(GAME_STATE_CARDS_PLAYED_THIS_TURN, 0);
-        self::incStat(1, 'number_of_turns', $player_id);
 
         $this->gamestate->nextState(STATE_HARVEST);
     }
