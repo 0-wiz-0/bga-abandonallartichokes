@@ -425,7 +425,6 @@ class AbandonAllArtichokes extends Table
         foreach ($opponents as $index => $opponent_id) {
             if ($this->cards->countCardInLocation(STOCK_HAND, $opponent_id) > 0) {
                 array_push($target_ids, $opponent_id);
-                break;
             }
         }
         return array ( 'target_ids' => $target_ids );
@@ -656,7 +655,6 @@ class AbandonAllArtichokes extends Table
             if ($this->cards->countCardInLocation($this->player_deck($opponent_id)) > 0 ||
                 $this->cards->countCardInLocation($this->player_discard($opponent_id)) > 0) {
                 array_push($target_ids, $opponent_id);
-                break;
             }
         }
         return array ( 'target_ids' => $target_ids );
