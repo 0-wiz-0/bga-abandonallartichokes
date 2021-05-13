@@ -10,7 +10,7 @@ Nice Features
 Topics
 ===
 - game board layout
-- check client side
+- checks on client side
 
 Cleanups/Bugs
 ===
@@ -21,3 +21,11 @@ Cleanups/Bugs
     probably because both animations start at the same time; same for beet, possibly others
 - log message for what you receive from eggplant
 - play log reduction
+  - discard
+  - combine
+- auto stop when nothing playable
+  - only artichokes
+  - no cards left
+- just visible in log who selects who
+- names for areas
+- ends turn message has wrong player name

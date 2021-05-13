@@ -478,14 +478,12 @@ class AbandonAllArtichokes extends Table
             }
         }
         if ($artichoke_count < 3) {
-            throw new BgaUserException(self::_("To play a broccoli youT need 3 artichokes in your hand"));
+            throw new BgaUserException(self::_("To play a broccoli you need 3 artichokes in your hand"));
         }
 
         $this->play_card($id);
-        $this->cards->moveCard($artichoke['id'], STOCK_COMPOST);
-        $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} discards ${vegetable}'), $artichoke, array(
-            'destination' => STOCK_COMPOST
-        ));
+
+        $this->compost_artichoke($artichoke, self::getCurrentPlayerId());
 
         $this->discard_played_card();
         return STATE_PLAY_CARD;
@@ -1142,11 +1140,11 @@ class AbandonAllArtichokes extends Table
         self::incStat(-1, 'artichokes', $player_id);
     }
 
-    function discard_played_card() {
+    function discard_played_card($notify = false) {
         $player_id = self::getActivePlayerId();
         $played_card = $this->get_played_card_id();
         $this->cards->moveCard($played_card['id'], $this->player_discard($player_id));
-        $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} discards ${vegetable}'), $played_card, array(
+        $this->notify_all(NOTIFICATION_CARD_MOVED, $notify ? clienttranslate('${player_name} discards ${vegetable}') : '', $played_card, array(
             'player_id' => $player_id,
             'origin' => STOCK_PLAYED_CARD,
             'destination' => STOCK_DISCARD,
