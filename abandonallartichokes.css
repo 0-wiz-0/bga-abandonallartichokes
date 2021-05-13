@@ -73,48 +73,45 @@
 }
 
 /***** GENERAL LAYOUT ****/
-#table {
+#artichoke_table {
     padding: 1em;
 }
 
-#table > div {
+#artichoke_table > div {
     margin-bottom: 1em;
 }
 
-.flex_row {
+.artichoke_flex_row {
     display: flex;
     justify-content: space-between;
 }
 
-.label {
+.artichoke_label {
     margin-right: 5px;
 }
 
-#garden_area {
+#artichoke_garden_area {
     background-color: var(--garden);
     padding: 10px;
     border-radius: 10px;
-    max-width: 770px;
+    /* 5 * card-width + 4 * 5 (margin) + 2 * 1 (border of last card) */
+    /* for width 100px */
+    max-width: 522px;
+    /* for width 150px: */
+    /* max-width: 770px; */
 }
 
 /***** PLAYER PANEL ****/
-.deck_board {
+.artichoke_deck_board {
     display: flex;
     justify-content: space-around;
 }
 
 /***** CUSTOM CARD DESIGN ****/
-.card {
+.artichoke_card {
     border-radius: 10px;
     border: 1px solid black;
-}
-
-.deck_face_down {
-    box-shadow: 1px 1px 0 black,
-    3px 3px 0 rgba(var(--cardBack)),
-    4px 4px 0 black,
-    5px 5px 0 rgba(var(--cardBack)),
-    6px 6px 0 black;
+    background-size: contain;
 }
 
 .stockitem_selected {
