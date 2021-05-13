@@ -137,7 +137,7 @@ $machinestates = array(
 
     STATE_EGGPLANT_CHOOSE_CARDS => array(
         "name" => "eggplantChooseCards",
-        "description" => clienttranslate('${actplayer} must choose two cards to pass on'),
+        "description" => clienttranslate('Other players must choose two cards to pass on'),
         "descriptionmyturn" => clienttranslate('${you} must choose two cards to pass on'),
         "action" => "stEggplantInit",
         "type" => "multipleactiveplayer",
