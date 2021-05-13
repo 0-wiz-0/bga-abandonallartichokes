@@ -212,6 +212,12 @@ class AbandonAllArtichokes extends Table
             $artichoke_percentages[] = $artichoke_count / ($card_count > 0 ? $card_count : 1);
         }
 
+        // has a player won yet?
+        $sql = "SELECT MAX(player_score) FROM player;";
+        if (self::getUniqueValueFromDB($sql) > 0) {
+            return 100;
+        }
+
         return max(0, min(100 * (1 - min($artichoke_percentages)), 100));
     }
 
