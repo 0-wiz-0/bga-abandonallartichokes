@@ -95,7 +95,7 @@ class AbandonAllArtichokes extends Table
         self::setGameStateInitialValue(GAME_STATE_AUTOMATIC_PLAYER_DECISIONS, 1);
         
         // Init game statistics
-        self::initStat('player', 'number_of_turns', 10);
+        self::initStat('player', 'number_of_turns', 0);
         self::initStat('player', 'artichokes', 10);
 
         // TODO: setup the initial game situation here
@@ -148,6 +148,7 @@ class AbandonAllArtichokes extends Table
 
         // activate first player
         $this->activeNextPlayer();
+        self::incStat(1, 'number_of_turns', self::getActivePlayerId());
 
         /************ End of the game initialization *****/
     }
@@ -264,6 +265,7 @@ class AbandonAllArtichokes extends Table
         $player_id = self::activeNextPlayer();
         self::giveExtraTime($player_id);
         self::setGameStateInitialValue(GAME_STATE_CARDS_PLAYED_THIS_TURN, 0);
+        self::incStat(1, 'number_of_turns', $player_id);
 
         $this->gamestate->nextState(STATE_HARVEST);
     }
