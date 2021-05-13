@@ -83,7 +83,8 @@ $machinestates = array(
         "description" => clienttranslate('Player cleanup and refilling garden row'),
         "type" => "game",
         "action" => "stNextPlayer",
-        "transitions" => array(STATE_HARVEST => STATE_HARVEST, STATE_END_GAME => STATE_END_GAME)
+        "transitions" => array(STATE_HARVEST => STATE_HARVEST, STATE_END_GAME => STATE_END_GAME),
+        "updateGameProgression" => true,
     ),
 
     STATE_HARVEST => array(

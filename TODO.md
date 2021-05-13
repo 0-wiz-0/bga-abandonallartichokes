@@ -9,7 +9,6 @@ Nice Features
 
 Topics
 ===
-- game progression
 - game board layout
 
 Cleanups/Bugs

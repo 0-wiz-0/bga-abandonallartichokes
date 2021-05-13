@@ -197,9 +197,22 @@ class AbandonAllArtichokes extends Table
     */
     function getGameProgression()
     {
-        // TODO: compute and return the game progression
+        $players = self::loadPlayersBasicInfos();
 
-        return 0;
+        $artichoke_percentages = array();
+        foreach ($players as $player_id => $player) {
+            $deck = $this->player_deck($player_id);
+            $discard = $this->player_discard($player_id);
+            $card_count = $this->cards->countCardInLocation($deck) +
+                        $this->cards->countCardInLocation($discard) +
+                        $this->cards->countCardInLocation(STOCK_HAND, $player_id);
+            $artichoke_count = count($this->cards->getCardsOfTypeInLocation(VEGETABLE_ARTICHOKE, null, $deck)) +
+                             count($this->cards->getCardsOfTypeInLocation(VEGETABLE_ARTICHOKE, null, $discard)) +
+                             count($this->cards->getCardsOfTypeInLocation(VEGETABLE_ARTICHOKE, null, STOCK_HAND, $player_id));
+            $artichoke_percentages[] = $artichoke_count / ($card_count > 0 ? $card_count : 1);
+        }
+
+        return max(0, min(100 * (1 - min($artichoke_percentages)), 100));
     }
 
     function stEggplantInit() {
