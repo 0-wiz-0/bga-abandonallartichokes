@@ -95,10 +95,9 @@ class AbandonAllArtichokes extends Table
         self::setGameStateInitialValue(GAME_STATE_AUTOMATIC_PLAYER_DECISIONS, 1);
         
         // Init game statistics
-        self::initStat('player', 'number_of_turns', 0);
-        self::initStat('player', 'artichokes', 10);
-
-        // TODO: setup the initial game situation here
+        //        self::initStat('player', 'artichokes', 10);
+        //        self::initStat('player', 'card_count', 0);
+        //self::initStat('player', 'number_of_turns', 0);
 
         // Create cards
         $cards = array();
@@ -148,8 +147,8 @@ class AbandonAllArtichokes extends Table
 
         // activate first player
         $this->activeNextPlayer();
-        self::incStat(1, 'number_of_turns', self::getActivePlayerId());
-
+        // TODO: set turn count in statistics to 1 for active player, how? can't use getCurrentPlayerId in setup
+        
         /************ End of the game initialization *****/
     }
 
@@ -265,7 +264,7 @@ class AbandonAllArtichokes extends Table
         $player_id = self::activeNextPlayer();
         self::giveExtraTime($player_id);
         self::setGameStateInitialValue(GAME_STATE_CARDS_PLAYED_THIS_TURN, 0);
-        self::incStat(1, 'number_of_turns', $player_id);
+        //self::incStat(1, 'number_of_turns', $player_id);
 
         $this->gamestate->nextState(STATE_HARVEST);
     }
@@ -1120,7 +1119,7 @@ class AbandonAllArtichokes extends Table
         $this->cards->moveCard($card['id'], STOCK_COMPOST);
         $this->notify_all(NOTIFICATION_CARD_MOVED, $notify_message ? clienttranslate('${player_name} composts ${vegetable}') : '', $card,
                           array( 'destination' => STOCK_COMPOST, 'player_id' => $player_id ));
-        self::incStat(-1, "artichokes", $player_id);
+        //self::incStat(-1, 'artichokes', $player_id);
     }
 
     function discard_played_card() {
@@ -1172,7 +1171,7 @@ class AbandonAllArtichokes extends Table
             $card_count = $this->cards->countCardInLocation($this->player_deck($player_id)) +
                         $this->cards->countCardInLocation($this->player_discard($player_id)) +
                         $this->cards->countCardInLocation(STOCK_HAND, $player_id);
-            self::setStat($card_count, "card_count", $player_id);
+            //self::setStat($card_count, 'card_count', $player_id);
         }
     }
 
