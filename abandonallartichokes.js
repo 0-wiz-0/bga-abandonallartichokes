@@ -53,6 +53,7 @@ define([
                     DrewHand: "drew_hand",
                     RefilledGardenRow: "refilled_garden_row",
                     UpdateCounters: "update_counters",
+                    Victory: "victory",
                 };
                 // this needs to match the values in abandonallartichokes.action.php and states.inc.php
                 this.AjaxActions = {
@@ -375,6 +376,7 @@ define([
                 dojo.subscribe(this.Notification.DrewHand, this, "notif_drewHand");
                 dojo.subscribe(this.Notification.RefilledGardenRow, this, "notif_refilledGardenRow");
                 dojo.subscribe(this.Notification.UpdateCounters, this, "notif_updateCounters");
+                dojo.subscribe(this.Notification.Victory, this, "notif_victory");
             },
 
             notif_cardMoved: function (notification) {
@@ -414,6 +416,12 @@ define([
                 console.log(notification);
                 this.updateCounter(notification.args.counters);
             },
+
+	    notif_victory: function (notification) {
+                console.log(this.Notification.UpdateCounters + ' notification');
+                console.log(notification);
+		this.scoreCtrl[notification.args.player_id].setValue(1);
+	    },
 
             // Utility functions
 
