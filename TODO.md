@@ -6,13 +6,14 @@ Nice Features
   - How to Play
   - Developed by
 - replace remaining graphics
+- rhubarb
 
 Topics
 ===
 - game progression
 - game board layout
 
-Cleanups
+Cleanups/Bugs
 ===
 - remove console logs and debug logging
 - debug animation issues
@@ -20,5 +21,3 @@ Cleanups
   - onion when auto-choosing opponent moves from hand to played card and disappears, and hand to other player,
     probably because both animations start at the same time; same for beet, possibly others
 - find out how to get the winner into the banner message to the right of "end of game"
-- get all player names into multiplayerstatemessage (waiting for) or none
-- restore tooltips for artichokes

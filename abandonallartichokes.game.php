@@ -66,7 +66,8 @@ class AbandonAllArtichokes extends Table
     {
         // Set the colors of the players with HTML color code
         // The default below is red/green/blue/orange/brown
-        // The number of colors defined here must correspond to the maximum number of players allowed for the gams
+        // The number of colors defined here must correspond to the maximum number of players allowed for the game
+        // TODO check
         $gameinfos = self::getGameinfos();
         $default_colors = $gameinfos['player_colors'];
 
@@ -94,9 +95,8 @@ class AbandonAllArtichokes extends Table
         self::setGameStateInitialValue(GAME_STATE_AUTOMATIC_PLAYER_DECISIONS, 1);
         
         // Init game statistics
-        // (note: statistics used in this file must be defined in your stats.inc.php file)
-        //self::initStat('table', 'table_teststat1', 0);    // Init a table statistics
-        //self::initStat('player', 'player_teststat1', 0);  // Init a player statistics (for all players)
+        self::initStat('player', 'number_of_turns', 10);
+        self::initStat('player', 'artichokes', 10);
 
         // TODO: setup the initial game situation here
 
@@ -112,9 +112,9 @@ class AbandonAllArtichokes extends Table
                 $cards[] = array('type' => $vegetable_id, 'type_arg' => 3, 'nbr' => 2 * count($players));
                 $cards[] = array('type' => $vegetable_id, 'type_arg' => 4, 'nbr' => 2 * count($players));
             } else {
-                $cards[] = array('type' => $vegetable_id, 'type_arg' => 0, 'nbr' => 6);
+                //$cards[] = array('type' => $vegetable_id, 'type_arg' => 0, 'nbr' => 6);
                 //$cards[] = array('type' => VEGETABLE_BEET, 'type_arg' => 0, 'nbr' => 6);
-                //$cards[] = array('type' => VEGETABLE_CARROT, 'type_arg' => 0, 'nbr' => 6);
+                $cards[] = array('type' => VEGETABLE_CARROT, 'type_arg' => 0, 'nbr' => 6);
                 //$cards[] = array('type' => VEGETABLE_POTATO, 'type_arg' => 0, 'nbr' => 6);
                 //$cards[] = array('type' => VEGETABLE_ONION, 'type_arg' => 0, 'nbr' => 6);
                 //$cards[] = array('type' => VEGETABLE_PEPPER, 'type_arg' => 0, 'nbr' => 6);
@@ -430,12 +430,8 @@ class AbandonAllArtichokes extends Table
 
     function beetHandleDrawnCards($card, $opponent_card, $opponent_id) {
         if ($card['type'] == VEGETABLE_ARTICHOKE && $opponent_card['type'] == VEGETABLE_ARTICHOKE) {
-            $this->cards->moveCard($card['id'], STOCK_COMPOST);
-            $this->cards->moveCard($opponent_card['id'], STOCK_COMPOST);
-            $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} composts ${vegetable}'), $card,
-                array( 'destination' => STOCK_COMPOST ));
-            $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name2} composts ${vegetable}'),
-                $opponent_card, array( 'destination' => STOCK_COMPOST, 'player_name2' => $this->player_name($opponent_id)));
+            $this->compost_artichoke($card, $player_id);
+            $this->compost_artichoke($opponent_card, $opponent_id);
         }
         else {
             $this->cards->moveCard($card['id'], STOCK_HAND, $opponent_id);
@@ -498,11 +494,9 @@ class AbandonAllArtichokes extends Table
 
         $card = $this->play_card($id);
 
-        // compost them
-        $this->cards->moveCard($artichoke_1['id'], STOCK_COMPOST);
-        $this->notify_all(NOTIFICATION_CARD_MOVED, '', $artichoke_1, array( 'destination' => STOCK_COMPOST ));
-        $this->cards->moveCard($artichoke_2['id'], STOCK_COMPOST);
-        $this->notify_all(NOTIFICATION_CARD_MOVED, '', $artichoke_2, array( 'destination' => STOCK_COMPOST ));
+        // compost carrot and both artichokes
+        $this->compost_artichoke($artichoke_1, self::getCurrentPlayerId(), false);
+        $this->compost_artichoke($artichoke_2, self::getCurrentPlayerId(), false);
         $this->cards->moveCard($card['id'], STOCK_COMPOST);
         $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} composts carrot and two artichokes'), $card, array( 'destination' => STOCK_COMPOST ));
 
@@ -577,8 +571,7 @@ class AbandonAllArtichokes extends Table
 
         $this->play_card($id);
 
-        $this->cards->moveCard($artichoke['id'], STOCK_COMPOST);
-        $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} composts ${vegetable}'), $artichoke, array( 'destination' => STOCK_COMPOST ));
+        $this->compost_artichoke($artichoke, self::getCurrentPlayerId());
 
         return STATE_EGGPLANT_CHOOSE_CARDS;
     }
@@ -733,8 +726,7 @@ class AbandonAllArtichokes extends Table
 
         $this->play_card($id);
 
-        $this->cards->moveCard($artichoke['id'], STOCK_COMPOST);
-        $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} composts ${vegetable}'), $artichoke, array( 'destination' => STOCK_COMPOST ));
+        $this->compost_artichoke($artichoke, self::getCurrentPlayerId());
 
         if (self::getGameStateValue(GAME_STATE_AUTOMATIC_PLAYER_DECISIONS) > 0 && count($target_ids) == 1) {
             $target_id = array_pop($target_ids);
@@ -963,8 +955,7 @@ class AbandonAllArtichokes extends Table
         ));
 
         if ($picked_card['type'] == VEGETABLE_ARTICHOKE) {
-            $this->cards->moveCard($picked_card['id'], STOCK_COMPOST);
-            $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} composts ${vegetable}'), $picked_card, array( 'destination' => STOCK_COMPOST ));
+            $this->compost_artichoke($picked_card, self::getCurrentPlayerId());
         } else {
             $this->cards->moveCard($picked_card['id'], $this->player_discard($player_id));
             $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} discards ${vegetable}'), $picked_card, array( 'destination' => STOCK_DISCARD, 'destination_arg' => $player_id ));
@@ -1117,6 +1108,16 @@ class AbandonAllArtichokes extends Table
             'origin' => STOCK_PLAYED_CARD,
             'destination' => STOCK_COMPOST,
         ));
+    }
+
+    function compost_artichoke($card, $player_id, $notify_message = true) {
+        if ($card['type'] != VEGETABLE_ARTICHOKE) {
+            throw new BgaVisibleSystemException("Trying to compost non-artichoke with special artichoke composter");
+        }
+        $this->cards->moveCard($card['id'], STOCK_COMPOST);
+        $this->notify_all(NOTIFICATION_CARD_MOVED, $notify_message ? clienttranslate('${player_name} composts ${vegetable}') : '', $card,
+                          array( 'destination' => STOCK_COMPOST, 'player_id' => $player_id ));
+        self::incStat(-1, "artichokes", $player_id);
     }
 
     function discard_played_card() {
