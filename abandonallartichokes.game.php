@@ -451,7 +451,7 @@ class AbandonAllArtichokes extends Table
 
     function beetHandleDrawnCards($card, $opponent_card, $opponent_id) {
         if ($card['type'] == VEGETABLE_ARTICHOKE && $opponent_card['type'] == VEGETABLE_ARTICHOKE) {
-            $this->compost_artichoke($card, $player_id);
+            $this->compost_artichoke($card, self::getCurrentPlayerId());
             $this->compost_artichoke($opponent_card, $opponent_id);
         }
         else {
@@ -529,6 +529,7 @@ class AbandonAllArtichokes extends Table
             throw new BgaUserException(self::_("You can not play corn if there are no cards in the garden row"));
         }
         $hand = $this->cards->getPlayerHand(self::getCurrentPlayerId());
+        $artichoke = null;
         foreach ($hand as $card) {
             if ($card['type'] == VEGETABLE_ARTICHOKE) {
                 $artichoke = $card;
@@ -536,7 +537,7 @@ class AbandonAllArtichokes extends Table
             }
         }
         if ($artichoke == null) {
-            throw new BgaUserException(self::_("To play an eggplant you need an artichoke in your hand"));
+            throw new BgaUserException(self::_("To play a corn you need an artichoke in your hand"));
         }
 
         $player_id = self::getCurrentPlayerId();
