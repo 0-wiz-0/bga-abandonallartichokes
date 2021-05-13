@@ -325,9 +325,7 @@ class AbandonAllArtichokes extends Table
 
     function pass() {
         $this->gamestate->nextState(STATE_NEXT_PLAYER);
-        self::notifyAllPlayers(NOTIFICATION_MESSAGE, clienttranslate('${player_name} ends turn'), array(
-            'player_name' => self::getActivePlayerName(),
-        ));
+        self::notifyAllPlayers(NOTIFICATION_MESSAGE, clienttranslate('${player_name} ends turn'), array( ));
     }
 
     function playCard($id) {
@@ -436,20 +434,20 @@ class AbandonAllArtichokes extends Table
             $this->cards->moveCard($opponent_card['id'], STOCK_COMPOST);
             $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} composts ${vegetable}'), $card,
                 array( 'destination' => STOCK_COMPOST ));
-            $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${opponent_name} composts ${vegetable}'),
-                $opponent_card, array( 'destination' => STOCK_COMPOST, 'opponent_name' => $this->player_name($opponent_id)));
+            $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name2} composts ${vegetable}'),
+                $opponent_card, array( 'destination' => STOCK_COMPOST, 'player_name2' => $this->player_name($opponent_id)));
         }
         else {
             $this->cards->moveCard($card['id'], STOCK_HAND, $opponent_id);
             $this->cards->moveCard($opponent_card['id'], STOCK_HAND, self::getCurrentPlayerId());
-            $this->notify_all(NOTIFICATION_CARD_MOVED,  clienttranslate('${player_name} gives ${vegetable} to ${opponent_name}'),
+            $this->notify_all(NOTIFICATION_CARD_MOVED,  clienttranslate('${player_name} gives ${vegetable} to ${player_name2}'),
                 $card, array( 'destination' => STOCK_HAND,
                               'destination_arg' => $opponent_id,
-                              'opponent_name' => $this->player_name($opponent_id)));
-            $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${opponent_name} gives ${vegetable} to ${player_name}'),
+                              'player_name2' => $this->player_name($opponent_id)));
+            $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name2} gives ${vegetable} to ${player_name}'),
                               $opponent_card, array( 'destination' => STOCK_HAND,
                                                      'destination_arg' => self::getCurrentPlayerId(),
-                                                     'opponent_name' => $this->player_name($opponent_id)));
+                                                     'player_name2' => $this->player_name($opponent_id)));
         }
     }
 
@@ -611,16 +609,16 @@ class AbandonAllArtichokes extends Table
             $this->cards->moveCard($card_id, STOCK_LIMBO, $player_id);
             // in test solo-mode games, eggplant moves from and to own deck
             if ($player_id != $opponent_id) {
-                $this->notify_one($player_id, NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} passes ${vegetable} to ${opponent_name}'), $passed_card, array(
+                $this->notify_one($player_id, NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} passes ${vegetable} to ${player_name2}'), $passed_card, array(
                     'destination' => STOCK_DECK,
                     'destination_arg' => $opponent_id,
-                    'opponent_name' => $opponent_name,
+                    'player_name2' => $opponent_name,
                 ));
             }
         }
-        $this->notify_others($player_id, NOTIFICATION_MESSAGE, clienttranslate('${player_name} passes ${count} cards to ${opponent_name}'), '', array(
+        $this->notify_others($player_id, NOTIFICATION_MESSAGE, clienttranslate('${player_name} passes ${count} cards to ${player_name2}'), '', array(
             'count' => $count,
-            'opponent_name' => $opponent_name
+            'player_name2' => $opponent_name
         ));
 
         $this->gamestate->setPlayerNonMultiactive($player_id, STATE_EGGPLANT_DONE);
@@ -638,9 +636,11 @@ class AbandonAllArtichokes extends Table
         $this->play_card($id);
 
         if (self::getGameStateValue(GAME_STATE_AUTOMATIC_PLAYER_DECISIONS) > 0 && count($target_ids) == 1) {
-            $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('[automatic] Only one valid target player for ${vegetable}'), '',
-                              array( 'vegetable' => $this->vegetables[VEGETABLE_LEEK]['name']));
             $target_id = array_pop($target_ids);
+            $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('[automatic] ${vegetable} can only target ${player_name2}'), '',
+                              array( 'vegetable' => $this->vegetables[VEGETABLE_LEEK]['name'],
+                                     'player_name2' => $this->player_name($target_id),
+                              ));
             $this->gamestate->nextState(STATE_LEEK_CHOOSE_OPPONENT);
             $this->leekChooseOpponent($target_id);
         } else {
@@ -668,11 +668,11 @@ class AbandonAllArtichokes extends Table
         }
 
         $players = self::loadPlayersBasicInfos();
-        $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} reveals ${vegetable} from the deck of ${opponent_name}'), $picked_card, array(
+        $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} reveals ${vegetable} from the deck of ${player_name2}'), $picked_card, array(
             'origin' => STOCK_DECK,
             'origin_arg' => $opponent_id,
             'destination' => STOCK_DISPLAYED_CARD,
-            'opponent_name' => $players[$opponent_id]['player_name'],
+            'player_name2' => $players[$opponent_id]['player_name'],
         ));
 
         self::setGameStateValue(GAME_STATE_TARGET_PLAYER, $opponent_id);
@@ -697,10 +697,11 @@ class AbandonAllArtichokes extends Table
         } else {
             $card = array_pop($cards);
             $this->cards->moveCard($card['id'], $this->player_discard($opponent_id));
-            $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} declines to take ${vegetable}'), $card, array(
+            $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} returns ${vegetable} to ${player_name2}'), $card, array(
                 'origin' => STOCK_DISPLAYED_CARD,
                 'destination' => STOCK_DISCARD,
                 'destination_arg' => $opponent_id,
+                'player_name2' => $this->player_name($opponent_id),
             ));
         }
 
@@ -736,9 +737,11 @@ class AbandonAllArtichokes extends Table
         $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} composts ${vegetable}'), $artichoke, array( 'destination' => STOCK_COMPOST ));
 
         if (self::getGameStateValue(GAME_STATE_AUTOMATIC_PLAYER_DECISIONS) > 0 && count($target_ids) == 1) {
-            $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('[automatic] Only one valid target player for ${vegetable}'), '',
-                              array( 'vegetable' => $this->vegetables[VEGETABLE_ONION]['name']));
             $target_id = array_pop($target_ids);
+            $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('[automatic] ${vegetable} can only target ${player_name2}'), '',
+                              array( 'vegetable' => $this->vegetables[VEGETABLE_ONION]['name'],
+                                     'player_name2' => $this->player_name($target_id),
+                              ));
             $this->gamestate->nextState(STATE_ONION_CHOOSE_OPPONENT);
             $this->onionChooseOpponent($target_id);
             return;
@@ -756,10 +759,10 @@ class AbandonAllArtichokes extends Table
 
         $played_card = $this->get_played_card_id();
         $this->cards->moveCard($played_card['id'], $this->player_discard($opponent_id));
-        $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} gives ${vegetable} to ${opponent_name}'), $played_card, array(
+        $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} gives ${vegetable} to ${player_name2}'), $played_card, array(
             'destination' => STOCK_DISCARD,
             'destination_arg' => $opponent_id,
-            'opponent_name' => $opponent_name,
+            'player_name2' => $opponent_name,
         ));
 
         $this->gamestate->nextState(STATE_PLAY_CARD);
@@ -823,9 +826,11 @@ class AbandonAllArtichokes extends Table
         $target_ids = $targets['target_ids'];
 
         if (self::getGameStateValue(GAME_STATE_AUTOMATIC_PLAYER_DECISIONS) > 0 && count($target_ids) == 1) {
-            $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('[automatic] Only one valid target player for ${vegetable}'), '',
-                              array( 'vegetable' => $this->vegetables[VEGETABLE_PEAS]['name']));
             $target_id = array_pop($target_ids);
+            $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('[automatic] ${vegetable} can only target ${player_name2}'), '',
+                              array( 'vegetable' => $this->vegetables[VEGETABLE_PEAS]['name'],
+                                     'player_name2' => $this->player_name($target_id),
+                              ));
             $this->gamestate->nextState(STATE_PEAS_CHOOSE_OPPONENT);
             $this->peasChooseOpponent($target_id);
             return;
@@ -852,10 +857,10 @@ class AbandonAllArtichokes extends Table
         $present = array_pop($presents);
 
         $this->cards->moveCard($present['id'], $this->player_discard($opponent_id));
-        $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} gives ${vegetable} to ${opponent_name}'), $present, array(
+        $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} gives ${vegetable} to ${player_name2}'), $present, array(
             'destination' => STOCK_DISCARD,
             'destination_arg' => $opponent_id,
-            'opponent_name' => $players[$opponent_id]['player_name'],
+            'player_name2' => $players[$opponent_id]['player_name'],
         ));
 
         $this->discard_played_card();
