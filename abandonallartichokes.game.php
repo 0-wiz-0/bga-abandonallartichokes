@@ -96,7 +96,7 @@ class AbandonAllArtichokes extends Table
         // TODO: make it a variant
         self::setGameStateInitialValue(GAME_STATE_AUTOMATIC_CARD_DECISIONS, 0);
         self::setGameStateInitialValue(GAME_STATE_AUTOMATIC_PLAYER_DECISIONS, 1);
-        
+
         // Init game statistics
         self::initStat('player', 'artichokes', 10);
         self::initStat('player', 'card_count', 0);
@@ -150,7 +150,7 @@ class AbandonAllArtichokes extends Table
 
         // activate first player
         $this->activeNextPlayer();
-        
+
         /************ End of the game initialization *****/
     }
 
@@ -292,7 +292,7 @@ class AbandonAllArtichokes extends Table
         // to update counters
         $this->notify_all(NOTIFICATION_UPDATE_COUNTERS, '');
         self::incStat(1, 'number_of_turns', $player_id);
-        
+
         // check victory
         if (empty($this->cards->getCardsOfTypeInLocation(VEGETABLE_ARTICHOKE, null, STOCK_HAND, $player_id))) {
             // game over, player won!
@@ -465,7 +465,7 @@ class AbandonAllArtichokes extends Table
         $opponent_hand = $this->cards->getPlayerHand($opponent_id);
         if (count($opponent_hand) < 1) {
             throw new BgaUserException(self::_("Beet can only be played on an opponent with cards in hand"));
-        }            
+        }
         $opponent_card = $this->cards->getCard(array_rand($opponent_hand, 1));
         $this->beetHandleDrawnCards($card, $opponent_card, $opponent_id);
 
@@ -924,7 +924,7 @@ class AbandonAllArtichokes extends Table
         if (self::getGameStateValue(GAME_STATE_AUTOMATIC_CARD_DECISIONS) > 0 && count($available_types) == 1) {
             $types = array_keys($available_types);
             $type = array_pop($types);
-            $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('[automatic] Only cards of type ${vegetable} in discard pile'), null, 
+            $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('[automatic] Only cards of type ${vegetable} in discard pile'), null,
                               array( 'vegetable' => $this->vegetables[$type]['name']));
             $card_id = array_pop($available_types);
             $this->cards->moveCard($card_id, STOCK_DISPLAYED_CARD);
@@ -989,7 +989,7 @@ class AbandonAllArtichokes extends Table
         $player_id = self::getCurrentPlayerId();
         $picked_card = $this->cards->pickCardForLocation($this->player_deck($player_id), STOCK_DISPLAYED_CARD);
         if ($picked_card == null) {
-            throw new BgaUserException(self::_("You must have cards in your deck to play a potato")); 
+            throw new BgaUserException(self::_("You must have cards in your deck to play a potato"));
         }
 
         $this->play_card($id);
@@ -1195,7 +1195,7 @@ class AbandonAllArtichokes extends Table
         }
         return array_pop($played_cards);
     }
-    
+
     function get_opponent_ids() {
         $player_id = self::getActivePlayerId();
         $players = self::loadPlayersBasicInfos();
