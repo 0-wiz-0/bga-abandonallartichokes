@@ -133,7 +133,7 @@ $machinestates = array(
         "descriptionmyturn" => clienttranslate('${you} must take card or decline to take it'),
         "type" => "activeplayer",
         "possibleactions" => array("leekTakeCard"),
-        "transitions" => array(STATE_PLAY_CARD => STATE_PLAY_CARD),
+        "transitions" => array(STATE_PLAY_CARD => STATE_PLAY_CARD, STATE_NEXT_PLAYER => STATE_NEXT_PLAYER),
     ),
 
     STATE_EGGPLANT_CHOOSE_CARDS => array(
@@ -151,7 +151,7 @@ $machinestates = array(
         "description" => clienttranslate('Passing cards for eggplant'),
         "type" => "game",
         "action" => "stEggplantDone",
-        "transitions" => array(STATE_PLAY_CARD => STATE_PLAY_CARD),
+        "transitions" => array(STATE_PLAY_CARD => STATE_PLAY_CARD, STATE_NEXT_PLAYER => STATE_NEXT_PLAYER),
     ),
 
     STATE_PEPPER_TAKE_CARD => array(
@@ -160,7 +160,7 @@ $machinestates = array(
         "descriptionmyturn" => clienttranslate('${you} must pick card to put on deck'),
         "type" => "activeplayer",
         "possibleactions" => array("pepperTakeCard"),
-        "transitions" => array(STATE_PLAY_CARD => STATE_PLAY_CARD),
+        "transitions" => array(STATE_PLAY_CARD => STATE_PLAY_CARD, STATE_NEXT_PLAYER => STATE_NEXT_PLAYER),
     ),
 
     STATE_PEAS_TAKE_CARD => array(
@@ -179,7 +179,7 @@ $machinestates = array(
         "type" => "activeplayer",
         "args" => "arg_allOpponents",
         "possibleactions" => array("peasChooseOpponent"),
-        "transitions" => array(STATE_PLAY_CARD => STATE_PLAY_CARD),
+        "transitions" => array(STATE_PLAY_CARD => STATE_PLAY_CARD, STATE_NEXT_PLAYER => STATE_NEXT_PLAYER),
     ),
 
     STATE_ONION_CHOOSE_OPPONENT => array(
@@ -189,7 +189,7 @@ $machinestates = array(
         "type" => "activeplayer",
         "args" => "arg_allOpponents",
         "possibleactions" => array("onionChooseOpponent"),
-        "transitions" => array(STATE_PLAY_CARD => STATE_PLAY_CARD),
+        "transitions" => array(STATE_PLAY_CARD => STATE_PLAY_CARD, STATE_NEXT_PLAYER => STATE_NEXT_PLAYER),
     ),
 
     STATE_CORN_TAKE_CARD => array(
@@ -198,7 +198,7 @@ $machinestates = array(
         "descriptionmyturn" => clienttranslate('${you} must pick a card from the garden row'),
         "type" => "activeplayer",
         "possibleactions" => array("cornTakeCard"),
-        "transitions" => array(STATE_PLAY_CARD => STATE_PLAY_CARD),
+        "transitions" => array(STATE_PLAY_CARD => STATE_PLAY_CARD, STATE_NEXT_PLAYER => STATE_NEXT_PLAYER),
     ),
     STATE_BEET_CHOOSE_OPPONENT => array(
         "name" => "beetChooseOpponent",
@@ -207,7 +207,7 @@ $machinestates = array(
         "type" => "activeplayer",
         "args" => "arg_beetOpponents",
         "possibleactions" => array("beetChooseOpponent"),
-        "transitions" => array(STATE_PLAY_CARD => STATE_PLAY_CARD),
+        "transitions" => array(STATE_PLAY_CARD => STATE_PLAY_CARD, STATE_NEXT_PLAYER => STATE_NEXT_PLAYER),
     ),
 
     // Final state.

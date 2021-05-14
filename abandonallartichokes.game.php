@@ -244,7 +244,8 @@ class AbandonAllArtichokes extends Table
         }
 
         $this->compost_played_card();
-        $this->gamestate->nextState(STATE_PLAY_CARD);
+
+        $this->next_state_or_turn_end();
     }
 
     function stNextPlayer() {
@@ -345,8 +346,9 @@ class AbandonAllArtichokes extends Table
     }
 
     function pass() {
+        $player_id = self::getActivePlayerId();
         $this->gamestate->nextState(STATE_NEXT_PLAYER);
-        self::notifyAllPlayers(NOTIFICATION_MESSAGE, clienttranslate('${player_name} ends turn'), array( 'player_name' => self::getActivePlayerName() ));
+        self::notifyAllPlayers(NOTIFICATION_MESSAGE, clienttranslate('${player_name} ends turn'), array( 'player_name' => $this->player_name($player_id) ));
     }
 
     function playCard($id) {
@@ -396,7 +398,7 @@ class AbandonAllArtichokes extends Table
         self::incGameStateValue(GAME_STATE_CARDS_PLAYED_THIS_TURN, 1);
 
         if ($next_state) {
-            $this->gamestate->nextState($next_state);
+            $this->next_state_or_turn_end($next_state);
         }
     }
 
@@ -435,7 +437,7 @@ class AbandonAllArtichokes extends Table
         $this->beetHandleDrawnCards($card, $opponent_card, $opponent_id);
 
         $this->discard_played_card();
-        $this->gamestate->nextState(STATE_PLAY_CARD);
+        $this->next_state_or_turn_end();
     }
 
     function arg_beetOpponents() {
@@ -567,7 +569,7 @@ class AbandonAllArtichokes extends Table
 
         $this->discard_played_card();
 
-        $this->gamestate->nextState(STATE_PLAY_CARD);
+        $this->next_state_or_turn_end();
     }
 
     function playEggplant($id) {
@@ -722,7 +724,7 @@ class AbandonAllArtichokes extends Table
 
         self::setGameStateValue(GAME_STATE_TARGET_PLAYER, 0);
 
-        $this->gamestate->nextState(STATE_PLAY_CARD);
+        $this->next_state_or_turn_end();
     }
 
     function playOnion($id) {
@@ -777,7 +779,7 @@ class AbandonAllArtichokes extends Table
             'player_name2' => $opponent_name,
         ));
 
-        $this->gamestate->nextState(STATE_PLAY_CARD);
+        $this->next_state_or_turn_end();
     }
 
     function playPeas($id) {
@@ -877,7 +879,7 @@ class AbandonAllArtichokes extends Table
 
         $this->discard_played_card();
 
-        $this->gamestate->nextState(STATE_PLAY_CARD);
+        $this->next_state_or_turn_end();
     }
 
     function playPepper($id) {
@@ -955,7 +957,7 @@ class AbandonAllArtichokes extends Table
 
         $this->discard_played_card();
 
-        $this->gamestate->nextState(STATE_PLAY_CARD);
+        $this->next_state_or_turn_end();
     }
 
     function playPotato($id) {
@@ -1160,6 +1162,23 @@ class AbandonAllArtichokes extends Table
             'destination' => STOCK_PLAYED_CARD,
         ));
         return $this->cards->getCard($id);
+    }
+
+    // end turn if there are no cards left in hand, or only artichokes
+    function next_state_or_turn_end($state = STATE_PLAY_CARD) {
+        $hand = $this->cards->getCardsInLocation(STOCK_HAND, self::getCurrentPlayerId());
+        $artichoke_count = 0;
+        foreach ($hand as $card) {
+            if ($card['type'] == VEGETABLE_ARTICHOKE) {
+                $artichoke_count++;
+            }
+        }
+        if ($state == STATE_PLAY_CARD && ($artichoke_count == count($hand) || count($hand) == 0)) {
+            $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('[automatic] No playable cards left, ${player_name} ends turn'));
+            $this->gamestate->nextState(STATE_NEXT_PLAYER);
+        } else {
+            $this->gamestate->nextState($state);
+        }
     }
 
     function get_played_card_id() {
