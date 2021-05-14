@@ -34,6 +34,7 @@ class AbandonAllArtichokes extends Table
         self::initGameStateLabels(array(
             "cards_played_this_turn" => 10,
             "target_player" => 11,
+            "played_carrot_this_turn" => 12,
             "automatic_card_decisions" => 101,
             "automatic_player_decisions" => 102,
         ));
@@ -90,6 +91,8 @@ class AbandonAllArtichokes extends Table
 
         // Init global values with their initial values
         self::setGameStateInitialValue(GAME_STATE_CARDS_PLAYED_THIS_TURN, 0);
+        self::setGameStateInitialValue(GAME_STATE_TARGET_PLAYER, 0);
+        self::setGameStateInitialValue(GAME_STATE_PLAYED_CARROT_THIS_TURN, 0);
         // TODO: make it a variant
         self::setGameStateInitialValue(GAME_STATE_AUTOMATIC_CARD_DECISIONS, 0);
         self::setGameStateInitialValue(GAME_STATE_AUTOMATIC_PLAYER_DECISIONS, 1);
@@ -245,7 +248,7 @@ class AbandonAllArtichokes extends Table
 
         $this->compost_played_card();
 
-        $this->next_state_or_turn_end();
+        $this->gamestate->nextState(STATE_PLAYED_CARD);
     }
 
     function stNextPlayer() {
@@ -285,8 +288,29 @@ class AbandonAllArtichokes extends Table
         $player_id = self::activeNextPlayer();
         self::giveExtraTime($player_id);
         self::setGameStateInitialValue(GAME_STATE_CARDS_PLAYED_THIS_TURN, 0);
+        self::setGameStateInitialValue(GAME_STATE_TARGET_PLAYER, 0);
+        self::setGameStateInitialValue(GAME_STATE_PLAYED_CARROT_THIS_TURN, 0);
 
         $this->gamestate->nextState(STATE_HARVEST);
+    }
+
+    function stPlayedCard() {
+        $hand = $this->cards->getCardsInLocation(STOCK_HAND, self::getCurrentPlayerId());
+        $artichoke_count = 0;
+        foreach ($hand as $card) {
+            if ($card['type'] == VEGETABLE_ARTICHOKE) {
+                $artichoke_count++;
+            }
+        }
+        if (self::getGameStateValue(GAME_STATE_PLAYED_CARROT_THIS_TURN) > 0) {
+            $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('[automatic] ${player_name} played carrot and ends turn'));
+            $this->gamestate->nextState(STATE_NEXT_PLAYER);
+        } else if ($artichoke_count == count($hand)) {
+            $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('[automatic] Only artichokes left in hand, ${player_name} ends turn'));
+            $this->gamestate->nextState(STATE_NEXT_PLAYER);
+        } else {
+            $this->gamestate->nextState(STATE_PLAY_CARD);
+        }
     }
 
     function refreshGardenRow($notify) {
@@ -357,49 +381,30 @@ class AbandonAllArtichokes extends Table
         if ($card == null || $card['location'] != STOCK_HAND || $card['location_arg'] != self::getCurrentPlayerId()) {
             throw new BgaUserException(self::_("You must play a card from your hand"));
         }
-
-        switch($card['type']) {
-        case VEGETABLE_BEET:
-            $next_state = $this->playBeet($id);
-            break;
-        case VEGETABLE_BROCCOLI:
-            $next_state = $this->playBroccoli($id);
-            break;
-        case VEGETABLE_CARROT:
-            $next_state = $this->playCarrot($id);
-            break;
-        case VEGETABLE_CORN:
-            $next_state = $this->playCorn($id);
-            break;
-        case VEGETABLE_EGGPLANT:
-            $next_state = $this->playEggplant($id);
-            break;
-        case VEGETABLE_LEEK:
-            $next_state = $this->playLeek($id);
-            break;
-        case VEGETABLE_ONION:
-            $next_state = $this->playOnion($id);
-            break;
-        case VEGETABLE_PEAS:
-            $next_state = $this->playPeas($id);
-            break;
-        case VEGETABLE_PEPPER:
-            $next_state = $this->playPepper($id);
-            break;
-        case VEGETABLE_POTATO:
-            $next_state = $this->playPotato($id);
-            break;
-        case VEGETABLE_ARTICHOKE:
-            throw new BgaUserException(self::_("Artichokes can't be played"));
-        default:
-            throw new BgaUserException(self::_("This vegetable is not supported yet"));
+        $play_actions = array (
+            VEGETABLE_ARTICHOKE => 'playArtichoke',
+            VEGETABLE_BEET => 'playBeet',
+            VEGETABLE_BROCCOLI => 'playBroccoli',
+            VEGETABLE_CARROT => 'playCarrot',
+            VEGETABLE_CORN => 'playCorn',
+            VEGETABLE_EGGPLANT => 'playEggplant',
+            VEGETABLE_LEEK => 'playLeek',
+            VEGETABLE_ONION => 'playOnion',
+            VEGETABLE_PEAS => 'playPeas',
+            VEGETABLE_PEPPER => 'playPepper',
+            VEGETABLE_POTATO => 'playPotato',
+        );
+        $name = $play_actions[$card['type']];
+        if ($name == null) {
+            throw new BgaVisibleSystemException("This vegetable is not supported yet");
         }
+        $this->$name($id);
 
         self::incGameStateValue(GAME_STATE_CARDS_PLAYED_THIS_TURN, 1);
+    }
 
-        if ($next_state) {
-            $this->next_state_or_turn_end($next_state);
-        }
+    function playArtichoke($id) {
+        throw new BgaUserException(self::_("Artichokes can't be played"));
     }
 
     function playBeet($id) {
@@ -423,7 +428,7 @@ class AbandonAllArtichokes extends Table
             $this->gamestate->nextState(STATE_BEET_CHOOSE_OPPONENT);
             $this->beetChooseOpponent($target_id);
         } else {
-            return STATE_BEET_CHOOSE_OPPONENT;
+            $this->gamestate->nextState(STATE_BEET_CHOOSE_OPPONENT);
         }
     }
 
@@ -439,7 +444,8 @@ class AbandonAllArtichokes extends Table
         $this->beetHandleDrawnCards($card, $opponent_card, $opponent_id);
 
         $this->discard_played_card();
-        $this->next_state_or_turn_end();
+
+        $this->gamestate->nextState(STATE_PLAYED_CARD);
     }
 
     function arg_beetOpponents() {
@@ -490,7 +496,8 @@ class AbandonAllArtichokes extends Table
         $this->compost_artichoke($artichoke, self::getCurrentPlayerId());
 
         $this->discard_played_card();
-        return STATE_PLAY_CARD;
+
+        $this->gamestate->nextState(STATE_PLAYED_CARD);
     }
 
     function playCarrot($id) {
@@ -523,7 +530,9 @@ class AbandonAllArtichokes extends Table
         $this->cards->moveCard($card['id'], STOCK_COMPOST);
         $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} composts carrot and two artichokes'), $card, array( 'destination' => STOCK_COMPOST ));
 
-        return STATE_NEXT_PLAYER;
+        self::setGameStateValue(GAME_STATE_PLAYED_CARROT_THIS_TURN, 1);
+
+        $this->gamestate->nextState(STATE_PLAYED_CARD);
     }
 
     function playCorn($id) {
@@ -552,7 +561,7 @@ class AbandonAllArtichokes extends Table
             'destination_arg' => $player_id,
         ));
 
-        return STATE_CORN_TAKE_CARD;
+        $this->gamestate->nextState(STATE_CORN_TAKE_CARD);
     }
 
     function cornTakeCard($id) {
@@ -571,7 +580,7 @@ class AbandonAllArtichokes extends Table
 
         $this->discard_played_card();
 
-        $this->next_state_or_turn_end();
+        $this->gamestate->nextState(STATE_PLAYED_CARD);
     }
 
     function playEggplant($id) {
@@ -597,7 +606,7 @@ class AbandonAllArtichokes extends Table
 
         $this->compost_artichoke($artichoke, self::getCurrentPlayerId());
 
-        return STATE_EGGPLANT_CHOOSE_CARDS;
+        $this->gamestate->nextState(STATE_EGGPLANT_CHOOSE_CARDS);
     }
 
     function eggplantChooseCards($card_ids) {
@@ -661,7 +670,7 @@ class AbandonAllArtichokes extends Table
             $this->gamestate->nextState(STATE_LEEK_CHOOSE_OPPONENT);
             $this->leekChooseOpponent($target_id);
         } else {
-            return STATE_LEEK_CHOOSE_OPPONENT;
+            $this->gamestate->nextState(STATE_LEEK_CHOOSE_OPPONENT);
         }
     }
 
@@ -726,7 +735,7 @@ class AbandonAllArtichokes extends Table
 
         self::setGameStateValue(GAME_STATE_TARGET_PLAYER, 0);
 
-        $this->next_state_or_turn_end();
+        $this->gamestate->nextState(STATE_PLAYED_CARD);
     }
 
     function playOnion($id) {
@@ -781,7 +790,7 @@ class AbandonAllArtichokes extends Table
             'player_name2' => $opponent_name,
         ));
 
-        $this->next_state_or_turn_end();
+        $this->gamestate->nextState(STATE_PLAYED_CARD);
     }
 
     function playPeas($id) {
@@ -819,7 +828,7 @@ class AbandonAllArtichokes extends Table
             return;
         }
 
-        return STATE_PEAS_TAKE_CARD;
+        $this->gamestate->nextState(STATE_PEAS_TAKE_CARD);
     }
 
     function peasTakeCard($id) {
@@ -881,7 +890,7 @@ class AbandonAllArtichokes extends Table
 
         $this->discard_played_card();
 
-        $this->next_state_or_turn_end();
+        $this->gamestate->nextState(STATE_PLAYED_CARD);
     }
 
     function playPepper($id) {
@@ -928,7 +937,7 @@ class AbandonAllArtichokes extends Table
             ));
         }
 
-        return STATE_PEPPER_TAKE_CARD;
+        $this->gamestate->nextState(STATE_PEPPER_TAKE_CARD);
     }
 
     function pepperTakeCard($id) {
@@ -959,7 +968,7 @@ class AbandonAllArtichokes extends Table
 
         $this->discard_played_card();
 
-        $this->next_state_or_turn_end();
+        $this->gamestate->nextState(STATE_PLAYED_CARD);
     }
 
     function playPotato($id) {
@@ -987,7 +996,7 @@ class AbandonAllArtichokes extends Table
 
         $this->discard_played_card();
 
-        return STATE_PLAY_CARD;
+        $this->gamestate->nextState(STATE_PLAYED_CARD);
     }
 
 //////////////////////////////////////////////////////////////////////////////

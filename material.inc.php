@@ -32,8 +32,9 @@ $this->card_types = array(
 
 */
 
-if (!defined('GAME_STATE_CARDS_PLAYED_THIS_TURN')) { // ensure this block is only invoked once, since it is included multiple times
+if (!defined('GAME_STATE_PLAYED_CARROT_THIS_TURN')) { // ensure this block is only invoked once, since it is included multiple times
     // must match name in constructor in game.php
+    define("GAME_STATE_PLAYED_CARROT_THIS_TURN", "played_carrot_this_turn");
     define("GAME_STATE_CARDS_PLAYED_THIS_TURN", "cards_played_this_turn");
     define("GAME_STATE_TARGET_PLAYER", "target_player");
     define("GAME_STATE_AUTOMATIC_CARD_DECISIONS", "automatic_card_decisions");
