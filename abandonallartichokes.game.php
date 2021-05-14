@@ -415,9 +415,11 @@ class AbandonAllArtichokes extends Table
         $this->play_card($id);
 
         if (self::getGameStateValue(GAME_STATE_AUTOMATIC_PLAYER_DECISIONS) > 0 && count($target_ids) == 1) {
-            $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('[automatic] Only one valid target player for ${vegetable}'), '',
-                array( 'vegetable' => $this->vegetables[VEGETABLE_BEET]['name']));
             $target_id = array_pop($target_ids);
+            $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('[automatic] ${vegetable} can only target ${player_name2}'), '',
+                              array( 'vegetable' => $this->vegetables[VEGETABLE_BEET]['name'],
+                                     'player_name2' => $this->player_name($target_id),
+                              ));
             $this->gamestate->nextState(STATE_BEET_CHOOSE_OPPONENT);
             $this->beetChooseOpponent($target_id);
         } else {
