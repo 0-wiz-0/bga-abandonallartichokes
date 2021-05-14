@@ -73,11 +73,11 @@
 }
 
 /***** GENERAL LAYOUT ****/
-#artichoke_table {
+#table {
     padding: 1em;
 }
 
-#artichoke_table > div {
+#table > div {
     margin-bottom: 1em;
 }
 
@@ -90,13 +90,14 @@
     margin-right: 5px;
 }
 
-#artichoke_garden_area {
+#garden_area {
     background-color: var(--garden);
-    padding: 10px;
+    /* stock adds 5 padding to bottom */
+    padding: 10px 10px 5px 10px;
     border-radius: 10px;
-    /* 5 * card-width + 4 * 5 (margin) + 2 * 1 (border of last card) */
+    /* 5 * card-width + 4 * 5 (margin) */
     /* for width 100px */
-    max-width: 522px;
+    max-width: 520px;
     /* for width 150px: */
     /* max-width: 770px; */
 }
@@ -112,9 +113,12 @@
     border-radius: 10px;
     border: 1px solid black;
     background-size: contain;
+    box-sizing: border-box;
 }
 
+/* here we want to override BGA's defaults */
 .stockitem_selected {
     opacity: 0.5 !important;
-    border-style: none !important;
+    /* border-style: none !important; */
+    border: 1px solid grey !important;
 }
