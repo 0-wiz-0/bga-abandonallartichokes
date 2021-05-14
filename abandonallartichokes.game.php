@@ -287,14 +287,16 @@ class AbandonAllArtichokes extends Table
         // switch to next player
         $player_id = self::activeNextPlayer();
         self::giveExtraTime($player_id);
-        self::setGameStateInitialValue(GAME_STATE_CARDS_PLAYED_THIS_TURN, 0);
-        self::setGameStateInitialValue(GAME_STATE_TARGET_PLAYER, 0);
-        self::setGameStateInitialValue(GAME_STATE_PLAYED_CARROT_THIS_TURN, 0);
+        self::setGameStateValue(GAME_STATE_CARDS_PLAYED_THIS_TURN, 0);
+        self::setGameStateValue(GAME_STATE_TARGET_PLAYER, 0);
+        self::setGameStateValue(GAME_STATE_PLAYED_CARROT_THIS_TURN, 0);
 
         $this->gamestate->nextState(STATE_HARVEST);
     }
 
     function stPlayedCard() {
+        self::incGameStateValue(GAME_STATE_CARDS_PLAYED_THIS_TURN, 1);
+
         $hand = $this->cards->getCardsInLocation(STOCK_HAND, self::getCurrentPlayerId());
         $artichoke_count = 0;
         foreach ($hand as $card) {
@@ -399,8 +401,6 @@ class AbandonAllArtichokes extends Table
             throw new BgaVisibleSystemException("This vegetable is not supported yet");
         }
         $this->$name($id);
-
-        self::incGameStateValue(GAME_STATE_CARDS_PLAYED_THIS_TURN, 1);
     }
 
     function playArtichoke($id) {
@@ -1173,23 +1173,6 @@ class AbandonAllArtichokes extends Table
             'destination' => STOCK_PLAYED_CARD,
         ));
         return $this->cards->getCard($id);
-    }
-
-    // end turn if there are no cards left in hand, or only artichokes
-    function next_state_or_turn_end($state = STATE_PLAY_CARD) {
-        $hand = $this->cards->getCardsInLocation(STOCK_HAND, self::getCurrentPlayerId());
-        $artichoke_count = 0;
-        foreach ($hand as $card) {
-            if ($card['type'] == VEGETABLE_ARTICHOKE) {
-                $artichoke_count++;
-            }
-        }
-        if ($state == STATE_PLAY_CARD && ($artichoke_count == count($hand))) {
-            $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('[automatic] Only artichokes left in hand, ${player_name} ends turn'));
-            $this->gamestate->nextState(STATE_NEXT_PLAYER);
-        } else {
-            $this->gamestate->nextState($state);
-        }
     }
 
     function get_played_card_id() {
