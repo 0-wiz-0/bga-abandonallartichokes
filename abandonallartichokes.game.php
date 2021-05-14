@@ -172,8 +172,11 @@ class AbandonAllArtichokes extends Table
         // Get information about players
         $result['players'] = self::loadPlayersBasicInfos();
 
+        $hand = $this->cards->getPlayerHand($player_id);
+        // add cards from limbo
+        $limbo = $this->cards->getCardsInLocation(STOCK_LIMBO, $player_id);
         $result[STOCK_GARDEN_ROW] = $this->cards->getCardsInLocation(STOCK_GARDEN_ROW);
-        $result[STOCK_HAND] = $this->cards->getPlayerHand($player_id);
+        $result[STOCK_HAND] = array_merge($hand, $limbo);
         $result[STOCK_PLAYED_CARD] = $this->cards->getCardsInLocation(STOCK_PLAYED_CARD);
         $compost = $this->cards->getCardOnTop(STOCK_COMPOST);
         $result[STOCK_COMPOST] = $compost ? array($compost) : array();

@@ -6,12 +6,14 @@ Nice Features
   - Developed by
 - replace remaining graphics
 - rhubarb
+- game options
+  - autoplay
+  - rhubarb
 
 Topics
 ===
 - game board layout
 - checks on client side
-- game options
 
 Cleanups/Bugs
 ===
@@ -25,4 +27,3 @@ Cleanups/Bugs
 - just visible in log who selects who
 - names for areas
 - white line on iPad at bottom of cards
-- add limbo cards to hand on refresh
