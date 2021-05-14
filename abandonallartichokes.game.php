@@ -1175,8 +1175,8 @@ class AbandonAllArtichokes extends Table
                 $artichoke_count++;
             }
         }
-        if ($state == STATE_PLAY_CARD && ($artichoke_count == count($hand) || count($hand) == 0)) {
-            $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('[automatic] No playable cards left, ${player_name} ends turn'));
+        if ($state == STATE_PLAY_CARD && ($artichoke_count == count($hand))) {
+            $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('[automatic] Only artichokes left in hand, ${player_name} ends turn'));
             $this->gamestate->nextState(STATE_NEXT_PLAYER);
         } else {
             $this->gamestate->nextState($state);
