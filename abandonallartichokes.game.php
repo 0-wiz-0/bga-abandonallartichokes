@@ -791,7 +791,7 @@ class AbandonAllArtichokes extends Table
             throw new BgaVisibleSystemException("Onion can only be played when you have an opponent");
         }
 
-        $this->notify_all(NOTIFICATION_MESSAGE, '${player_name} plays onion and composts artichoke', null, array( 'player_name' => self::getActivePlayerName() ));
+        $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('${player_name} plays onion and composts artichoke'), null, array( 'player_name' => self::getActivePlayerName() ));
         $this->compost_artichoke($artichoke, self::getActivePlayerId(), false);
 
         if (self::getGameStateValue(GAME_STATE_AUTOMATIC_PLAYER_DECISIONS) > 0 && count($target_ids) == 1) {
@@ -1134,7 +1134,7 @@ class AbandonAllArtichokes extends Table
                 $this->leekTakeCard(false);
                 break;
             default:
-                $this->notify_all(NOTIFICATION_MESSAGE, 'Zombie mode not supported in this active game state (' . $statename . '), trying undo');
+                $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('Trying to undo incomplete action for player who quit'));
                 $this->gamestate->nextState(STATE_ZOMBIE_UNDO);
             }
 
