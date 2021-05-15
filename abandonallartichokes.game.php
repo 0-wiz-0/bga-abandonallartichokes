@@ -172,7 +172,7 @@ class AbandonAllArtichokes extends Table
         $result['players'] = self::loadPlayersBasicInfos();
 
         $hand = $this->cards->getPlayerHand($player_id);
-        // add cards from limbo
+        // add cards from limbo because they are still in hand, just not in our database
         $limbo = $this->cards->getCardsInLocation(STOCK_LIMBO, $player_id);
         $result[STOCK_GARDEN_ROW] = $this->cards->getCardsInLocation(STOCK_GARDEN_ROW);
         $result[STOCK_HAND] = array_merge($hand, $limbo);
@@ -224,6 +224,18 @@ class AbandonAllArtichokes extends Table
         }
 
         return max(0, min(100 * (1 - min($artichoke_percentages)), 100));
+    }
+
+    function stZombieUndo() {
+        // discard played card
+        $this->discard_played_card();
+        // discard any displayed cards
+        $displayed_cards = $this->cards->getCardsInLocation(STOCK_DISPLAYED_CARD);
+        foreach ($displayed_cards as $id => $card) {
+            $this->cards->moveCard($id, STOCK_COMPOST);
+            $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('Composting card on display for player who quit'), $card, array( 'destination' => STOCK_COMPOST ));
+        }
+        $this->pass();
     }
 
     function stEggplantInit() {
@@ -280,7 +292,7 @@ class AbandonAllArtichokes extends Table
     }
 
     function stNextPlayer() {
-        $player_id = self::getCurrentPlayerId();
+        $player_id = self::getActivePlayerId();
         // discard cards
         $this->cards->moveAllCardsInLocation(STOCK_HAND, $this->player_discard($player_id), $player_id, $player_id);
         // draw up to five cards
@@ -289,7 +301,7 @@ class AbandonAllArtichokes extends Table
             'cards' => $this->cards->getPlayerHand($player_id),
             'discard' => $result[STOCK_DISCARD] = $this->cards->getCardsInLocation($this->player_discard($player_id)),
             'player_id' => $player_id,
-            'player_name' => self::GetCurrentPlayerName(),
+            'player_name' => self::GetActivePlayerName(),
         ));
         // to update counters
         $this->notify_all(NOTIFICATION_UPDATE_COUNTERS, '');
@@ -389,20 +401,19 @@ class AbandonAllArtichokes extends Table
             throw new BgaUserException(self::_("You must select a card from the garden row"));
         }
 
-        $this->cards->moveCard($id, STOCK_HAND, self::getCurrentPlayerId());
+        $this->cards->moveCard($id, STOCK_HAND, self::getActivePlayerId());
 
         $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} harvests ${vegetable}'), $card, array(
             'destination' => STOCK_HAND,
-            'destination_arg' => self::getCurrentPlayerId(),
+            'destination_arg' => self::getActivePlayerId(),
         ));
 
         $this->gamestate->nextState(STATE_PLAY_CARD);
     }
 
     function pass() {
-        $player_id = self::getActivePlayerId();
+        self::notifyAllPlayers(NOTIFICATION_MESSAGE, clienttranslate('${player_name} ends turn'), array( 'player_name' => self::getActivePlayerName() ));
         $this->gamestate->nextState(STATE_NEXT_PLAYER);
-        self::notifyAllPlayers(NOTIFICATION_MESSAGE, clienttranslate('${player_name} ends turn'), array( 'player_name' => $this->player_name($player_id) ));
     }
 
     function playCard($id) {
@@ -722,7 +733,7 @@ class AbandonAllArtichokes extends Table
         if (count($cards) != 1) {
             throw new BgaVisibleSystemException("Incorrect number of displayed cards for leek");
         }
-        $player_id = self::getCurrentPlayerId();
+        $player_id = self::getActivePlayerId();
         if ($take_card) {
             $picked_card = $this->cards->pickCard(STOCK_DISPLAYED_CARD, $player_id);
             $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} takes ${vegetable}'), $picked_card, array(
@@ -1080,22 +1091,48 @@ class AbandonAllArtichokes extends Table
 
         if ($state['type'] === "activeplayer") {
             switch ($statename) {
-                default:
-                    $this->gamestate->nextState("zombiePass");
-                	break;
+            case 'harvest':
+                // randomly harvest one card
+                $garden_row = $this->cards->getCardsInLocation(STOCK_GARDEN_ROW);
+                if (count($garden_row) > 0) {
+                    // if there are no cards in hand, player won already
+                    // with '1', array_rand returns a single value, the key
+                    $choice = array_rand($garden_row, 1);
+                    $this->harvestCard($choice);
+                } else {
+                    // not sure how we got here, try undo
+                    $this->gamestate->nextState(STATE_ZOMBIE_UNDO);
+                }
+                break;
+            case 'playCard':
+                // pass
+                $this->pass();
+                break;
+            case 'leekTakeCard':
+                // pass card back to opponent
+                $this->leekTakeCard(false);
+                break;
+            default:
+                $this->notify_all(NOTIFICATION_MESSAGE, 'Zombie mode not supported in this active game state (' . $statename . '), trying undo');
+                $this->gamestate->nextState(STATE_ZOMBIE_UNDO);
             }
 
             return;
         }
 
         if ($state['type'] === "multipleactiveplayer") {
-            // Make sure player is in a non blocking status for role turn
-            $this->gamestate->setPlayerNonMultiactive($active_player, '');
-
+            if ($statename == 'eggplantChooseCards') {
+                $hand = $this->cards->getCardsInLocation(STOCK_HAND, $active_player);
+                // with '2', array_rand returns an array of keys
+                $choice_ids = array_rand($hand, 2);
+                $this->eggplantChooseCards($choice_ids);
+            } else {
+                throw new BgaVisibleSystemException("Zombie mode not supported at this multipleactiveplayer game state: " . $statename);
+            }
             return;
         }
 
-        throw new BgaVisibleSystemException("Zombie mode not supported at this game state: ".$statename);
+        throw new BgaVisibleSystemException("Zombie mode not supported at this game state: " . $statename);
     }
 
 ///////////////////////////////////////////////////////////////////////////////////:
