@@ -27,10 +27,12 @@ define([
                 console.log('abandonallartichokes constructor');
 
 		// css spritesheet properties
-                this.cardwidth = 150;
-                this.cardheight = 225;
-		this.image_items_per_row = 4;
-		this.spritesheet = 'img/spritesheet150.jpg';
+                this.cardwidth = 100;
+                this.cardheight = 150;
+		// When using spritesheets, we can't use high-resolution card images
+		// There are only around 15 images, so we use single files instead
+		// this.image_items_per_row = 4;
+		// this.spritesheet = 'img/spritesheet100.jpg';
                 // the values must be the same in
                 // - gamedatas
                 // - HTML *.tpl file (div id)
@@ -53,6 +55,7 @@ define([
                     DrewHand: "drew_hand",
                     RefilledGardenRow: "refilled_garden_row",
                     UpdateCounters: "update_counters",
+                    Victory: "victory",
                 };
                 // this needs to match the values in abandonallartichokes.action.php and states.inc.php
                 this.AjaxActions = {
@@ -133,7 +136,7 @@ define([
                     {name: this.Stock.Compost, callback: null, selectionMode: 0, overlap: 1},
                 ];
 
-                const extraClasses = 'card';
+                const extraClasses = 'artichoke_card';
                 this.stock = {};
                 for (var stock_entry of stock_constructor) {
                     this.stock[stock_entry.name] = this.setupCardStocks(stock_entry.name, stock_entry.callback);
@@ -155,7 +158,8 @@ define([
                 this.stock[this.Stock.Deck].setOverlap(1);
                 this.stock[this.Stock.Deck].extraClasses = extraClasses;
                 this.stock[this.Stock.Deck].autowidth = true;
-                this.stock[this.Stock.Deck].addItemType(this.CardBackId, 0, g_gamethemeurl + this.spritesheet, this.Vegetables.BACK - 1);
+                //this.stock[this.Stock.Deck].addItemType(this.CardBackId, 0, g_gamethemeurl + this.spritesheet, this.Vegetables.BACK - 1);
+                this.stock[this.Stock.Deck].addItemType(this.CardBackId, 0, g_gamethemeurl + 'img/' + (this.Vegetables.BACK - 1) + '.jpg');
                 this.updateDecks();
 
                 this.setupNotifications();
@@ -181,7 +185,8 @@ define([
 		stock.image_items_per_row = this.image_items_per_row;
                 for (var vegetable_id = 1; vegetable_id < 16; vegetable_id++) {
 		    // 1-10: main vegetables, 11-15: artichokes
-                    stock.addItemType(vegetable_id, 0, g_gamethemeurl + this.spritesheet, vegetable_id - 1);
+                    //stock.addItemType(vegetable_id, 0, g_gamethemeurl + this.spritesheet, vegetable_id - 1);
+		    stock.addItemType(vegetable_id, 0, g_gamethemeurl + 'img/' + (vegetable_id - 1) + '.jpg');
                 }
                 if (selectionChangeFunctionName != null) {
                     dojo.connect(stock, 'onChangeSelection', this, selectionChangeFunctionName);
@@ -375,6 +380,7 @@ define([
                 dojo.subscribe(this.Notification.DrewHand, this, "notif_drewHand");
                 dojo.subscribe(this.Notification.RefilledGardenRow, this, "notif_refilledGardenRow");
                 dojo.subscribe(this.Notification.UpdateCounters, this, "notif_updateCounters");
+                dojo.subscribe(this.Notification.Victory, this, "notif_victory");
             },
 
             notif_cardMoved: function (notification) {
@@ -414,6 +420,12 @@ define([
                 console.log(notification);
                 this.updateCounter(notification.args.counters);
             },
+
+	    notif_victory: function (notification) {
+                console.log(this.Notification.UpdateCounters + ' notification');
+                console.log(notification);
+		this.scoreCtrl[notification.args.player_id].setValue(1);
+	    },
 
             // Utility functions
 
@@ -558,15 +570,15 @@ define([
                 case this.Vegetables.POTATO:
                     return _("Reveal the top card of your Deck. Compost if Artichoke, otherwise discard it.")
                 case this.Vegetables.ARTICHOKE1:
-                    return _("Don't break my heart!")
+		    return _("Don't break my heart!")
                 case this.Vegetables.ARTICHOKE2:
-                    return _("Did you know, I have thorns?!")
+		    return _("Did you know that I have thorns?!")
                 case this.Vegetables.ARTICHOKE3:
-                    return _("My stem itches!")
+		    return _("My stem is itching!")
                 case this.Vegetables.ARTICHOKE4:
-                    return _("Okey Dokey!")
+		    return _("Okey dokey!")
                 case this.Vegetables.ARTICHOKE5:
-                    return _("Looking forward to be abandoned by you!")
+                    return _("Looking forward to being abandoned by you!")
                 }
             },
         });
