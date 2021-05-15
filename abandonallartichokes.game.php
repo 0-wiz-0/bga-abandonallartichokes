@@ -356,7 +356,7 @@ class AbandonAllArtichokes extends Table
             }
             $row_after = $this->cards->getCardsInLocation(STOCK_GARDEN_ROW);
             $counts = array_count_values(array_column($row_after, 'type'));
-            foreach ($counts as $type => $count) {
+            foreach ($counts as $count) {
                 if ($count >= 4) {
                     if ($notify) {
                         $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('4 or more vegetables of the same type during refresh, replacing garden row'));
@@ -480,7 +480,7 @@ class AbandonAllArtichokes extends Table
     function arg_beetOpponents() {
         $opponents = $this->get_opponent_ids();
         $target_ids = array();
-        foreach ($opponents as $index => $opponent_id) {
+        foreach ($opponents as $opponent_id) {
             if ($this->cards->countCardInLocation(STOCK_HAND, $opponent_id) > 0) {
                 array_push($target_ids, $opponent_id);
             }
@@ -643,7 +643,7 @@ class AbandonAllArtichokes extends Table
         $player_id = $this->getCurrentPlayerId();
 
         $count = 0;
-        foreach ($card_ids as $index => $card_id) {
+        foreach ($card_ids as $card_id) {
             if ($card_id != null) {
                 $card = $this->cards->getCard($card_id);
                 if ($card == null || $card['location'] != STOCK_HAND || $card['location_arg'] != $player_id) {
@@ -656,7 +656,7 @@ class AbandonAllArtichokes extends Table
             throw new BgaUserException(self::_("You must choose two cards from your hand (or as many as you can if you have fewer cards)"));
         }
         // pass to limbo for next player
-        foreach ($card_ids as $index => $card_id) {
+        foreach ($card_ids as $card_id) {
             $this->cards->moveCard($card_id, STOCK_LIMBO, $player_id);
         }
 
@@ -688,7 +688,7 @@ class AbandonAllArtichokes extends Table
     function arg_leekOpponents() {
         $opponents = $this->get_opponent_ids();
         $target_ids = array();
-        foreach ($opponents as $index => $opponent_id) {
+        foreach ($opponents as $opponent_id) {
             if ($this->cards->countCardInLocation($this->player_deck($opponent_id)) > 0 ||
                 $this->cards->countCardInLocation($this->player_discard($opponent_id)) > 0) {
                 array_push($target_ids, $opponent_id);
