@@ -469,7 +469,7 @@ class AbandonAllArtichokes extends Table
             throw new BgaUserException(self::_("Beet can only be played if an opponent has cards in hand"));
         }
 
-        $this->play_card($id);
+        $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('${player_name} plays beet'), null, array( 'player_name' => self::getActivePlayerName() ));
 
         if (self::getGameStateValue(GAME_STATE_AUTOMATIC_PLAYER_DECISIONS) > 0 && count($target_ids) == 1) {
             $target_id = array_pop($target_ids);
@@ -478,15 +478,19 @@ class AbandonAllArtichokes extends Table
                                      'player_name2' => $this->player_name($target_id),
                               ));
             $this->gamestate->nextState(STATE_BEET_CHOOSE_OPPONENT);
-            $this->beetChooseOpponent($target_id);
+            // move card to limbo so it's not a valid target for the beet switch
+            $this->cards->moveCard($id, STOCK_LIMBO, self::getActivePlayerId());
+            $this->beetChooseOpponent($target_id, $id);
         } else {
+            $this->play_card($id, false);
+
             $this->gamestate->nextState(STATE_BEET_CHOOSE_OPPONENT);
         }
     }
 
-    function beetChooseOpponent($opponent_id) {
+    function beetChooseOpponent($opponent_id, $beet_id = null) {
         self::checkAction("beetChooseOpponent");
-        $hand = $this->cards->getPlayerHand(self::getCurrentPlayerId());
+        $hand = $this->cards->getPlayerHand(self::getActivePlayerId());
         $card = $this->cards->getCard(array_rand($hand, 1));
         $opponent_hand = $this->cards->getPlayerHand($opponent_id);
         if (count($opponent_hand) < 1) {
@@ -495,7 +499,18 @@ class AbandonAllArtichokes extends Table
         $opponent_card = $this->cards->getCard(array_rand($opponent_hand, 1));
         $this->beetHandleDrawnCards($card, $opponent_card, $opponent_id);
 
-        $this->discard_played_card();
+        if ($beet_id == null) {
+            $played_card = $this->get_played_card();
+        } else {
+            // restore card from limbo for correct animation
+            $this->cards->moveCard($beet_id, STOCK_HAND, self::getActivePlayerId());
+            $played_card = $this->cards->getCard($beet_id);
+        }
+        $this->cards->moveCard($played_card['id'], $this->player_discard(self::getActivePlayerId()));
+        $this->notify_all(NOTIFICATION_CARD_MOVED, '', $played_card, array(
+            'destination' => STOCK_DISCARD,
+            'destination_arg' => self::getActivePlayerId(),
+        ));
 
         $this->gamestate->nextState(STATE_PLAYED_CARD);
     }
@@ -513,19 +528,19 @@ class AbandonAllArtichokes extends Table
 
     function beetHandleDrawnCards($card, $opponent_card, $opponent_id) {
         if ($card['type'] == VEGETABLE_ARTICHOKE && $opponent_card['type'] == VEGETABLE_ARTICHOKE) {
-            $this->compost_artichoke($card, self::getCurrentPlayerId());
+            $this->compost_artichoke($card, self::getActivePlayerId());
             $this->compost_artichoke($opponent_card, $opponent_id);
         }
         else {
             $this->cards->moveCard($card['id'], STOCK_HAND, $opponent_id);
-            $this->cards->moveCard($opponent_card['id'], STOCK_HAND, self::getCurrentPlayerId());
+            $this->cards->moveCard($opponent_card['id'], STOCK_HAND, self::getActivePlayerId());
             $this->notify_all(NOTIFICATION_CARD_MOVED,  clienttranslate('${player_name} gives ${vegetable} to ${player_name2}'),
                 $card, array( 'destination' => STOCK_HAND,
                               'destination_arg' => $opponent_id,
                               'player_name2' => $this->player_name($opponent_id)));
             $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name2} gives ${vegetable} to ${player_name}'),
                               $opponent_card, array( 'destination' => STOCK_HAND,
-                                                     'destination_arg' => self::getCurrentPlayerId(),
+                                                     'destination_arg' => self::getActivePlayerId(),
                                                      'player_name2' => $this->player_name($opponent_id)));
         }
     }

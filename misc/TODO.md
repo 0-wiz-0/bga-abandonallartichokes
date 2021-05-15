@@ -17,9 +17,8 @@ Topics
 Cleanups/Bugs
 ===
 - remove console logs and debug logging
-- debug animation issues
-  - when moving from visible to visible
-  - bete when autoplaying
+- debug animation issues when moving from visible to visible
+  (cards are moved, then their shadows are removed from where they were before)
 - play log reduction
   - combine
 - just visible in log who selects who
