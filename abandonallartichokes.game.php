@@ -82,7 +82,7 @@ class AbandonAllArtichokes extends Table
             $values[] = "('" . $player_id . "','" . $color . "','" . $player['player_canal'] . "','" . addslashes($player['player_name']) . "','" . addslashes($player['player_avatar']) . "','0')";
             $player_no++;
         }
-        $sql .= implode($values, ',');
+        $sql .= implode(',', $values);
         self::DbQuery($sql);
         self::reattributeColorsBasedOnPreferences($players, $gameinfos['player_colors']);
         self::reloadPlayersBasicInfos();
@@ -656,10 +656,7 @@ class AbandonAllArtichokes extends Table
             throw new BgaUserException(self::_("You must choose two cards from your hand (or as many as you can if you have fewer cards)"));
         }
         // pass to limbo for next player
-        $opponent_id = self::getPlayerAfter($player_id);
-        $opponent_name = $this->player_name($opponent_id);
         foreach ($card_ids as $index => $card_id) {
-            $passed_card = $this->cards->getCard($card_id);
             $this->cards->moveCard($card_id, STOCK_LIMBO, $player_id);
         }
 
@@ -667,8 +664,6 @@ class AbandonAllArtichokes extends Table
     }
 
     function playLeek($id) {
-        $players = self::loadPlayersBasicInfos();
-
         $target_args = $this->arg_leekOpponents();
         $target_ids = $target_args['target_ids'];
         if (count($target_ids) < 1) {
@@ -818,7 +813,6 @@ class AbandonAllArtichokes extends Table
         if ($this->cards->countCardInLocation(STOCK_GARDEN_STACK) < 2) {
             throw new BgaUserException(self::_("Peas can only be played when there are two cards in the garden stack"));
         }
-        $player_id = self::getCurrentPlayerId();
 
         $this->play_card($id);
 
@@ -837,7 +831,7 @@ class AbandonAllArtichokes extends Table
             $types = array_keys($available_types);
             $type = array_pop($types);
             $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('[automatic] Only cards of type ${vegetable} in display area'), null,
-                              array( 'vegetable' => $this->vegetables[VEGETABLE_PEAS]['name']));
+                              array( 'vegetable' => $this->vegetables[$type]['name']));
             $card_id = array_pop($available_types);
             $this->gamestate->nextState(STATE_PEAS_TAKE_CARD);
             $this->peasTakeCard($card_id);
@@ -1182,7 +1176,6 @@ class AbandonAllArtichokes extends Table
     }
 
     function play_card($id) {
-        $player_id = self::getCurrentPlayerId();
         $played_card = $this->cards->getCard($id);
         $this->cards->moveCard($id, STOCK_PLAYED_CARD);
         $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} plays ${vegetable}'), $played_card, array(
