@@ -773,7 +773,7 @@ class AbandonAllArtichokes extends Table
     }
 
     function playOnion($id) {
-        $hand = $this->cards->getPlayerHand(self::getCurrentPlayerId());
+        $hand = $this->cards->getPlayerHand(self::getActivePlayerId());
         foreach ($hand as $card) {
             if ($card['type'] == VEGETABLE_ARTICHOKE) {
                 $artichoke = $card;
@@ -791,9 +791,8 @@ class AbandonAllArtichokes extends Table
             throw new BgaVisibleSystemException("Onion can only be played when you have an opponent");
         }
 
-        $this->play_card($id);
-
-        $this->compost_artichoke($artichoke, self::getCurrentPlayerId());
+        $this->notify_all(NOTIFICATION_MESSAGE, '${player_name} plays onion and composts artichoke', null, array( 'player_name' => self::getActivePlayerName() ));
+        $this->compost_artichoke($artichoke, self::getActivePlayerId(), false);
 
         if (self::getGameStateValue(GAME_STATE_AUTOMATIC_PLAYER_DECISIONS) > 0 && count($target_ids) == 1) {
             $target_id = array_pop($target_ids);
@@ -801,22 +800,31 @@ class AbandonAllArtichokes extends Table
                               array( 'vegetable' => $this->vegetables[VEGETABLE_ONION]['name'],
                                      'player_name2' => $this->player_name($target_id),
                               ));
-            $this->gamestate->nextState(STATE_ONION_CHOOSE_OPPONENT);
-            $this->onionChooseOpponent($target_id);
-            return;
-        }
 
-        $this->gamestate->nextState(STATE_ONION_CHOOSE_OPPONENT);
+            $this->gamestate->nextState(STATE_ONION_CHOOSE_OPPONENT);
+
+            $this->onionChooseOpponent($target_id, $id);
+            return;
+        } else {
+            $this->play_card($id, false);
+
+            $this->gamestate->nextState(STATE_ONION_CHOOSE_OPPONENT);
+        }
     }
 
-    function onionChooseOpponent($opponent_id) {
+    function onionChooseOpponent($opponent_id, $played_card_id = null) {
         self::checkAction("onionChooseOpponent");
         $opponent_name = $this->player_name($opponent_id);
         if ($opponent_id == self::getCurrentPlayerId() || $opponent_name == null) {
             throw new BgaVisibleSystemException("Invalid target player");
         }
 
-        $played_card = $this->get_played_card_id();
+        if ($played_card_id == null) {
+            $played_card = $this->get_played_card();
+        } else {
+            $played_card = $this->cards->getCard($played_card_id);
+        }
+
         $this->cards->moveCard($played_card['id'], $this->player_discard($opponent_id));
         $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} gives ${vegetable} to ${player_name2}'), $played_card, array(
             'destination' => STOCK_DISCARD,
@@ -1193,7 +1201,7 @@ class AbandonAllArtichokes extends Table
 
     function compost_played_card() {
         $player_id = self::getActivePlayerId();
-        $played_card = $this->get_played_card_id();
+        $played_card = $this->get_played_card();
         $this->cards->moveCard($played_card['id'], STOCK_COMPOST);
         $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} composts ${vegetable}'), $played_card, array(
             'player_id' => $player_id,
@@ -1214,7 +1222,7 @@ class AbandonAllArtichokes extends Table
 
     function discard_played_card($notify = false) {
         $player_id = self::getActivePlayerId();
-        $played_card = $this->get_played_card_id();
+        $played_card = $this->get_played_card();
         $this->cards->moveCard($played_card['id'], $this->player_discard($player_id));
         $this->notify_all(NOTIFICATION_CARD_MOVED, $notify ? clienttranslate('${player_name} discards ${vegetable}') : '', $played_card, array(
             'player_id' => $player_id,
@@ -1224,16 +1232,16 @@ class AbandonAllArtichokes extends Table
         ));
     }
 
-    function play_card($id) {
+    function play_card($id, $notify = true) {
         $played_card = $this->cards->getCard($id);
         $this->cards->moveCard($id, STOCK_PLAYED_CARD);
-        $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} plays ${vegetable}'), $played_card, array(
+        $this->notify_all(NOTIFICATION_CARD_MOVED, $notify ? clienttranslate('${player_name} plays ${vegetable}') : '', $played_card, array(
             'destination' => STOCK_PLAYED_CARD,
         ));
         return $this->cards->getCard($id);
     }
 
-    function get_played_card_id() {
+    function get_played_card() {
         $played_cards = $this->cards->getCardsInLocation(STOCK_PLAYED_CARD);
         if (count($played_cards) != 1) {
             throw new BgaVisibleSystemException("Incorrect number of played cards");
