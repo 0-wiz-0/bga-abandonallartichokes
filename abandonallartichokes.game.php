@@ -104,8 +104,7 @@ class AbandonAllArtichokes extends Table
 
         // Create cards
         $cards = array();
-        foreach ($this->vegetables as $vegetable_id => $vegetable)
-        {
+        foreach (array_keys($this->vegetables) as $vegetable_id) {
             if ($vegetable_id == VEGETABLE_ARTICHOKE) {
                 // type_arg is used for selecting one of the 5 artichoke pictures, see frontend
                 $cards[] = array('type' => $vegetable_id, 'type_arg' => 0, 'nbr' => 2 * count($players));
@@ -184,7 +183,7 @@ class AbandonAllArtichokes extends Table
         $result[STOCK_DISPLAYED_CARD] = $this->cards->getCardsInLocation(STOCK_DISPLAYED_CARD);
 
         $result['counters'] = array();
-        foreach ($result['players'] as $player_id => $player) {
+        foreach (array_keys($result['players']) as $player_id) {
             $result['counters'][$player_id] = $this->get_counters($player_id);
         }
 
@@ -206,7 +205,7 @@ class AbandonAllArtichokes extends Table
         $players = self::loadPlayersBasicInfos();
 
         $artichoke_percentages = array();
-        foreach ($players as $player_id => $player) {
+        foreach (array_keys($players) as $player_id) {
             $deck = $this->player_deck($player_id);
             $discard = $this->player_discard($player_id);
             $card_count = $this->cards->countCardInLocation($deck) +
@@ -235,7 +234,7 @@ class AbandonAllArtichokes extends Table
         // move cards from limbos to player's hands and update state
         $players = self::loadPlayersBasicInfos();
 
-        foreach ($players as $source_id => $value) {
+        foreach (array_keys($players) as $source_id) {
             $target_id = self::getPlayerAfter($source_id);
             $cards = $this->cards->getCardsInLocation(STOCK_LIMBO, $source_id);
             $card_ids = array_map(function($n) { return $n['id']; }, $cards);
@@ -266,7 +265,7 @@ class AbandonAllArtichokes extends Table
                 'player_name2' => $this->player_name($target_id),
             ));
         }
-        foreach ($players as $player_id => $value) {
+        foreach (array_keys($players) as $player_id) {
             $this->notify_one($player_id, NOTIFICATION_DREW_HAND, '', null, array(
                 'cards' => $this->cards->getPlayerHand($player_id),
                 'discard' => $this->cards->getCardsInLocation($this->player_discard($player_id)),
@@ -432,7 +431,7 @@ class AbandonAllArtichokes extends Table
         $this->$name($id);
     }
 
-    function playArtichoke($id) {
+    function playArtichoke() {
         throw new BgaUserException(self::_("Artichokes can't be played"));
     }
 
@@ -1196,7 +1195,7 @@ class AbandonAllArtichokes extends Table
         $player_id = self::getActivePlayerId();
         $players = self::loadPlayersBasicInfos();
         $target_ids = array();
-        foreach ($players as $opponent_id => $opponent) {
+        foreach (array_keys($players) as $opponent_id) {
             if ($player_id == $opponent_id) {
                 continue;
             }
@@ -1207,7 +1206,7 @@ class AbandonAllArtichokes extends Table
 
     function update_statistics() {
         $players = self::loadPlayersBasicInfos();
-        foreach ($players as $player_id => $player) {
+        foreach (array_keys($players) as $player_id) {
             $card_count = $this->cards->countCardInLocation($this->player_deck($player_id)) +
                         $this->cards->countCardInLocation($this->player_discard($player_id)) +
                         $this->cards->countCardInLocation(STOCK_HAND, $player_id);
@@ -1243,7 +1242,7 @@ class AbandonAllArtichokes extends Table
 
     function notify_others($excluded_player_ids, $type, $message, $card = null, $arguments = array()) {
         $players = self::loadPlayersBasicInfos();
-        foreach ($players as $player_id => $value) {
+        foreach (array_keys($players) as $player_id) {
             if (!in_array($player_id, $excluded_player_ids)) {
                 $this->notify_backend($player_id, $type, $message, $card, $arguments);
             }
@@ -1261,7 +1260,8 @@ class AbandonAllArtichokes extends Table
             $this->set_if_not_set($arguments, 'origin_arg', $card['location_arg']);
         }
         $arguments['counters'] = array();
-        foreach (self::loadPlayersBasicInfos() as $player_id => $player) {
+        $players = self::loadPlayersBasicInfos();
+        foreach (array_keys($players) as $player_id) {
             $arguments['counters'][$player_id] = $this->get_counters($player_id);
         }
         if ($target_player_id != null) {
