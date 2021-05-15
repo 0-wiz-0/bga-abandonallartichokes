@@ -113,17 +113,11 @@ class AbandonAllArtichokes extends Table
                 $cards[] = array('type' => $vegetable_id, 'type_arg' => 3, 'nbr' => 2 * count($players));
                 $cards[] = array('type' => $vegetable_id, 'type_arg' => 4, 'nbr' => 2 * count($players));
             } else {
+                // for testing only; list at least two!
+                // if (!in_array($vegetable_id, array(VEGETABLE_ONION, VEGETABLE_CARROT))) {
+                //     continue;
+                // }
                 $cards[] = array('type' => $vegetable_id, 'type_arg' => 0, 'nbr' => 6);
-                //$cards[] = array('type' => VEGETABLE_BEET, 'type_arg' => 0, 'nbr' => 6);
-                //$cards[] = array('type' => VEGETABLE_CARROT, 'type_arg' => 0, 'nbr' => 6);
-                //$cards[] = array('type' => VEGETABLE_POTATO, 'type_arg' => 0, 'nbr' => 6);
-                //$cards[] = array('type' => VEGETABLE_ONION, 'type_arg' => 0, 'nbr' => 6);
-                //$cards[] = array('type' => VEGETABLE_PEPPER, 'type_arg' => 0, 'nbr' => 6);
-                //$cards[] = array('type' => VEGETABLE_PEAS, 'type_arg' => 0, 'nbr' => 6);
-                //$cards[] = array('type' => VEGETABLE_CORN, 'type_arg' => 0, 'nbr' => 6);
-                //$cards[] = array('type' => VEGETABLE_LEEK, 'type_arg' => 0, 'nbr' => 6);
-                //$cards[] = array('type' => VEGETABLE_EGGPLANT, 'type_arg' => 0, 'nbr' => 6);
-                //$cards[] = array('type' => VEGETABLE_BROCCOLI, 'type_arg' => 0, 'nbr' => 6);
             }
 
         }
@@ -331,7 +325,11 @@ class AbandonAllArtichokes extends Table
         self::setGameStateValue(GAME_STATE_TARGET_PLAYER, 0);
         self::setGameStateValue(GAME_STATE_PLAYED_CARROT_THIS_TURN, 0);
 
-        $this->gamestate->nextState(STATE_HARVEST);
+        if (count($this->cards->getCardsInLocation(STOCK_GARDEN_ROW)) > 0) {
+            $this->gamestate->nextState(STATE_HARVEST);
+        } else {
+            $this->gamestate->nextState(STATE_PLAY_CARD);
+        }
     }
 
     function stPlayedCard() {
@@ -356,36 +354,51 @@ class AbandonAllArtichokes extends Table
     }
 
     function refreshGardenRow($notify) {
+        // limit number of tries; especially in testing and at end of game there might be impossible cases
+        $loop_count = 0;
         $finished = false;
         $had_to_reshuffle = false;
         $row_before = $this->cards->getCardsInLocation(STOCK_GARDEN_ROW);
+        $garden_stack_count_before = count($this->cards->getCardsInLocation(STOCK_GARDEN_STACK));
         while (!$finished) {
+            $loop_count++;
             $finished = true;
             $count = $this->cards->countCardInLocation(STOCK_GARDEN_ROW);
             if ($count < 5) {
                 $this->cards->pickCardsForLocation(5 - $count, STOCK_GARDEN_STACK, STOCK_GARDEN_ROW);
             }
-            $row_after = $this->cards->getCardsInLocation(STOCK_GARDEN_ROW);
-            $counts = array_count_values(array_column($row_after, 'type'));
-            foreach ($counts as $count) {
-                if ($count >= 4) {
-                    if ($notify) {
-                        $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('4 or more vegetables of the same type during refresh, replacing garden row'));
+            $garden_stack_count_after = count($this->cards->getCardsInLocation(STOCK_GARDEN_STACK));
+            // no point reshuffling if there is nothing left in the garden row
+            if ($garden_stack_count_after > 0 && $loop_count < 5) {
+                $row_after = $this->cards->getCardsInLocation(STOCK_GARDEN_ROW);
+                $counts = array_count_values(array_column($row_after, 'type'));
+                foreach ($counts as $count) {
+                    if ($count >= 4) {
+                        if ($notify) {
+                            $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('4 or more vegetables of the same type during refresh, replacing garden row'));
+                        }
+                        $card_ids = array_map(function($n) { return $n['id']; }, $this->cards->getCardsInLocation(STOCK_GARDEN_ROW));
+                        $this->cards->moveCards($card_ids, STOCK_GARDEN_STACK);
+                        $this->cards->shuffle(STOCK_GARDEN_STACK);
+                        $had_to_reshuffle = true;
+                        $finished = false;
+                        break;
                     }
-                    $card_ids = array_map(function($n) { return $n['id']; }, $this->cards->getCardsInLocation(STOCK_GARDEN_ROW));
-                    $this->cards->moveCards($card_ids, STOCK_GARDEN_STACK);
-                    $this->cards->shuffle(STOCK_GARDEN_STACK);
-                    $had_to_reshuffle = true;
-                    $finished = false;
-                    break;
                 }
             }
+        }
+        if ($loop_count >= 5) {
+            $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('Multiple reshuffles did not reduce the number of vegetables of the same type below 4, giving up'));
+        }
+        if ($garden_stack_count_before > 0 && $garden_stack_count_after == 0) {
+            $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('Garden stack is empty now'));
         }
         if ($had_to_reshuffle) {
             $new_cards_object = $this->cards->getCardsInLocation(STOCK_GARDEN_ROW);
             return array_values($new_cards_object);
         }
         $new_cards = [];
+        $row_after = $this->cards->getCardsInLocation(STOCK_GARDEN_ROW);
         foreach ($row_after as $key => $value) {
             if (!array_key_exists($key, $row_before)) {
                 array_push($new_cards, $value);

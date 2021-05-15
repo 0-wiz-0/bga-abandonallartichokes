@@ -27,5 +27,4 @@ Cleanups/Bugs
 - just visible in log who selects who
 - names for areas
 - white line on iPad at bottom of cards
-- skip harvest if garden row is empty
 - artichoke count wrong in statistics if we received artichokes/passed artichokes
