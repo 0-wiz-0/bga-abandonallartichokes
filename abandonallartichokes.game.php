@@ -647,7 +647,7 @@ class AbandonAllArtichokes extends Table
             if ($card_id != null) {
                 $card = $this->cards->getCard($card_id);
                 if ($card == null || $card['location'] != STOCK_HAND || $card['location_arg'] != $player_id) {
-                    throw BgaUserException(self::_("You must choose two cards from your hand (or as many as you can if you have fewer cards)"));
+                    throw new BgaUserException(self::_("You must choose two cards from your hand (or as many as you can if you have fewer cards)"));
                 }
                 $count++;
             }
