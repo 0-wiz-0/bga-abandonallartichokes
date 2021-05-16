@@ -26,7 +26,7 @@
 
 $game_options = array(
     100 => array(
-        'name' => totranslate('Choosing players'),
+        'name' => totranslate('Targets for card effects'),
         'values' => array(
             0 => array('name' => totranslate('Choose players manually') ),
             1 => array('name' => totranslate('Choose players automatically'), 'description' => totranslate('When there is only one valid target player for a vegetable effect, choose the player automatically')),
