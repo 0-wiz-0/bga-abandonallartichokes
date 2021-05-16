@@ -13,10 +13,12 @@ var jstpl_fake_card = "<div id=\"${id}\" class=\"stockitem\" style=\"top:${top}p
 </script>
 
 <div id="table">
-  <div id="garden_area">
-    <div id="garden_row"></div>
+  <div class="artichoke_flex_center">
+    <div id="garden_area">
+      <div id="garden_row"></div>
+    </div>
   </div>
-  <div id="common_area" class="artichoke_flex_row">
+  <div id="common_area" class="artichoke_flex_away">
     <div id="played_card_area">
       <div id="played_card"></div>
     </div>
@@ -27,10 +29,10 @@ var jstpl_fake_card = "<div id=\"${id}\" class=\"stockitem\" style=\"top:${top}p
       <div id="compost"></div>
     </div>
   </div>
-  <div id="hand_area">
+  <div id="hand_area" class="artichoke_flex_center">
     <div id="hand"></div>
   </div>
-  <div id="player_area" class="artichoke_flex_row">
+  <div id="player_area" class="artichoke_flex_away">
     <div id="draw_pile_area">
 	 <div id="deck"></div>
     </div>

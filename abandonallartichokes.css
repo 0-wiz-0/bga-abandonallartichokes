@@ -81,9 +81,14 @@
     margin-bottom: 1em;
 }
 
-.artichoke_flex_row {
+.artichoke_flex_away {
     display: flex;
     justify-content: space-between;
+}
+
+.artichoke_flex_center {
+    display: flex;
+    justify-content: center;
 }
 
 .artichoke_label {
@@ -97,7 +102,7 @@
     border-radius: 10px;
     /* 5 * card-width + 4 * 5 (margin) */
     /* for width 100px */
-    max-width: 520px;
+    width: 520px;
     /* for width 150px: */
     /* max-width: 770px; */
 }
