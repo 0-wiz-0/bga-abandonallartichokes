@@ -2,7 +2,7 @@
 /**
  *------
  * BGA framework: © Gregory Isabelli <gisabelli@boardgamearena.com> & Emmanuel Colin <ecolin@boardgamearena.com>
- * AbandonAllArtichokes implementation : © Thomas Klausner <tk@giga.or.at> & Roja Maschajekhi
+ * AbandonAllArtichokes implementation : © Thomas Klausner <tk@giga.or.at> & Roja Maschajekhi <roja@roja.co.at>
  *
  * This code has been produced on the BGA studio platform for use on https://boardgamearena.com.
  * See http://en.doc.boardgamearena.com/Studio for more information.
