@@ -1,14 +1,11 @@
-Nice Features
+Soon
 ===
-- replace remaining graphics
-- rhubarb
-- game options
-  - player autoselect?
-  - rhubarb
+- game_display images
+- copyright header
 
-Topics
+Possibly Later
 ===
-- game board layout
+- rhubarb
 - checks on client side
 - HTML pages:
   - How to Play
