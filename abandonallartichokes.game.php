@@ -98,7 +98,8 @@ class AbandonAllArtichokes extends Table
         self::setGameStateInitialValue(GAME_STATE_AUTOMATIC_CARD_DECISIONS, 0);
 
         // Init game statistics
-        self::initStat('player', 'artichokes', 10);
+        self::initStat('player', 'artichokes_composted', 0);
+        self::initStat('player', 'artichoke_count', 0);
         self::initStat('player', 'card_count', 0);
         self::initStat('player', 'number_of_turns', 0);
 
@@ -200,15 +201,8 @@ class AbandonAllArtichokes extends Table
 
         $artichoke_percentages = array();
         foreach (array_keys($players) as $player_id) {
-            $deck = $this->player_deck($player_id);
-            $discard = $this->player_discard($player_id);
-            $card_count = $this->cards->countCardInLocation($deck) +
-                        $this->cards->countCardInLocation($discard) +
-                        $this->cards->countCardInLocation(STOCK_HAND, $player_id);
-            $artichoke_count = count($this->cards->getCardsOfTypeInLocation(VEGETABLE_ARTICHOKE, null, $deck)) +
-                             count($this->cards->getCardsOfTypeInLocation(VEGETABLE_ARTICHOKE, null, $discard)) +
-                             count($this->cards->getCardsOfTypeInLocation(VEGETABLE_ARTICHOKE, null, STOCK_HAND, $player_id));
-            $artichoke_percentages[] = $artichoke_count / ($card_count > 0 ? $card_count : 1);
+            $counts = $this->count_cards_and_artichokes($player_id);
+            $artichoke_percentages[] = $counts['artichoke_count'] / ($counts['card_count'] > 0 ? $counts['card_count'] : 1);
         }
 
         // has a player won yet?
@@ -1235,7 +1229,7 @@ class AbandonAllArtichokes extends Table
         $this->cards->moveCard($card['id'], STOCK_COMPOST);
         $this->notify_all(NOTIFICATION_CARD_MOVED, $notify_message ? clienttranslate('${player_name} composts ${vegetable}') : '', $card,
                           array( 'destination' => STOCK_COMPOST, 'player_id' => $player_id ));
-        self::incStat(-1, 'artichokes', $player_id);
+        self::incStat(1, 'artichokes_composted', $player_id);
     }
 
     function discard_played_card($notify = false) {
@@ -1283,11 +1277,22 @@ class AbandonAllArtichokes extends Table
     function update_statistics() {
         $players = self::loadPlayersBasicInfos();
         foreach (array_keys($players) as $player_id) {
-            $card_count = $this->cards->countCardInLocation($this->player_deck($player_id)) +
-                        $this->cards->countCardInLocation($this->player_discard($player_id)) +
-                        $this->cards->countCardInLocation(STOCK_HAND, $player_id);
-            self::setStat($card_count, 'card_count', $player_id);
+            $counts = $this->count_cards_and_artichokes($player_id);
+            self::setStat($counts['card_count'], 'card_count', $player_id);
+            self::setStat($counts['artichoke_count'], 'artichoke_count', $player_id);
         }
+    }
+
+    function count_cards_and_artichokes($player_id) {
+        $deck = $this->player_deck($player_id);
+        $discard = $this->player_discard($player_id);
+        $card_count = $this->cards->countCardInLocation($deck) +
+                    $this->cards->countCardInLocation($discard) +
+                    $this->cards->countCardInLocation(STOCK_HAND, $player_id);
+        $artichoke_count = count($this->cards->getCardsOfTypeInLocation(VEGETABLE_ARTICHOKE, null, $deck)) +
+                         count($this->cards->getCardsOfTypeInLocation(VEGETABLE_ARTICHOKE, null, $discard)) +
+                         count($this->cards->getCardsOfTypeInLocation(VEGETABLE_ARTICHOKE, null, STOCK_HAND, $player_id));
+        return array('card_count' => $card_count, 'artichoke_count' => $artichoke_count);
     }
 
     function player_deck($player_id) {
