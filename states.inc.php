@@ -2,12 +2,12 @@
 /**
  *------
  * BGA framework: © Gregory Isabelli <gisabelli@boardgamearena.com> & Emmanuel Colin <ecolin@boardgamearena.com>
- * AbandonAllArtichokes implementation : © <Your name here> <Your email address here>
+ * AbandonAllArtichokes implementation : © Thomas Klausner <tk@giga.or.at>
  *
  * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
  * See http://en.boardgamearena.com/#!doc/Studio for more information.
  * -----
- * 
+ *
  * states.inc.php
  *
  * AbandonAllArtichokes game states description
@@ -65,9 +65,10 @@ if (!defined('STATE_END_GAME')) { // ensure this block is only invoked once, sin
    define("STATE_CORN_TAKE_CARD", 13);
    define("STATE_BEET_CHOOSE_OPPONENT", 14);
    define("STATE_PLAYED_CARD", 15);
+   define("STATE_ZOMBIE_UNDO", 16);
    define("STATE_END_GAME", 99);
 }
- 
+
 $machinestates = array(
 
     // The initial state. Please do not modify.
@@ -78,13 +79,13 @@ $machinestates = array(
         "action" => "stGameSetup",
         "transitions" => array( "" => STATE_HARVEST)
     ),
-    
+
     STATE_NEXT_PLAYER => array(
         "name" => "nextPlayer",
         "description" => clienttranslate('Player cleanup and refilling garden row'),
         "type" => "game",
         "action" => "stNextPlayer",
-        "transitions" => array(STATE_HARVEST => STATE_HARVEST, STATE_END_GAME => STATE_END_GAME),
+        "transitions" => array(STATE_HARVEST => STATE_HARVEST, STATE_PLAY_CARD => STATE_PLAY_CARD, STATE_END_GAME => STATE_END_GAME),
         "updateGameProgression" => true,
     ),
 
@@ -125,7 +126,8 @@ $machinestates = array(
         "type" => "activeplayer",
         "args" => "arg_leekOpponents",
         "possibleactions" => array("leekChooseOpponent"),
-        "transitions" => array(STATE_LEEK_TAKE_CARD => STATE_LEEK_TAKE_CARD),
+        "transitions" => array(STATE_LEEK_TAKE_CARD => STATE_LEEK_TAKE_CARD,
+                               STATE_ZOMBIE_UNDO => STATE_ZOMBIE_UNDO),
     ),
 
     STATE_LEEK_TAKE_CARD => array(
@@ -161,7 +163,8 @@ $machinestates = array(
         "descriptionmyturn" => clienttranslate('${you} must pick card to put on deck'),
         "type" => "activeplayer",
         "possibleactions" => array("pepperTakeCard"),
-        "transitions" => array(STATE_PLAYED_CARD => STATE_PLAYED_CARD),
+        "transitions" => array(STATE_PLAYED_CARD => STATE_PLAYED_CARD,
+                               STATE_ZOMBIE_UNDO => STATE_ZOMBIE_UNDO),
     ),
 
     STATE_PEAS_TAKE_CARD => array(
@@ -170,7 +173,8 @@ $machinestates = array(
         "descriptionmyturn" => clienttranslate('${you} must pick a card to keep'),
         "type" => "activeplayer",
         "possibleactions" => array("peasTakeCard"),
-        "transitions" => array(STATE_PEAS_CHOOSE_OPPONENT => STATE_PEAS_CHOOSE_OPPONENT),
+        "transitions" => array(STATE_PEAS_CHOOSE_OPPONENT => STATE_PEAS_CHOOSE_OPPONENT,
+                               STATE_ZOMBIE_UNDO => STATE_ZOMBIE_UNDO),
     ),
 
     STATE_PEAS_CHOOSE_OPPONENT => array(
@@ -180,7 +184,8 @@ $machinestates = array(
         "type" => "activeplayer",
         "args" => "arg_allOpponents",
         "possibleactions" => array("peasChooseOpponent"),
-        "transitions" => array(STATE_PLAYED_CARD => STATE_PLAYED_CARD),
+        "transitions" => array(STATE_PLAYED_CARD => STATE_PLAYED_CARD,
+                               STATE_ZOMBIE_UNDO => STATE_ZOMBIE_UNDO),
     ),
 
     STATE_ONION_CHOOSE_OPPONENT => array(
@@ -190,7 +195,8 @@ $machinestates = array(
         "type" => "activeplayer",
         "args" => "arg_allOpponents",
         "possibleactions" => array("onionChooseOpponent"),
-        "transitions" => array(STATE_PLAYED_CARD => STATE_PLAYED_CARD),
+        "transitions" => array(STATE_PLAYED_CARD => STATE_PLAYED_CARD,
+                               STATE_ZOMBIE_UNDO => STATE_ZOMBIE_UNDO),
     ),
 
     STATE_CORN_TAKE_CARD => array(
@@ -199,7 +205,8 @@ $machinestates = array(
         "descriptionmyturn" => clienttranslate('${you} must pick a card from the garden row'),
         "type" => "activeplayer",
         "possibleactions" => array("cornTakeCard"),
-        "transitions" => array(STATE_PLAYED_CARD => STATE_PLAYED_CARD),
+        "transitions" => array(STATE_PLAYED_CARD => STATE_PLAYED_CARD,
+                               STATE_ZOMBIE_UNDO => STATE_ZOMBIE_UNDO),
     ),
 
     STATE_BEET_CHOOSE_OPPONENT => array(
@@ -209,7 +216,8 @@ $machinestates = array(
         "type" => "activeplayer",
         "args" => "arg_beetOpponents",
         "possibleactions" => array("beetChooseOpponent"),
-        "transitions" => array(STATE_PLAYED_CARD => STATE_PLAYED_CARD),
+        "transitions" => array(STATE_PLAYED_CARD => STATE_PLAYED_CARD,
+                               STATE_ZOMBIE_UNDO => STATE_ZOMBIE_UNDO),
     ),
 
     STATE_PLAYED_CARD => array(
@@ -219,6 +227,14 @@ $machinestates = array(
         "action" => "stPlayedCard",
         "transitions" => array(STATE_PLAY_CARD => STATE_PLAY_CARD, STATE_NEXT_PLAYER => STATE_NEXT_PLAYER),
         "updateGameProgression" => true,
+    ),
+
+    STATE_ZOMBIE_UNDO => array(
+        "name" => "zombieUndo",
+        "description" => clienttranslate('Undo last card play of player that quit'),
+        "type" => "game",
+        "action" => "stZombieUndo",
+        "transitions" => array(STATE_NEXT_PLAYER => STATE_NEXT_PLAYER),
     ),
 
     // Final state.
@@ -232,6 +248,3 @@ $machinestates = array(
     )
 
 );
-
-
-

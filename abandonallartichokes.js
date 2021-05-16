@@ -1,7 +1,7 @@
 /**
  *------
  * BGA framework: © Gregory Isabelli <gisabelli@boardgamearena.com> & Emmanuel Colin <ecolin@boardgamearena.com>
- * AbandonAllArtichokes implementation : © <Your name here> <Your email address here>
+ * AbandonAllArtichokes implementation : © Thomas Klausner <tk@giga.or.at>
  *
  * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
  * See http://en.boardgamearena.com/#!doc/Studio for more information.
@@ -453,23 +453,26 @@ define([
 
             isVisible: function (location, location_arg) {
                 switch (location) {
-                    case this.Stock.GardenStack:
-                        return false;
-                    case this.Stock.GardenRow:
-                    case this.Stock.DisplayedCard:
-                    case this.Stock.PlayedCard:
-                    case this.Stock.Compost:
+                case this.Stock.GardenStack:
+                    return false;
+                case this.Stock.GardenRow:
+                case this.Stock.DisplayedCard:
+                case this.Stock.PlayedCard:
+                case this.Stock.Compost:
+                    return true;
+                case this.Stock.Deck:
+                case this.Stock.Discard:
+                case this.Stock.Hand:
+		    if (this.isSpectator) {
+			return false;
+		    }
+                    if (location_arg == this.player_id) {
                         return true;
-                    case this.Stock.Deck:
-                    case this.Stock.Discard:
-                    case this.Stock.Hand:
-                        if (location_arg == this.player_id) {
-                            return true;
-                        }
-                        return false;
-                    default:
-                        console.log("unhandled case '" + location + "' in isVisible()");
-                        return false;
+                    }
+                    return false;
+                default:
+                    console.log("unhandled case '" + location + "' in isVisible()");
+                    return false;
                 }
             },
 
@@ -497,7 +500,7 @@ define([
             },
 
             moveVisibleToPanel: function (from, player_id, card) {
-                this.slideToObject(from + '_item_' + card.id, 'player_board_' + player_id);
+		this.slideToObject(from + '_item_' + card.id, 'player_board_' + player_id);
                 this.stock[from].removeFromStockById(card.id, 'player_board_' + player_id);
             },
 
@@ -515,6 +518,8 @@ define([
             },
 
             updateDecks: function () {
+		// for spectators, do nothing
+		if (this.isSpectator) return;
               	//update deck according to counter
 		deck_target = this.counter[this.player_id].deck.getValue();
 		deck_status = this.stock[this.Stock.Deck].count();

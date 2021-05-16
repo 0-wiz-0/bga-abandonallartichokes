@@ -13,7 +13,7 @@
 $gameinfos = array(
 
 // Name of the game in English (will serve as the basis for translation)
-'game_name' => "Abandon All Artichokes",
+'game_name' => totranslate('Abandon All Artichokes'),
 
 // Game designer (or game designers, separated by commas)
 'designer' => 'Emma Larkins',

@@ -3,7 +3,7 @@
 /**
  *------
  * BGA framework: © Gregory Isabelli <gisabelli@boardgamearena.com> & Emmanuel Colin <ecolin@boardgamearena.com>
- * AbandonAllArtichokes implementation : © <Your name here> <Your email address here>
+ * AbandonAllArtichokes implementation : © Thomas Klausner <tk@giga.or.at>
  *
  * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
  * See http://en.boardgamearena.com/#!doc/Studio for more information.
@@ -12,9 +12,9 @@
  * gameoptions.inc.php
  *
  * AbandonAllArtichokes game options description
- * 
+ *
  * In this file, you can define your game options (= game variants).
- *   
+ *
  * Note: If your game has no variant, you don't have to modify this file.
  *
  * Note²: All options defined in this file should have a corresponding "game state labels"
@@ -25,12 +25,19 @@
  */
 
 $game_options = array(
-
+    100 => array(
+        'name' => totranslate('Choosing players'),
+        'values' => array(
+            0 => array('name' => totranslate('Choose players manually') ),
+            1 => array('name' => totranslate('Choose players automatically'), 'description' => 'When there is only one valid target player for a vegetable effect, choose the player automatically'),
+        ),
+        'default' => 1,
+    )
     /*
-    
+
     // note: game variant ID should start at 100 (ie: 100, 101, 102, ...). The maximum is 199.
     100 => array(
-                'name' => totranslate('my game option'),    
+                'name' => totranslate('my game option'),
                 'values' => array(
 
                             // A simple value for this option:
