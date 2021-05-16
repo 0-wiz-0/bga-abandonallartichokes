@@ -381,6 +381,8 @@ define([
                 dojo.subscribe(this.Notification.RefilledGardenRow, this, "notif_refilledGardenRow");
                 dojo.subscribe(this.Notification.UpdateCounters, this, "notif_updateCounters");
                 dojo.subscribe(this.Notification.Victory, this, "notif_victory");
+
+		this.notifqueue.setSynchronous(this.Notification.DrewHand, 500);
             },
 
             notif_cardMoved: function (notification) {
