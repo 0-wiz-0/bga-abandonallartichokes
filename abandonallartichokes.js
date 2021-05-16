@@ -500,7 +500,7 @@ define([
             },
 
             moveVisibleToPanel: function (from, player_id, card) {
-//                this.slideToObject(from + '_item_' + card.id, 'player_board_' + player_id);
+		this.slideToObject(from + '_item_' + card.id, 'player_board_' + player_id);
                 this.stock[from].removeFromStockById(card.id, 'player_board_' + player_id);
             },
 
