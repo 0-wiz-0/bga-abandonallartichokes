@@ -555,9 +555,14 @@ class AbandonAllArtichokes extends Table
             throw new BgaUserException(self::_("To play a broccoli you need 3 artichokes in your hand"));
         }
 
-        $this->play_card($id);
-
-        $this->compost_artichoke($artichoke, self::getActivePlayerId());
+        $this->compost_artichoke($artichoke, self::getActivePlayerId(), false);
+        $card = $this->cards->getCard($id);
+        $player_id = self::getActivePlayerId();
+        $this->cards->moveCard($id, $this->player_discard($player_id));
+        $this->notify_all(NOTIFICATION_CARD_MOVED,  clienttranslate('${player_name} plays broccoli and composts artichoke'), $card, array(
+            'destination' => STOCK_DISCARD,
+            'destination_arg' => $player_id,
+        ));
 
         $this->gamestate->nextState(STATE_PLAYED_CARD);
     }
@@ -584,13 +589,12 @@ class AbandonAllArtichokes extends Table
             throw new BgaUserException(self::_("You must have two artichokes in hand to play a carrot"));
         }
 
-        $card = $this->play_card($id);
-
         // compost carrot and both artichokes
         $this->compost_artichoke($artichoke_1, self::getCurrentPlayerId(), false);
         $this->compost_artichoke($artichoke_2, self::getCurrentPlayerId(), false);
+        $card = $this->cards->getCard($id);
         $this->cards->moveCard($card['id'], STOCK_COMPOST);
-        $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} composts carrot and two artichokes'), $card, array( 'destination' => STOCK_COMPOST ));
+        $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} plays carrot and composts it and two artichokes'), $card, array( 'destination' => STOCK_COMPOST ));
 
         self::setGameStateValue(GAME_STATE_PLAYED_CARROT_THIS_TURN, 1);
 
@@ -1024,16 +1028,17 @@ class AbandonAllArtichokes extends Table
             throw new BgaUserException(self::_("You must have cards in your deck to play a potato"));
         }
 
-        $this->play_card($id);
-
-        $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} reveals ${vegetable} from their deck'), $picked_card, array(
+        $card = $this->cards->getCard($id);
+        $this->cards->moveCard($id, $this->player_discard($player_id));
+        $this->notify_all(NOTIFICATION_CARD_MOVED, '', $card, array( 'destination' => STOCK_DISCARD, 'destination_arg' => $player_id ));
+        $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} plays potato and reveals ${vegetable} from their deck'), $picked_card, array(
             'origin' => STOCK_DECK,
             'origin_arg' => self::getActivePlayerId(),
             'destination' => STOCK_DISPLAYED_CARD,
         ));
 
         if ($picked_card['type'] == VEGETABLE_ARTICHOKE) {
-            $this->compost_artichoke($picked_card, self::getCurrentPlayerId());
+            $this->compost_artichoke($picked_card, self::getActivePlayerId());
         } else {
             $this->cards->moveCard($picked_card['id'], $this->player_discard($player_id));
             $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} discards ${vegetable}'), $picked_card, array( 'destination' => STOCK_DISCARD, 'destination_arg' => $player_id ));
