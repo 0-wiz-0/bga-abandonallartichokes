@@ -32,11 +32,12 @@ class AbandonAllArtichokes extends Table
         parent::__construct();
 
         self::initGameStateLabels(array(
-            "cards_played_this_turn" => 10,
-            "target_player" => 11,
-            "played_carrot_this_turn" => 12,
-            "automatic_player_decisions" => 100,
-            "automatic_card_decisions" => 199,
+            GAME_STATE_CARDS_PLAYED_THIS_TURN => 10,
+            GAME_STATE_TARGET_PLAYER => 11,
+            GAME_STATE_PLAYED_CARROT_THIS_TURN => 12,
+            GAME_STATE_AUTOMATIC_PLAYER_DECISIONS => 100,
+            GAME_STATE_AUTOMATIC_TURN_END => 101,
+            GAME_STATE_AUTOMATIC_CARD_DECISIONS => 199,
         ));
 
         $this->cards = self::getNew("module.common.deck");
@@ -95,6 +96,7 @@ class AbandonAllArtichokes extends Table
         self::setGameStateInitialValue(GAME_STATE_PLAYED_CARROT_THIS_TURN, 0);
 
         //self::setGameStateInitialValue(GAME_STATE_AUTOMATIC_PLAYER_DECISIONS, 1);
+        //self::setGameStateInitialValue(GAME_STATE_AUTOMATIC_TURN_END, 1);
         self::setGameStateInitialValue(GAME_STATE_AUTOMATIC_CARD_DECISIONS, 0);
 
         // Init game statistics
@@ -341,7 +343,7 @@ class AbandonAllArtichokes extends Table
         if (self::getGameStateValue(GAME_STATE_PLAYED_CARROT_THIS_TURN) > 0) {
             $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('[automatic] ${player_name} played carrot and ends turn'));
             $this->gamestate->nextState(STATE_NEXT_PLAYER);
-        } else if ($artichoke_count == count($hand)) {
+        } else if (self::getGameStateValue(GAME_STATE_AUTOMATIC_TURN_END) > 0 && ($artichoke_count == count($hand))) {
             $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('[automatic] Only artichokes left in hand, ${player_name} ends turn'));
             $this->gamestate->nextState(STATE_NEXT_PLAYER);
         } else {

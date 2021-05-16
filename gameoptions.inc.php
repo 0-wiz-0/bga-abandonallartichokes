@@ -29,10 +29,19 @@ $game_options = array(
         'name' => totranslate('Choosing players'),
         'values' => array(
             0 => array('name' => totranslate('Choose players manually') ),
-            1 => array('name' => totranslate('Choose players automatically'), 'description' => 'When there is only one valid target player for a vegetable effect, choose the player automatically'),
+            1 => array('name' => totranslate('Choose players automatically'), 'description' => totranslate('When there is only one valid target player for a vegetable effect, choose the player automatically')),
         ),
         'default' => 1,
+    ),
+    101 => array(
+        'name' => totranslate('Turn end'),
+        'values' => array(
+            0 => array('name' => totranslate('Manually end turn'),  ),
+            1 => array('name' => totranslate('Automatically end turn'), 'description' => totranslate('End turn automatically if you only have artichokes in your hand')),
+        ),
+        'default' => 0,
     )
+
     /*
 
     // note: game variant ID should start at 100 (ie: 100, 101, 102, ...). The maximum is 199.
