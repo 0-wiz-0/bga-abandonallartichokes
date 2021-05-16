@@ -425,6 +425,7 @@ class AbandonAllArtichokes extends Table
     }
 
     function pass() {
+        self::checkAction("pass");
         self::notifyAllPlayers(NOTIFICATION_MESSAGE, clienttranslate('${player_name} ends turn'), array( 'player_name' => self::getActivePlayerName() ));
         $this->gamestate->nextState(STATE_NEXT_PLAYER);
     }
@@ -756,6 +757,7 @@ class AbandonAllArtichokes extends Table
     }
 
     function leekTakeCard($take_card) {
+        self::checkAction("leekTakeCard");
         $cards = $this->cards->getCardsInLocation(STOCK_DISPLAYED_CARD);
         $opponent_id = self::getGameStateValue(GAME_STATE_TARGET_PLAYER);
         if (count($cards) != 1) {
@@ -997,6 +999,7 @@ class AbandonAllArtichokes extends Table
     }
 
     function pepperTakeCard($id) {
+        self::checkAction("pepperTakeCard");
         if ($id == null) {
             throw new BgaVisibleSystemException("You must pick a card from the display to put on deck");
         }
