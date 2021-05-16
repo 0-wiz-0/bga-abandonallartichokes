@@ -451,7 +451,7 @@ class AbandonAllArtichokes extends Table
         );
         $name = $play_actions[$card['type']];
         if ($name == null) {
-            throw new BgaVisibleSystemException("This vegetable is not supported yet");
+            throw new BgaVisibleSystemException(self::_("This vegetable is not supported yet"));
         }
         $this->$name($id);
     }
@@ -636,7 +636,7 @@ class AbandonAllArtichokes extends Table
         self::checkAction("cornTakeCard");
         $card = $this->cards->getCard($id);
         if ($card == null || $card['location'] != STOCK_GARDEN_ROW) {
-            throw new BgaVisibleSystemException("Choose a card from the garden row");
+            throw new BgaVisibleSystemException(self::_("Choose a card from the garden row"));
         }
 
         $player_id = self::getCurrentPlayerId();
@@ -761,7 +761,7 @@ class AbandonAllArtichokes extends Table
         $cards = $this->cards->getCardsInLocation(STOCK_DISPLAYED_CARD);
         $opponent_id = self::getGameStateValue(GAME_STATE_TARGET_PLAYER);
         if (count($cards) != 1) {
-            throw new BgaVisibleSystemException("Incorrect number of displayed cards for leek");
+            throw new BgaVisibleSystemException(self::_("Incorrect number of displayed cards for leek"));
         }
         $player_id = self::getActivePlayerId();
         if ($take_card) {
@@ -805,7 +805,7 @@ class AbandonAllArtichokes extends Table
         $target_ids = $targets['target_ids'];
         // for testing in solo-mode
         if (count($target_ids) == 0) {
-            throw new BgaVisibleSystemException("Onion can only be played when you have an opponent");
+            throw new BgaVisibleSystemException(self::_("Onion can only be played when you have an opponent"));
         }
 
         $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('${player_name} plays onion and composts artichoke'), null, array( 'player_name' => self::getActivePlayerName() ));
@@ -833,7 +833,7 @@ class AbandonAllArtichokes extends Table
         self::checkAction("onionChooseOpponent");
         $opponent_name = $this->player_name($opponent_id);
         if ($opponent_id == self::getCurrentPlayerId() || $opponent_name == null) {
-            throw new BgaVisibleSystemException("Invalid target player");
+            throw new BgaVisibleSystemException(self::_("Invalid target player"));
         }
 
         if ($played_card_id == null) {
@@ -856,7 +856,7 @@ class AbandonAllArtichokes extends Table
         $players = self::loadPlayersBasicInfos();
         // for testing in solo-mode
         if (count($players) < 2) {
-            throw new BgaVisibleSystemException("Peas can only be played when you have an opponent");
+            throw new BgaVisibleSystemException(self::_("Peas can only be played when you have an opponent"));
         }
         if ($this->cards->countCardInLocation(STOCK_GARDEN_STACK) < 2) {
             throw new BgaUserException(self::_("Peas can only be played when there are two cards in the garden stack"));
@@ -892,11 +892,11 @@ class AbandonAllArtichokes extends Table
     function peasTakeCard($id) {
         self::checkAction("peasTakeCard");
         if ($id == null) {
-            throw new BgaVisibleSystemException("You must pick a card from the display");
+            throw new BgaVisibleSystemException(self::_("You must pick a card from the display"));
         }
         $card = $this->cards->getCard($id);
         if ($card == null || $card['location'] != STOCK_DISPLAYED_CARD) {
-            throw new BgaVisibleSystemException("You must pick a card from the display");
+            throw new BgaVisibleSystemException(self::_("You must pick a card from the display"));
         }
         $player_id = self::getCurrentPlayerId();
         $this->cards->moveCard($id, $this->player_discard($player_id));
@@ -931,11 +931,11 @@ class AbandonAllArtichokes extends Table
         self::checkAction("peasChooseOpponent");
         $players = self::loadPlayersBasicInfos();
         if ($players[$opponent_id] == null) {
-            throw new BgaVisibleSystemException("You must pick a player at the table");
+            throw new BgaVisibleSystemException(self::_("You must pick a player at the table"));
         }
         $presents = $this->cards->getCardsInLocation(STOCK_DISPLAYED_CARD);
         if (count($presents) != 1) {
-            throw new BgaVisibleSystemException("Incorrect number of displayed cards");
+            throw new BgaVisibleSystemException(self::_("Incorrect number of displayed cards"));
         }
         $present = array_pop($presents);
 
@@ -1001,11 +1001,11 @@ class AbandonAllArtichokes extends Table
     function pepperTakeCard($id) {
         self::checkAction("pepperTakeCard");
         if ($id == null) {
-            throw new BgaVisibleSystemException("You must pick a card from the display to put on deck");
+            throw new BgaVisibleSystemException(self::_("You must pick a card from the display to put on deck"));
         }
         $card = $this->cards->getCard($id);
         if ($card == null || $card['location'] != STOCK_DISPLAYED_CARD) {
-            throw new BgaVisibleSystemException("You must pick a card from the display to put on deck");
+            throw new BgaVisibleSystemException(self::_("You must pick a card from the display to put on deck"));
         }
         $player_id = self::getCurrentPlayerId();
         // move chosen card to deck
@@ -1166,12 +1166,12 @@ class AbandonAllArtichokes extends Table
                 $choice_ids = array_rand($hand, 2);
                 $this->eggplantChooseCards($choice_ids);
             } else {
-                throw new BgaVisibleSystemException("Zombie mode not supported at this multipleactiveplayer game state: " . $statename);
+                throw new BgaVisibleSystemException(self::_("Zombie mode not supported at this multipleactiveplayer game state: ") . $statename);
             }
             return;
         }
 
-        throw new BgaVisibleSystemException("Zombie mode not supported at this game state: " . $statename);
+        throw new BgaVisibleSystemException(self::_("Zombie mode not supported at this game state: ") . $statename);
     }
 
 ///////////////////////////////////////////////////////////////////////////////////:
@@ -1230,7 +1230,7 @@ class AbandonAllArtichokes extends Table
 
     function compost_artichoke($card, $player_id, $notify_message = true) {
         if ($card['type'] != VEGETABLE_ARTICHOKE) {
-            throw new BgaVisibleSystemException("Trying to compost non-artichoke with special artichoke composter");
+            throw new BgaVisibleSystemException(self::_("Trying to compost non-artichoke with special artichoke composter"));
         }
         $this->cards->moveCard($card['id'], STOCK_COMPOST);
         $this->notify_all(NOTIFICATION_CARD_MOVED, $notify_message ? clienttranslate('${player_name} composts ${vegetable}') : '', $card,
@@ -1262,7 +1262,7 @@ class AbandonAllArtichokes extends Table
     function get_played_card() {
         $played_cards = $this->cards->getCardsInLocation(STOCK_PLAYED_CARD);
         if (count($played_cards) != 1) {
-            throw new BgaVisibleSystemException("Incorrect number of played cards");
+            throw new BgaVisibleSystemException(self::_("Incorrect number of played cards"));
         }
         return array_pop($played_cards);
     }
