@@ -329,7 +329,7 @@ class AbandonAllArtichokes extends Table
     function stPlayedCard() {
         self::incGameStateValue(GAME_STATE_CARDS_PLAYED_THIS_TURN, 1);
 
-        $hand = $this->cards->getCardsInLocation(STOCK_HAND, self::getCurrentPlayerId());
+        $hand = $this->cards->getCardsInLocation(STOCK_HAND, self::getActivePlayerId());
         $artichoke_count = 0;
         foreach ($hand as $card) {
             if ($card['type'] == VEGETABLE_ARTICHOKE) {
@@ -427,7 +427,7 @@ class AbandonAllArtichokes extends Table
     function playCard($id) {
         self::checkAction("playCard");
         $card = $this->cards->getCard($id);
-        if ($card == null || $card['location'] != STOCK_HAND || $card['location_arg'] != self::getCurrentPlayerId()) {
+        if ($card == null || $card['location'] != STOCK_HAND || $card['location_arg'] != self::getActivePlayerId()) {
             throw new BgaUserException(self::_("You must play a card from your hand"));
         }
         $play_actions = array (

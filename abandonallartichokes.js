@@ -453,23 +453,26 @@ define([
 
             isVisible: function (location, location_arg) {
                 switch (location) {
-                    case this.Stock.GardenStack:
-                        return false;
-                    case this.Stock.GardenRow:
-                    case this.Stock.DisplayedCard:
-                    case this.Stock.PlayedCard:
-                    case this.Stock.Compost:
+                case this.Stock.GardenStack:
+                    return false;
+                case this.Stock.GardenRow:
+                case this.Stock.DisplayedCard:
+                case this.Stock.PlayedCard:
+                case this.Stock.Compost:
+                    return true;
+                case this.Stock.Deck:
+                case this.Stock.Discard:
+                case this.Stock.Hand:
+		    if (this.isSpectator) {
+			return false;
+		    }
+                    if (location_arg == this.player_id) {
                         return true;
-                    case this.Stock.Deck:
-                    case this.Stock.Discard:
-                    case this.Stock.Hand:
-                        if (location_arg == this.player_id) {
-                            return true;
-                        }
-                        return false;
-                    default:
-                        console.log("unhandled case '" + location + "' in isVisible()");
-                        return false;
+                    }
+                    return false;
+                default:
+                    console.log("unhandled case '" + location + "' in isVisible()");
+                    return false;
                 }
             },
 
@@ -515,6 +518,8 @@ define([
             },
 
             updateDecks: function () {
+		// for spectators, do nothing
+		if (this.isSpectator) return;
               	//update deck according to counter
 		deck_target = this.counter[this.player_id].deck.getValue();
 		deck_status = this.stock[this.Stock.Deck].count();
