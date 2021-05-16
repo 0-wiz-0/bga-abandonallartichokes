@@ -1,22 +1,28 @@
 Soon
 ===
 - game_display images
-- copyright header
 
 Possibly Later
 ===
 - rhubarb
 - checks on client side
+
+For Release
+===
+- remove console logs and debug logging
 - HTML pages:
   - How to Play
   - Developed by
 
 Cleanups/Bugs
 ===
-- remove console logs and debug logging
+- reduce play log
 - debug animation issues when moving from visible to visible
   (cards are moved, then their shadows are removed from where they were before)
-- play log reduction
-  - combine
-- just visible in log who selects who
-- names for areas
+
+Comments from players
+===
+- you can only see in the log who selects who
+- names for areas might be helpful
+
+
