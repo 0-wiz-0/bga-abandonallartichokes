@@ -20,5 +20,3 @@ Cleanups/Bugs
   - combine
 - just visible in log who selects who
 - names for areas
-- white line on iPad at bottom of cards
-- artichoke count wrong in statistics if we received artichokes/passed artichokes
