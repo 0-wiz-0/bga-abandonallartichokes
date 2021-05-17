@@ -1,18 +1,16 @@
-Soon
+For Release
 ===
-- game_display images
+
+- remove console logs and debug logging
+- HTML pages:
+  - description (gameinfos)
+  - How to Play
+  - Developed by
 
 Possibly Later
 ===
 - rhubarb
 - checks on client side
-
-For Release
-===
-- remove console logs and debug logging
-- HTML pages:
-  - How to Play
-  - Developed by
 
 Cleanups/Bugs
 ===
