@@ -50,7 +50,7 @@ $gameinfos = array(
 
 
 // Estimated game duration, in minutes (used only for the launch, afterward the real duration is computed)
-'estimated_duration' => 15,
+'estimated_duration' => 20,
 
 // Time in second add to a player when "giveExtraTime" is called (speed profile = fast)
 'fast_additional_time' => 30,
@@ -97,7 +97,7 @@ $gameinfos = array(
 'strategy' => 2,
 
 // Diplomacy of the game, from 0 (no interaction in this game) to 5 (totally based on interaction and discussion between players)
-'diplomacy' => 1,
+'diplomacy' => 2,
 
 // Colors attributed to players
 // list all available preference colours (as of May 2021) since the game has none
