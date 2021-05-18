@@ -24,7 +24,7 @@ define([
     function (dojo, declare) {
         return declare("bgagame.abandonallartichokes", ebg.core.gamegui, {
             constructor: function () {
-                console.log('abandonallartichokes constructor');
+                // console.log('abandonallartichokes constructor');
 
 		// css spritesheet properties
                 this.cardwidth = 100;
@@ -109,10 +109,10 @@ define([
             */
 
             setup: function (gamedatas) {
-                console.log("Starting game setup");
+                // console.log("Starting game setup");
 
                 // TODO: remove
-                console.log(gamedatas);
+                // console.log(gamedatas);
 
                 this.counter = {};
                 // Setting up player boards
@@ -164,8 +164,8 @@ define([
 
                 this.setupNotifications();
 
-                console.log(this);
-                console.log("Ending game setup");
+                // console.log(this);
+                // console.log("Ending game setup");
             },
 
             createCounter: function (player_id, name) {
@@ -260,7 +260,7 @@ define([
             //                  You can use this method to perform some user interface changes at this moment.
             //
             onEnteringState: function (stateName, args) {
-                console.log('Entering state: ' + stateName);
+                // console.log('Entering state: ' + stateName);
 
                 switch (stateName) {
 
@@ -284,7 +284,7 @@ define([
             //                 You can use this method to perform some user interface changes at this moment.
             //
             onLeavingState: function (stateName) {
-                console.log('Leaving state: ' + stateName);
+                // console.log('Leaving state: ' + stateName);
 
                 switch (stateName) {
 
@@ -305,8 +305,8 @@ define([
             },
 
             onUpdateActionButtons: function (stateName, args) {
-                console.log('onUpdateActionButtons: ' + stateName);
-		console.log(args);
+                // console.log('onUpdateActionButtons: ' + stateName);
+		// console.log(args);
 
                 if (this.isCurrentPlayerActive()) {
                     switch (stateName) {
@@ -374,7 +374,7 @@ define([
 
             // Notifications
             setupNotifications: function () {
-                console.log('notifications subscriptions setup');
+                // console.log('notifications subscriptions setup');
 
                 dojo.subscribe(this.Notification.CardMoved, this, "notif_cardMoved");
                 dojo.subscribe(this.Notification.DrewHand, this, "notif_drewHand");
@@ -386,8 +386,8 @@ define([
             },
 
             notif_cardMoved: function (notification) {
-                console.log(this.Notification.CardMoved + ' notification');
-                console.log(notification);
+                // console.log(this.Notification.CardMoved + ' notification');
+                // console.log(notification);
 		// for five types of artichokes, add type_arg
 		notification.args.card.type = parseInt(notification.args.card.type) + parseInt(notification.args.card.type_arg);
                 this.showCardPlay(notification.args.player_id,
@@ -397,8 +397,8 @@ define([
             },
 
             notif_drewHand: function (notification) {
-                console.log(this.Notification.DrewHand + ' notification');
-                console.log(notification);
+                // console.log(this.Notification.DrewHand + ' notification');
+                // console.log(notification);
                 this.stock[this.Stock.Hand].removeAll();
                 this.addCardsToStock(this.stock[this.Stock.Hand], notification.args.cards);
                 this.stock[this.Stock.Discard].removeAll();
@@ -407,8 +407,8 @@ define([
             },
 
             notif_refilledGardenRow: function (notification) {
-                console.log(this.Notification.RefilledGardenRow + ' notification');
-                console.log(notification);
+                // console.log(this.Notification.RefilledGardenRow + ' notification');
+                // console.log(notification);
                 if (notification.args.new_cards.length >= 5) {
                     this.stock[this.Stock.GardenRow].removeAll();
                 }
@@ -418,14 +418,14 @@ define([
             },
 
             notif_updateCounters: function (notification) {
-                console.log(this.Notification.UpdateCounters + ' notification');
-                console.log(notification);
+                // console.log(this.Notification.UpdateCounters + ' notification');
+                // console.log(notification);
                 this.updateCounter(notification.args.counters);
             },
 
 	    notif_victory: function (notification) {
-                console.log(this.Notification.UpdateCounters + ' notification');
-                console.log(notification);
+                // console.log(this.Notification.UpdateCounters + ' notification');
+                // console.log(notification);
 		this.scoreCtrl[notification.args.player_id].setValue(1);
 	    },
 
@@ -473,7 +473,7 @@ define([
                     }
                     return false;
                 default:
-                    console.log("unhandled case '" + location + "' in isVisible()");
+                    // console.log("unhandled case '" + location + "' in isVisible()");
                     return false;
                 }
             },
