@@ -149,9 +149,9 @@ $gameinfos = array(
 // Each paragraph must be wrapped with totranslate() for translation and should not contain html (plain text without formatting).
 // A good length for this text is between 100 and 150 words (about 6 to 9 lines on a standard display)
 'presentation' => array(
-//    totranslate("This wonderful game is about geometric shapes!"),
-//    totranslate("It was awarded best triangle game of the year in 2005 and nominated for the Spiel des Jahres."),
-//    ...
+    totranslate("This game full of charming vegetables is all about getting rid of your artichokes."),
+    totranslate("The rules are simple - get a vegetable, play vegetables from your hand, then discard your hand and redraw."),
+    totranslate("If during your redraw you draw no artichokes, you have won!"),
 ),
 
 // Games categories
