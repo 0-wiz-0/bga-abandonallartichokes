@@ -126,8 +126,6 @@
 
 /* here we want to override BGA's defaults */
 .stockitem_selected {
-    opacity: 0.5 !important;
-    /* border-style: none !important; */
-    border: 1px solid grey !important;
+    top: -25px !important;
 }
 
