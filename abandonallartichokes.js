@@ -27,6 +27,7 @@ define([
                 // console.log('abandonallartichokes constructor');
 
 		// css spritesheet properties
+		// when changing this, update #garden_area 'width' in the css file
                 this.cardwidth = 110;
                 this.cardheight = 165;
 		// When using spritesheets, we can't use high-resolution card images
@@ -557,35 +558,35 @@ define([
 		const typeNo = parseInt(type);
                 switch (typeNo) {
                 case this.Vegetables.BEET:
-                    return _("You and an opponent each reveal a random card. Compost both if Artichokes, otherwise swap them.")
+                    return _("<b>BEET</b><hr/>You and an opponent each reveal a random card. Compost both if Artichokes, otherwise swap them.")
                 case this.Vegetables.BROCCOLI:
-                    return _("Compost an Artichoke, if your hand has three or more Artichokes.")
+                    return _("<b>BROCCOLI</b><hr/>Compost an Artichoke, if your hand has three or more Artichokes.")
                 case this.Vegetables.CARROT:
-                    return _("As your only play action, compost exactly two Artichokes along with this card.")
+                    return _("<b>CARROT</b><hr/>As your only play action, compost exactly two Artichokes along with this card.")
                 case this.Vegetables.CORN:
-                    return _("Play this card with an Artichoke. Then put a card from the Garden Row on top of your Deck.")
+                    return _("<b>CORN</b><hr/>Play this card with an Artichoke. Then put a card from the Garden Row on top of your Deck.")
                 case this.Vegetables.EGGPLANT:
-                    return _("Compost an Artichoke, along with this card. All players pass two cards to the left.")
+                    return _("<b>EGGPLANT</b><hr/>Compost an Artichoke, along with this card. All players pass two cards to the left.")
                 case this.Vegetables.LEEK:
-		    return _("Reveal the top card of an opponent's Deck. Put it into your hand or on top of their Discard Pile.")
+		    return _("<b>LEEK</b><hr/>Reveal the top card of an opponent's Deck. Put it into your hand or on top of their Discard Pile.")
 		case this.Vegetables.ONION:
-                    return _("Compost an Artichoke. Put this card on top of another player's Discard Pile.")
+                    return _("<b>ONION</b><hr/>Compost an Artichoke. Put this card on top of another player's Discard Pile.")
                 case this.Vegetables.PEAS:
-                    return _("Reveal two cards from the Garden Stack. Put one on your Discard pile, the other on an opponent's.")
+                    return _("<b>PEAS</b><hr/>Reveal two cards from the Garden Stack. Put one on your Discard pile, the other on an opponent's.")
                 case this.Vegetables.PEPPER:
-                    return _("Put a card from your Discard Pile on top of your Deck.")
+                    return _("<b>PEPPER</b><hr/>Put a card from your Discard Pile on top of your Deck.")
                 case this.Vegetables.POTATO:
-                    return _("Reveal the top card of your Deck. Compost if Artichoke, otherwise discard it.")
+                    return _("<b>POTATO</b><hr/>Reveal the top card of your Deck. Compost if Artichoke, otherwise discard it.")
                 case this.Vegetables.ARTICHOKE1:
-		    return _("Don't break my heart!")
+		    return _("<b>ARTICHOKE</b><hr/>Don't break my heart!")
                 case this.Vegetables.ARTICHOKE2:
-		    return _("Did you know that I have thorns?!")
+		    return _("<b>ARTICHOKE</b><hr/>Did you know that I have thorns?!")
                 case this.Vegetables.ARTICHOKE3:
-		    return _("My stem is itching!")
+		    return _("<b>ARTICHOKE</b><hr/>My stem is itching!")
                 case this.Vegetables.ARTICHOKE4:
-		    return _("Okey dokey!")
+		    return _("<b>ARTICHOKE</b><hr/>Okey dokey!")
                 case this.Vegetables.ARTICHOKE5:
-                    return _("Looking forward to being abandoned by you!")
+                    return _("<b>ARTICHOKE</b><hr/>Looking forward to being abandoned by you!")
                 }
             },
         });
