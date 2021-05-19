@@ -341,10 +341,10 @@ class AbandonAllArtichokes extends Table
             }
         }
         if (self::getGameStateValue(GAME_STATE_PLAYED_CARROT_THIS_TURN) > 0) {
-            $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('[automatic] ${player_name} played carrot and ends turn'));
+            $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('${player_name} played carrot and ends turn'));
             $this->gamestate->nextState(STATE_NEXT_PLAYER);
         } else if (self::getGameStateValue(GAME_STATE_AUTOMATIC_TURN_END) > 0 && ($artichoke_count == count($hand))) {
-            $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('[automatic] Only artichokes left in hand, ${player_name} ends turn'));
+            $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('Only artichokes left in hand, ${player_name} ends turn'));
             $this->gamestate->nextState(STATE_NEXT_PLAYER);
         } else {
             $this->gamestate->nextState(STATE_PLAY_CARD);
@@ -472,7 +472,7 @@ class AbandonAllArtichokes extends Table
 
         if (self::getGameStateValue(GAME_STATE_AUTOMATIC_PLAYER_DECISIONS) > 0 && count($target_ids) == 1) {
             $target_id = array_pop($target_ids);
-            $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('[automatic] ${vegetable} can only target ${player_name2}'), null,
+            $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('${vegetable} can only target ${player_name2}'), null,
                               array( 'vegetable' => $this->vegetables[VEGETABLE_BEET]['name'],
                                      'player_name2' => $this->player_name($target_id),
                               ));
@@ -711,7 +711,7 @@ class AbandonAllArtichokes extends Table
 
         if (self::getGameStateValue(GAME_STATE_AUTOMATIC_PLAYER_DECISIONS) > 0 && count($target_ids) == 1) {
             $target_id = array_pop($target_ids);
-            $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('[automatic] ${vegetable} can only target ${player_name2}'), null,
+            $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('${vegetable} can only target ${player_name2}'), null,
                               array( 'vegetable' => $this->vegetables[VEGETABLE_LEEK]['name'],
                                      'player_name2' => $this->player_name($target_id),
                               ));
@@ -809,7 +809,7 @@ class AbandonAllArtichokes extends Table
 
         if (self::getGameStateValue(GAME_STATE_AUTOMATIC_PLAYER_DECISIONS) > 0 && count($target_ids) == 1) {
             $target_id = array_pop($target_ids);
-            $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('[automatic] ${vegetable} can only target ${player_name2}'), null,
+            $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('${vegetable} can only target ${player_name2}'), null,
                               array( 'vegetable' => $this->vegetables[VEGETABLE_ONION]['name'],
                                      'player_name2' => $this->player_name($target_id),
                               ));
@@ -874,7 +874,7 @@ class AbandonAllArtichokes extends Table
         if (self::getGameStateValue(GAME_STATE_AUTOMATIC_CARD_DECISIONS) > 0 && count($available_types) == 1) {
             $types = array_keys($available_types);
             $type = array_pop($types);
-            $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('[automatic] Only cards of type ${vegetable} in display area'), null,
+            $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('Only cards of type ${vegetable} in display area'), null,
                               array( 'vegetable' => $this->vegetables[$type]['name']));
             $card_id = array_pop($available_types);
             $this->gamestate->nextState(STATE_PEAS_TAKE_CARD);
@@ -906,7 +906,7 @@ class AbandonAllArtichokes extends Table
 
         if (self::getGameStateValue(GAME_STATE_AUTOMATIC_PLAYER_DECISIONS) > 0 && count($target_ids) == 1) {
             $target_id = array_pop($target_ids);
-            $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('[automatic] ${vegetable} can only target ${player_name2}'), null,
+            $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('${vegetable} can only target ${player_name2}'), null,
                               array( 'vegetable' => $this->vegetables[VEGETABLE_PEAS]['name'],
                                      'player_name2' => $this->player_name($target_id),
                               ));
@@ -963,7 +963,7 @@ class AbandonAllArtichokes extends Table
         if (self::getGameStateValue(GAME_STATE_AUTOMATIC_CARD_DECISIONS) > 0 && count($available_types) == 1) {
             $types = array_keys($available_types);
             $type = array_pop($types);
-            $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('[automatic] Only cards of type ${vegetable} in discard pile'), null,
+            $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('Only cards of type ${vegetable} in discard pile'), null,
                               array( 'vegetable' => $this->vegetables[$type]['name']));
             $card_id = array_pop($available_types);
             $this->cards->moveCard($card_id, STOCK_DISPLAYED_CARD);
