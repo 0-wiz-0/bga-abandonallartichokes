@@ -28,8 +28,13 @@ define([
 
 		// css spritesheet properties
 		// when changing this, update #garden_area 'width' in the css file
-                this.cardwidth = 110;
-                this.cardheight = 165;
+		// also update artichoke_cardmin
+                this.cardwidth = 140;
+                this.cardheight = 210;
+
+		// TODO: depending on available screen space
+		this.hand_default_overlap = 50;
+
 		// When using spritesheets, we can't use high-resolution card images
 		// There are only around 15 images, so we use single files instead
 		// this.image_items_per_row = 4;
@@ -163,6 +168,8 @@ define([
                 this.stock[this.Stock.Deck].addItemType(this.CardBackId, 0, g_gamethemeurl + 'img/' + (this.Vegetables.BACK - 1) + '.jpg');
                 this.updateDecks();
 
+		this.stock[this.Stock.Hand].setOverlap(this.hand_default_overlap);
+		this.showDisplayedArea();
                 this.setupNotifications();
 
                 // console.log(this);
@@ -438,7 +445,20 @@ define([
 			      this, function (result) { }, function (is_error) { });
             },
 
+	    showDisplayedArea: function (force = false) {
+		if (force || this.stock[this.Stock.DisplayedCard].count() > 0) {
+		    $(displayed_card_area).className = "artichoke_flex_center";
+		} else {
+		    $(displayed_card_area).className = "artichoke_hidden";
+		}
+            },
+
             showCardPlay: function (player_id, from, from_arg, to, to_arg, card, counters) {
+		// if something is moving to displayed card area, show area
+		if (to == this.Stock.DisplayedCard) {
+		    this.showDisplayedArea(true);
+		}
+		// do the normal card move
                 if (this.isVisible(from, from_arg)) {
                     if (this.isVisible(to, to_arg)) {
                         this.moveVisibleToVisible(from, to, card);
@@ -450,6 +470,8 @@ define([
                         this.movePanelToVisible(player_id, to, card);
                     }
                 }
+		// if there are no more cards in the display area, hide it
+		this.showDisplayedArea();
 
                 this.updateCounter(counters);
             },

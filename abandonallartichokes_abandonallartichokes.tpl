@@ -18,27 +18,19 @@ var jstpl_fake_card = "<div id=\"${id}\" class=\"stockitem\" style=\"top:${top}p
       <div id="garden_row"></div>
     </div>
   </div>
-  <div id="common_area" class="artichoke_flex_away">
-    <div id="played_card_area">
-      <div id="played_card"></div>
-    </div>
-    <div id="displayed_card_area">
-      <div id="displayed_card"></div>
-    </div>
-    <div id="compost_area">
-      <div id="compost"></div>
-    </div>
+  <div id="displayed_card_area" class="artichoke_hidden">
+    <div id="displayed_card"></div>
   </div>
   <div id="hand_area" class="artichoke_flex_center">
-    <div id="hand"></div>
+    <div id="hand" class="artichoke_space_right"></div>
+    <div id="played_card"></div>
   </div>
   <div id="player_area" class="artichoke_flex_away">
-    <div id="draw_pile_area">
-	 <div id="deck"></div>
+    <div id="left_part" class="artichoke_flex_center">
+      <div id="discard" class="artichoke_cardmin artichoke_deck_space_right"></div>
+      <div id="deck" class="artichoke_cardmin"></div>
     </div>
-    <div id="discard_area">
-      <div id="discard"></div>
-    </div>
+    <div id="compost" class="artichoke_cardmin"></div>
   </div>
 </div>
 
