@@ -58,5 +58,11 @@ $stats_type = array(
         "artichokes_composted" => array("id"=>11, "name" => totranslate("Artichokes composted"), "type" => "int"),
         "artichoke_count" => array("id"=>12, "name" => totranslate("Number of artichokes"), "type" => "int"),
         "card_count" => array("id"=>13, "name" => totranslate("Total number of cards"), "type" => "int"),
+        "composted_by_beet" => array("id"=>14, "name" => totranslate("Artichokes composted by beets"), "type" => "int"),
+        "composted_by_broccoli" => array("id"=>15, "name" => totranslate("Artichokes composted by broccoli"), "type" => "int"),
+        "composted_by_carrot" => array("id"=>16, "name" => totranslate("Artichokes composted by carrot"), "type" => "int"),
+        "composted_by_eggplant" => array("id"=>17, "name" => totranslate("Artichokes composted by eggplant"), "type" => "int"),
+        "composted_by_onion" => array("id"=>18, "name" => totranslate("Artichokes composted by onion"), "type" => "int"),
+        "composted_by_potato" => array("id"=>19, "name" => totranslate("Artichokes composted by potato"), "type" => "int"),
     ),
 );

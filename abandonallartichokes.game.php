@@ -104,6 +104,12 @@ class AbandonAllArtichokes extends Table
         self::initStat('player', 'artichoke_count', 0);
         self::initStat('player', 'card_count', 0);
         self::initStat('player', 'number_of_turns', 0);
+        self::initStat('player', 'composted_by_beet', 0);
+        self::initStat('player', 'composted_by_broccoli', 0);
+        self::initStat('player', 'composted_by_carrot', 0);
+        self::initStat('player', 'composted_by_eggplant', 0);
+        self::initStat('player', 'composted_by_onion', 0);
+        self::initStat('player', 'composted_by_potato', 0);
 
         // Create cards
         $cards = array();
@@ -527,8 +533,8 @@ class AbandonAllArtichokes extends Table
 
     function beetHandleDrawnCards($card, $opponent_card, $opponent_id) {
         if ($card['type'] == VEGETABLE_ARTICHOKE && $opponent_card['type'] == VEGETABLE_ARTICHOKE) {
-            $this->compost_artichoke($card, self::getActivePlayerId());
-            $this->compost_artichoke($opponent_card, $opponent_id);
+            $this->compost_artichoke($card, self::getActivePlayerId(), true, VEGETABLE_BEET);
+            $this->compost_artichoke($opponent_card, $opponent_id, true, VEGETABLE_BEET);
         }
         else {
             $this->cards->moveCard($card['id'], STOCK_HAND, $opponent_id);
@@ -557,7 +563,7 @@ class AbandonAllArtichokes extends Table
             throw new BgaUserException(self::_("To play a broccoli you need 3 artichokes in your hand"));
         }
 
-        $this->compost_artichoke($artichoke, self::getActivePlayerId(), false);
+        $this->compost_artichoke($artichoke, self::getActivePlayerId(), false, VEGETABLE_BROCCOLI);
         $card = $this->cards->getCard($id);
         $player_id = self::getActivePlayerId();
         $this->cards->moveCard($id, $this->player_discard($player_id));
@@ -592,8 +598,8 @@ class AbandonAllArtichokes extends Table
         }
 
         // compost carrot and both artichokes
-        $this->compost_artichoke($artichoke_1, self::getCurrentPlayerId(), false);
-        $this->compost_artichoke($artichoke_2, self::getCurrentPlayerId(), false);
+        $this->compost_artichoke($artichoke_1, self::getCurrentPlayerId(), false, VEGETABLE_CARROT);
+        $this->compost_artichoke($artichoke_2, self::getCurrentPlayerId(), false, VEGETABLE_CARROT);
         $card = $this->cards->getCard($id);
         $this->cards->moveCard($card['id'], STOCK_COMPOST);
         $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} plays carrot and composts it and two artichokes'), $card, array( 'destination' => STOCK_COMPOST ));
@@ -670,7 +676,7 @@ class AbandonAllArtichokes extends Table
 
         $this->play_card($id);
 
-        $this->compost_artichoke($artichoke, self::getCurrentPlayerId());
+        $this->compost_artichoke($artichoke, self::getCurrentPlayerId(), true, VEGETABLE_EGGPLANT);
 
         $this->gamestate->nextState(STATE_EGGPLANT_CHOOSE_CARDS);
     }
@@ -805,7 +811,7 @@ class AbandonAllArtichokes extends Table
         }
 
         $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('${player_name} plays onion and composts artichoke'), null, array( 'player_name' => self::getActivePlayerName() ));
-        $this->compost_artichoke($artichoke, self::getActivePlayerId(), false);
+        $this->compost_artichoke($artichoke, self::getActivePlayerId(), false, VEGETABLE_ONION);
 
         if (self::getGameStateValue(GAME_STATE_AUTOMATIC_PLAYER_DECISIONS) > 0 && count($target_ids) == 1) {
             $target_id = array_pop($target_ids);
@@ -1040,7 +1046,7 @@ class AbandonAllArtichokes extends Table
         ));
 
         if ($picked_card['type'] == VEGETABLE_ARTICHOKE) {
-            $this->compost_artichoke($picked_card, self::getActivePlayerId());
+            $this->compost_artichoke($picked_card, self::getActivePlayerId(), true, VEGETABLE_POTATO);
         } else {
             $this->cards->moveCard($picked_card['id'], $this->player_discard($player_id));
             $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} discards ${vegetable}'), $picked_card, array( 'destination' => STOCK_DISCARD, 'destination_arg' => $player_id ));
@@ -1219,7 +1225,7 @@ class AbandonAllArtichokes extends Table
         ));
     }
 
-    function compost_artichoke($card, $player_id, $notify_message = true) {
+    function compost_artichoke($card, $player_id, $notify_message, $vegetable) {
         if ($card['type'] != VEGETABLE_ARTICHOKE) {
             throw new BgaVisibleSystemException(self::_("Trying to compost non-artichoke with special artichoke composter"));
         }
@@ -1227,6 +1233,26 @@ class AbandonAllArtichokes extends Table
         $this->notify_all(NOTIFICATION_CARD_MOVED, $notify_message ? clienttranslate('${player_name} composts ${vegetable}') : '', $card,
                           array( 'destination' => STOCK_COMPOST, 'player_id' => $player_id ));
         self::incStat(1, 'artichokes_composted', $player_id);
+        switch ($vegetable) {
+        case VEGETABLE_BEET:
+            self::incStat(1, 'composted_by_beet', $player_id);
+            break;
+        case VEGETABLE_BROCCOLI:
+            self::incStat(1, 'composted_by_broccoli', $player_id);
+            break;
+        case VEGETABLE_CARROT:
+            self::incStat(1, 'composted_by_carrot', $player_id);
+            break;
+        case VEGETABLE_EGGPLANT:
+            self::incStat(1, 'composted_by_eggplant', $player_id);
+            break;
+        case VEGETABLE_ONION:
+            self::incStat(1, 'composted_by_onion', $player_id);
+            break;
+        case VEGETABLE_POTATO:
+            self::incStat(1, 'composted_by_potato', $player_id);
+            break;
+        }
     }
 
     function discard_played_cards() {
