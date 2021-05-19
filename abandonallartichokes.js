@@ -27,8 +27,8 @@ define([
                 // console.log('abandonallartichokes constructor');
 
 		// css spritesheet properties
-                this.cardwidth = 100;
-                this.cardheight = 150;
+                this.cardwidth = 110;
+                this.cardheight = 165;
 		// When using spritesheets, we can't use high-resolution card images
 		// There are only around 15 images, so we use single files instead
 		// this.image_items_per_row = 4;
