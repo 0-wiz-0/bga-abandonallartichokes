@@ -11,6 +11,7 @@ Cleanups/Bugs
     shadows are removed from where they were before
   - when potato/broccoli is played, for spectator, the card moves
     to played area then fades out, instead of two animations
+- display other player's played cards somewhere/somehow differently?
 
 Comments from players that will for now not be implemented
 ===
@@ -35,3 +36,48 @@ New comments
     necessary.
   - the same for discarding the hand after ending the turn animating
     new card in display from deck
+- Include which cards can be played when players turn comes up. Also,
+  include options at the beginning of each turn to make game play
+  smooth. No major bugs great game.
+- The way the cards overlap, sometimes you want to read a card that is
+  partially obscured. When possible, I think it would be better if the
+  cards do not overlap.
+- I've used https://iconify.design/ in two of my games, which is a
+  JavaScript library that handles loading icons from a huge
+  catalog. If you don't want the overhead of the JS library, you could
+  also use their site to search for and download icons as .svg image
+  files (you can even re-color the icon before you download the
+  image).
+
+  I have the same 3 things in the panel for one of my games and I
+  think these are the icons I used, but of course there are many
+  choices among their catalog of free icons.
+  https://iconify.design/icon-sets/mdi/hand-right.html
+  https://iconify.design/icon-sets/mdi/cards.html
+  https://iconify.design/icon-sets/mdi/shuffle-variant.html
+
+  I'm not confident my usage of these icons in my game is the best
+  example. Since you seem to have more available space in your player
+  panel than me, I'd recommend keeping the word in addition to adding
+  a small icon, perhaps.
+- when potato reshuffles, discard pile is not removed
+- add option for public artichoke count (#41540)
+- spectators get no message for eggplant passing
+- bug in translation? vegetable names not translated
+- Corn graphics issue (white box)
+- German graphics - how to integrate them?
+- Tableau graphics
+- (compost at top)
+- (broccoli show cards)
+- card move for shuffle/animation at turn end
+- (# in corner of pile to show how many cards -> deck)
+- garden pile # in garden area
+- message for reshuffle & draw hand
+- (discard searchable)
+- (slower gameflow as option)
+- explicit mention who was chosen as target of card
+  - log
+  - (message?)
+- show winning hand/(all hands?)
+- compost background
+- text in (garden row)/compost
