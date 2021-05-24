@@ -647,7 +647,7 @@ class AbandonAllArtichokes extends Table
 
         $player_id = self::getCurrentPlayerId();
         $this->cards->insertCardOnExtremePosition($id, $this->player_deck($player_id), true);
-        $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} picks ${vegetable}'), $card, array(
+        $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} takes ${vegetable}'), $card, array(
             'destination' => STOCK_DECK,
             'destination_arg' => $player_id,
         ));
@@ -894,15 +894,15 @@ class AbandonAllArtichokes extends Table
     function peasTakeCard($id) {
         self::checkAction("peasTakeCard");
         if ($id == null) {
-            throw new BgaVisibleSystemException(self::_("You must pick a card from the display"));
+            throw new BgaVisibleSystemException(self::_("You must take a card from the display"));
         }
         $card = $this->cards->getCard($id);
         if ($card == null || $card['location'] != STOCK_DISPLAYED_CARD) {
-            throw new BgaVisibleSystemException(self::_("You must pick a card from the display"));
+            throw new BgaVisibleSystemException(self::_("You must take a card from the display"));
         }
         $player_id = self::getCurrentPlayerId();
         $this->cards->moveCard($id, $this->player_discard($player_id));
-        $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} picks ${vegetable}'), $card, array(
+        $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} takes ${vegetable}'), $card, array(
             'destination' => STOCK_DISCARD,
             'destination_arg' => $player_id,
         ));
@@ -1001,16 +1001,16 @@ class AbandonAllArtichokes extends Table
     function pepperTakeCard($id) {
         self::checkAction("pepperTakeCard");
         if ($id == null) {
-            throw new BgaVisibleSystemException(self::_("You must pick a card from the display to put on deck"));
+            throw new BgaVisibleSystemException(self::_("You must take a card from the display to put on deck"));
         }
         $card = $this->cards->getCard($id);
         if ($card == null || $card['location'] != STOCK_DISPLAYED_CARD) {
-            throw new BgaVisibleSystemException(self::_("You must pick a card from the display to put on deck"));
+            throw new BgaVisibleSystemException(self::_("You must take a card from the display to put on deck"));
         }
         $player_id = self::getCurrentPlayerId();
         // move chosen card to deck
         $this->cards->insertCardOnExtremePosition($id, $this->player_deck($player_id), true);
-        $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} picks ${vegetable}'), $card, array(
+        $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} takes ${vegetable}'), $card, array(
             'destination' => STOCK_DECK,
             'destination_arg' => $player_id,
         ));
