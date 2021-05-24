@@ -1363,7 +1363,7 @@ class AbandonAllArtichokes extends Table
         $this->set_if_not_set($arguments, 'player_id', self::getCurrentPlayerId());
         $this->set_if_not_set($arguments, 'player_name', $this->player_name($arguments['player_id']));
         if ($card != null) {
-            // TODO: translate vegetable name
+            $arguments['i18n'] = array('vegetable'); // make sure 'vegetable' gets translated
             $this->set_if_not_set($arguments, 'vegetable', $this->vegetables[$card['type']]['name']);
             $this->set_if_not_set($arguments, 'card', $card);
             $this->set_if_not_set($arguments, 'origin', $card['location']);

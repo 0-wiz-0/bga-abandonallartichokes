@@ -81,3 +81,4 @@ New comments
 - show winning hand/(all hands?)
 - compost background
 - text in (garden row)/compost
+- spread out discard pile? (#41702)

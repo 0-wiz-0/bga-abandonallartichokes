@@ -330,7 +330,7 @@ define([
                     case this.AjaxActions.PeasChooseOpponent:
                         for (var player_id of args.target_ids) {
                             this.addActionButton('player_' + this.gamedatas.players[player_id].player_no,
-						 _('Choose ') + this.gamedatas.players[player_id].name,
+						 dojo.string.substitute( _('Choose ${player_name}'), { player_name: this.gamedatas.players[player_id].name }),
 						 this.onChooseOpponent.bind(this, stateName, player_id));
                         }
                         break;
