@@ -1,7 +1,6 @@
 Possibly Later
 ===
 - rhubarb
-- checks on client side
 - reduce overlap for hand on big displays? (window.screen.availWidth)
 - display other player's played cards somewhere/somehow differently?
 
@@ -40,18 +39,9 @@ New comments
 - when potato reshuffles, discard pile is not removed
 - add option for public artichoke count (#41540)
 - spectators get no message for eggplant passing
-+ bug in translation? vegetable names not translated
-- Corn graphics issue (white box)
-- German graphics - how to integrate them?
-- Tableau graphics
-- (compost at top)
-- (broccoli show cards)
 - card move for shuffle/animation at turn end
-- (# in corner of pile to show how many cards -> deck)
 - garden pile # in garden area
 - message for reshuffle & draw hand
-- (discard searchable)
-- (slower gameflow as option)
 - explicit mention who was chosen as target of card
   - log
   - (message?)
@@ -59,18 +49,48 @@ New comments
 - compost background
 - text in (garden row)/compost
 - spread out discard pile? (#41702)
+  - no, but perhaps tooltip with card counts?
+
+Waiting on others
+===
+- Corn graphics issue (white box)
+- German graphics - how to integrate them?
+- Tableau graphics
+
+Fixed bugs - to check
+===
++ bug in translation: vegetable names not translated
 
 Comments from players that will for now not be implemented
 ===
 - you can only see in the log who selects who
+  -> no good way to show it, since players have no real area on the board
+     which is good because that leaves more space for the cards
 - names for areas might be helpful
+  -> keep display as simple as possible
 - If there are <= 2 cards in my hand, automatically select those as
   the cards to pass
+  -> some effort to implement, and I think it might be too confusing for players
 - The positioning is not what I expected based on other BGA games. I
   expect my hand at the top, with the garden/common area below.
+  -> matches more what it looks like in real game
 - Use some divs to separate areas. You can use class="whiteblock" or
   something else.
+  -> I'd like to keep it visually simple
 - I will organize a player area like this: deck to the left, discard
   to the right and hand in between and not above. Played cards above
   the hand for display, I would also put the deck to the left, display
-  in the middle and compost at the right side.
+  in the middle and compost at the right side
+  -> had it like this, but this is a better use of space
+- move compost to top row -> not enough space, we want cards as big as possible
+- when playing broccoli, show that you have enough artichoke cards
+  -> not necessary, implementation checks this
+- put the card count in the corner of piles to show how many cards
+  -> numbers are in top right, only really useful for deck and that might add confusion
+- discard searchable
+  -> needs space, and you can already recognize what's inside by the card border
+- optional: slower gameflow
+  -> not sure what exactly we can do here
+- checks on client side
+  -> not necessary, play servers are fast enough and this way we don't
+     have to implement the code twice
