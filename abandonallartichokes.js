@@ -135,7 +135,7 @@ define([
 
                 const stock_constructor = [
                     {name: this.Stock.GardenRow, callback: 'onGardenRowSelect', selectionMode: 1},
-                    {name: this.Stock.Hand, callback: 'onPlayerHandSelect', selectionMode: 2},
+                    {name: this.Stock.Hand, callback: 'onPlayerHandSelect', selectionMode: 2, weights: true},
                     {name: this.Stock.DisplayedCard, callback: 'onDisplayedCardSelect', selectionMode: 1},
                     {name: this.Stock.PlayedCard, callback: null, selectionMode: 0},
                     {name: this.Stock.Discard, callback: null, selectionMode: 0, overlap: 1},
@@ -145,7 +145,7 @@ define([
                 const extraClasses = 'artichoke_card';
                 this.stock = {};
                 for (var stock_entry of stock_constructor) {
-                    this.stock[stock_entry.name] = this.setupCardStocks(stock_entry.name, stock_entry.callback);
+                    this.stock[stock_entry.name] = this.setupCardStocks(stock_entry.name, stock_entry.callback, stock_entry.weights);
                     this.stock[stock_entry.name].setSelectionMode(stock_entry.selectionMode);
                     this.stock[stock_entry.name].setSelectionAppearance('class');
 		    this.stock[stock_entry.name].extraClasses = extraClasses;
@@ -187,14 +187,15 @@ define([
 
             // Initialize a card stock
             // Arguments: div id, function which occurs when the card selection changes
-            setupCardStocks: function (id, selectionChangeFunctionName) {
+            setupCardStocks: function (id, selectionChangeFunctionName, weights = false) {
                 var stock = new ebg.stock();
                 stock.create(this, $(id), this.cardwidth, this.cardheight);
 		stock.image_items_per_row = this.image_items_per_row;
                 for (var vegetable_id = 1; vegetable_id < 16; vegetable_id++) {
 		    // 1-10: main vegetables, 11-15: artichokes
                     //stock.addItemType(vegetable_id, 0, g_gamethemeurl + this.spritesheet, vegetable_id - 1);
-		    stock.addItemType(vegetable_id, 0, g_gamethemeurl + 'img/' + (vegetable_id - 1) + '.jpg');
+		    // if weight is true, make artichokes lighter, so the top = most visible card is a vegetable
+		    stock.addItemType(vegetable_id, weights && (vegetable_id < 11 || vegetable_id > 15) ? 1 : 0, g_gamethemeurl + 'img/' + (vegetable_id - 1) + '.jpg');
                 }
                 if (selectionChangeFunctionName != null) {
                     dojo.connect(stock, 'onChangeSelection', this, selectionChangeFunctionName);

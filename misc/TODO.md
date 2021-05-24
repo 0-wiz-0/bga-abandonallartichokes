@@ -3,33 +3,10 @@ Possibly Later
 - rhubarb
 - checks on client side
 - reduce overlap for hand on big displays? (window.screen.availWidth)
-
-Cleanups/Bugs
-===
-- debug animation issues
-  - when moving from visible to visible, cards are moved, then their
-    shadows are removed from where they were before
-  - when potato/broccoli is played, for spectator, the card moves
-    to played area then fades out, instead of two animations
 - display other player's played cards somewhere/somehow differently?
-
-Comments from players that will for now not be implemented
-===
-- you can only see in the log who selects who
-- names for areas might be helpful
-- If there are <= 2 cards in my hand, automatically select those as
-  the cards to pass
-- The positioning is not what I expected based on other BGA games. I
-  expect my hand at the top, with the garden/common area below.
 
 New comments
 ===
-- Use some divs to separate areas. You can use class="whiteblock" or
-  something else.
-- I will organize a player area like this: deck to the left, discard
-  to the right and hand in between and not above. Played cards above
-  the hand for display, I would also put the deck to the left, display
-  in the middle and compost at the right side.
 - Some additional animations would be helpful:
   - getting a new hand: card by card in quick succession from the
     personal deck. (You can make them flip if you want but it is not
@@ -38,7 +15,7 @@ New comments
     new card in display from deck
 - Include which cards can be played when players turn comes up. Also,
   include options at the beginning of each turn to make game play
-  smooth. No major bugs great game.
+  smooth.
 - The way the cards overlap, sometimes you want to read a card that is
   partially obscured. When possible, I think it would be better if the
   cards do not overlap.
@@ -63,7 +40,7 @@ New comments
 - when potato reshuffles, discard pile is not removed
 - add option for public artichoke count (#41540)
 - spectators get no message for eggplant passing
-- bug in translation? vegetable names not translated
++ bug in translation? vegetable names not translated
 - Corn graphics issue (white box)
 - German graphics - how to integrate them?
 - Tableau graphics
@@ -82,3 +59,18 @@ New comments
 - compost background
 - text in (garden row)/compost
 - spread out discard pile? (#41702)
+
+Comments from players that will for now not be implemented
+===
+- you can only see in the log who selects who
+- names for areas might be helpful
+- If there are <= 2 cards in my hand, automatically select those as
+  the cards to pass
+- The positioning is not what I expected based on other BGA games. I
+  expect my hand at the top, with the garden/common area below.
+- Use some divs to separate areas. You can use class="whiteblock" or
+  something else.
+- I will organize a player area like this: deck to the left, discard
+  to the right and hand in between and not above. Played cards above
+  the hand for display, I would also put the deck to the left, display
+  in the middle and compost at the right side.
