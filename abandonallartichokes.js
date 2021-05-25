@@ -133,9 +133,6 @@ define([
 		// garden stack counter
                 this.counter.garden_stack = new ebg.counter();
                 this.counter.garden_stack.create('garden_stack_counter');
-		console.log('initializing garden stack with ');
-		console.log(this.gamedatas.counters);
-		console.log(this.gamedatas.counters.garden_stack);
 		this.counter.garden_stack.setValue(this.gamedatas.counters.garden_stack);
 
                 const stock_constructor = [

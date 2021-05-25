@@ -18,24 +18,6 @@ New comments
 - The way the cards overlap, sometimes you want to read a card that is
   partially obscured. When possible, I think it would be better if the
   cards do not overlap.
-- I've used https://iconify.design/ in two of my games, which is a
-  JavaScript library that handles loading icons from a huge
-  catalog. If you don't want the overhead of the JS library, you could
-  also use their site to search for and download icons as .svg image
-  files (you can even re-color the icon before you download the
-  image).
-
-  I have the same 3 things in the panel for one of my games and I
-  think these are the icons I used, but of course there are many
-  choices among their catalog of free icons.
-  https://iconify.design/icon-sets/mdi/hand-right.html
-  https://iconify.design/icon-sets/mdi/cards.html
-  https://iconify.design/icon-sets/mdi/shuffle-variant.html
-
-  I'm not confident my usage of these icons in my game is the best
-  example. Since you seem to have more available space in your player
-  panel than me, I'd recommend keeping the word in addition to adding
-  a small icon, perhaps.
 - when potato reshuffles, discard pile is not removed
 - spectators get no message for eggplant passing
 - card move for shuffle/animation at turn end
@@ -51,6 +33,7 @@ New comments
   - no, but perhaps tooltip with card counts?
 - mark displayed cards as other players' discard pile etc (#41753)
 - add option for public artichoke count (#41540)
+- improve discard icon
 
 Waiting on others
 ===

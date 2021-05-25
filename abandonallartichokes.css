@@ -107,6 +107,11 @@
     margin-right: 5px;
 }
 
+.artichoke_label_line {
+    display: flex;
+    align-items: center;
+}
+
 .artichoke_space_right {
     margin-right: 40px;
 }
@@ -146,6 +151,10 @@
     /* background-size: contain; */
     background-size: cover;
     box-sizing: border-box;
+}
+
+.artichoke_icon {
+    height: 2em;
 }
 
 /* here we want to override BGA's defaults */
