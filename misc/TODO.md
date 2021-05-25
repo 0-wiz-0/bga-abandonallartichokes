@@ -37,7 +37,6 @@ New comments
   panel than me, I'd recommend keeping the word in addition to adding
   a small icon, perhaps.
 - when potato reshuffles, discard pile is not removed
-- add option for public artichoke count (#41540)
 - spectators get no message for eggplant passing
 - card move for shuffle/animation at turn end
 - garden pile # in garden area
@@ -50,6 +49,8 @@ New comments
 - text in (garden row)/compost
 - spread out discard pile? (#41702)
   - no, but perhaps tooltip with card counts?
+- mark displayed cards as other players' discard pile etc (#41753)
+- add option for public artichoke count (#41540)
 
 Waiting on others
 ===

@@ -116,14 +116,11 @@ define([
 
             setup: function (gamedatas) {
                 // console.log("Starting game setup");
-
-                // TODO: remove
                 // console.log(gamedatas);
 
                 this.counter = {};
                 // Setting up player boards
                 for (var player_id in gamedatas.players) {
-                    var player = gamedatas.players[player_id];
                     var player_board_div = $('player_board_' + player_id);
                     dojo.place(this.format_block('jstpl_player_board', {id: player_id}), player_board_div);
 
@@ -132,6 +129,14 @@ define([
                     this.createCounter(player_id, 'deck');
                     this.createCounter(player_id, 'discard');
                 }
+
+		// garden stack counter
+                this.counter.garden_stack = new ebg.counter();
+                this.counter.garden_stack.create('garden_stack_counter');
+		console.log('initializing garden stack with ');
+		console.log(this.gamedatas.counters);
+		console.log(this.gamedatas.counters.garden_stack);
+		this.counter.garden_stack.setValue(this.gamedatas.counters.garden_stack);
 
                 const stock_constructor = [
                     {name: this.Stock.GardenRow, callback: 'onGardenRowSelect', selectionMode: 1},
@@ -169,6 +174,7 @@ define([
                 this.updateDecks();
 
 		this.stock[this.Stock.Hand].setOverlap(this.hand_default_overlap);
+
 		this.showDisplayedArea();
                 this.setupNotifications();
 
@@ -403,6 +409,9 @@ define([
                     notification.args.origin, notification.args.origin_arg,
                     notification.args.destination, notification.args.destination_arg,
                     notification.args.card, notification.args.counters);
+		if (notification.args.garden_stack_counter) {
+		    this.counter.garden_stack.setValue(notification.args.garden_stack_counter);
+		}
             },
 
             notif_drewHand: function (notification) {
@@ -424,6 +433,9 @@ define([
                 for (var card of notification.args.new_cards) {
                     this.stock[this.Stock.GardenRow].addToStockWithId(card.type, card.id);
                 }
+		if (notification.args.garden_stack_counter) {
+		    this.counter.garden_stack.setValue(notification.args.garden_stack_counter);
+		}
             },
 
             notif_updateCounters: function (notification) {

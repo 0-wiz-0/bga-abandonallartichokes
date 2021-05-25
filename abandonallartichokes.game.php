@@ -189,6 +189,7 @@ class AbandonAllArtichokes extends Table
         foreach (array_keys($result['players']) as $player_id) {
             $result['counters'][$player_id] = $this->get_counters($player_id);
         }
+        $result['counters']['garden_stack'] = $this->cards->countCardInLocation(STOCK_GARDEN_STACK);
 
         return $result;
     }
@@ -310,7 +311,6 @@ class AbandonAllArtichokes extends Table
             $this->notify_all(NOTIFICATION_VICTORY, clienttranslate('${player_name} wins!'));
             $this->update_statistics();
             $this->gamestate->nextState(STATE_END_GAME);
-            // TODO: notification
             return;
         }
 
@@ -318,6 +318,7 @@ class AbandonAllArtichokes extends Table
         $new_cards = $this->refreshGardenRow(true);
         self::notifyAllPlayers(NOTIFICATION_REFILLED_GARDEN_ROW, '', array (
             'new_cards' => $new_cards,
+            'garden_stack_counter' => $this->cards->countCardInLocation(STOCK_GARDEN_STACK),
         ));
 
         // switch to next player
@@ -363,7 +364,7 @@ class AbandonAllArtichokes extends Table
         $finished = false;
         $had_to_reshuffle = false;
         $row_before = $this->cards->getCardsInLocation(STOCK_GARDEN_ROW);
-        $garden_stack_count_before = count($this->cards->getCardsInLocation(STOCK_GARDEN_STACK));
+        $garden_stack_count_before = $this->cards->countCardInLocation(STOCK_GARDEN_STACK);
         while (!$finished) {
             $loop_count++;
             $finished = true;
@@ -371,7 +372,7 @@ class AbandonAllArtichokes extends Table
             if ($count < 5) {
                 $this->cards->pickCardsForLocation(5 - $count, STOCK_GARDEN_STACK, STOCK_GARDEN_ROW);
             }
-            $garden_stack_count_after = count($this->cards->getCardsInLocation(STOCK_GARDEN_STACK));
+            $garden_stack_count_after = $this->cards->countCardInLocation(STOCK_GARDEN_STACK);
             // no point reshuffling if there is nothing left in the garden row
             if ($garden_stack_count_after > 0 && $loop_count < 5) {
                 $row_after = $this->cards->getCardsInLocation(STOCK_GARDEN_ROW);
@@ -874,6 +875,7 @@ class AbandonAllArtichokes extends Table
             $this->notify_all(NOTIFICATION_CARD_MOVED, '', $card, array(
                 'origin' => STOCK_GARDEN_STACK,
                 'destination' => STOCK_DISPLAYED_CARD,
+                'garden_stack_counter' => $this->cards->countCardInLocation(STOCK_GARDEN_STACK),
             ));
         }
 
