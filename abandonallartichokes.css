@@ -99,6 +99,12 @@
     justify-content: center;
 }
 
+.artichoke_flex_column {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
 .artichoke_hidden {
     display: none;
 }
@@ -134,6 +140,14 @@
     width: 720px;
     /* for width 150px: */
     /* max-width: 770px; */
+}
+
+#garden_stack_counter {
+    background-color: var(--garden);
+    margin-bottom: 5px;
+    border-radius: 20px;
+    //border: 1px solid black;
+    padding: 10px;
 }
 
 /***** PLAYER PANEL ****/
