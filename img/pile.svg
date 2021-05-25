@@ -13,7 +13,9 @@
    version="1.1"
    id="svg1032"
    inkscape:version="1.0.2 (e86c8708, 2021-01-15)"
-   sodipodi:docname="pile-alternate.svg">
+   sodipodi:docname="pile.svg">
+  <title
+     id="title41">Draw Pile</title>
   <defs
      id="defs1026">
     <inkscape:perspective
@@ -43,7 +45,7 @@
      inkscape:window-width="1252"
      inkscape:window-height="1174"
      inkscape:window-x="473"
-     inkscape:window-y="97"
+     inkscape:window-y="69"
      inkscape:window-maximized="0" />
   <metadata
      id="metadata1029">
@@ -53,8 +55,28 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title>Draw Pile</dc:title>
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>Thomas Klausner</dc:title>
+          </cc:Agent>
+        </dc:creator>
+        <cc:license
+           rdf:resource="http://creativecommons.org/licenses/by/4.0/" />
       </cc:Work>
+      <cc:License
+         rdf:about="http://creativecommons.org/licenses/by/4.0/">
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Reproduction" />
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Distribution" />
+        <cc:requires
+           rdf:resource="http://creativecommons.org/ns#Notice" />
+        <cc:requires
+           rdf:resource="http://creativecommons.org/ns#Attribution" />
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#DerivativeWorks" />
+      </cc:License>
     </rdf:RDF>
   </metadata>
   <g
