@@ -7,9 +7,9 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="500"
+   width="365"
    height="500"
-   viewBox="0 0 132.29166 132.29167"
+   viewBox="0 0 96.57298 132.29167"
    version="1.1"
    id="svg1032"
    inkscape:version="1.0.2 (e86c8708, 2021-01-15)"
@@ -22,8 +22,8 @@
        sodipodi:type="inkscape:persp3d"
        inkscape:vp_x="0 : 66.145835 : 1"
        inkscape:vp_y="0 : 1000 : 0"
-       inkscape:vp_z="132.29166 : 66.145835 : 1"
-       inkscape:persp3d-origin="66.14583 : 44.097223 : 1"
+       inkscape:vp_z="132.29177 : 66.145835 : 1"
+       inkscape:persp3d-origin="66.14587 : 44.097223 : 1"
        id="perspective1034" />
   </defs>
   <sodipodi:namedview
@@ -45,7 +45,7 @@
      inkscape:window-width="1252"
      inkscape:window-height="1174"
      inkscape:window-x="473"
-     inkscape:window-y="69"
+     inkscape:window-y="41"
      inkscape:window-maximized="0" />
   <metadata
      id="metadata1029">
