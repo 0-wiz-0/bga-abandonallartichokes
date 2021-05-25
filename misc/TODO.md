@@ -21,7 +21,6 @@ New comments
 - when potato reshuffles, discard pile is not removed
 - spectators get no message for eggplant passing
 - card move for shuffle/animation at turn end
-- garden pile # in garden area
 - message for reshuffle & draw hand
 - explicit mention who was chosen as target of card
   - log
@@ -33,7 +32,6 @@ New comments
   - no, but perhaps tooltip with card counts?
 - mark displayed cards as other players' discard pile etc (#41753)
 - add option for public artichoke count (#41540)
-- improve discard icon
 
 Waiting on others
 ===
