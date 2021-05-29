@@ -124,7 +124,7 @@ class AbandonAllArtichokes extends Table
                 $cards[] = array('type' => $vegetable_id, 'type_arg' => 4, 'nbr' => 2 * count($players));
             } else {
                 // for testing only; list at least two!
-                // if (!in_array($vegetable_id, array(VEGETABLE_ONION, VEGETABLE_CARROT))) {
+                //if (!in_array($vegetable_id, array(VEGETABLE_BEET, VEGETABLE_LEEK, VEGETABLE_ONION, VEGETABLE_PEAS))) {
                 //     continue;
                 // }
                 $cards[] = array('type' => $vegetable_id, 'type_arg' => 0, 'nbr' => 6);
@@ -480,10 +480,6 @@ class AbandonAllArtichokes extends Table
 
         if (self::getGameStateValue(GAME_STATE_AUTOMATIC_PLAYER_DECISIONS) > 0 && count($target_ids) == 1) {
             $target_id = array_pop($target_ids);
-            $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('${vegetable} can only target ${player_name2}'), null,
-                              array( 'vegetable' => $this->vegetables[VEGETABLE_BEET]['name'],
-                                     'player_name2' => $this->player_name($target_id),
-                              ));
             $this->gamestate->nextState(STATE_BEET_CHOOSE_OPPONENT);
             // move card to limbo so it's not a valid target for the beet switch
             $this->cards->moveCard($id, STOCK_LIMBO, self::getActivePlayerId());
@@ -497,6 +493,10 @@ class AbandonAllArtichokes extends Table
 
     function beetChooseOpponent($opponent_id, $beet_id = null) {
         self::checkAction("beetChooseOpponent");
+        $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('${player_name} chooses ${player_name2} as target for ${vegetable}'), null,
+                          array( 'vegetable' => $this->vegetables[VEGETABLE_BEET]['name'],
+                                 'player_name2' => $this->player_name($opponent_id),
+                          ));
         $hand = $this->cards->getPlayerHand(self::getActivePlayerId());
         $card = $this->cards->getCard(array_rand($hand, 1));
         $opponent_hand = $this->cards->getPlayerHand($opponent_id);
@@ -719,10 +719,6 @@ class AbandonAllArtichokes extends Table
 
         if (self::getGameStateValue(GAME_STATE_AUTOMATIC_PLAYER_DECISIONS) > 0 && count($target_ids) == 1) {
             $target_id = array_pop($target_ids);
-            $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('${vegetable} can only target ${player_name2}'), null,
-                              array( 'vegetable' => $this->vegetables[VEGETABLE_LEEK]['name'],
-                                     'player_name2' => $this->player_name($target_id),
-                              ));
             $this->gamestate->nextState(STATE_LEEK_CHOOSE_OPPONENT);
             $this->leekChooseOpponent($target_id);
         } else {
@@ -744,12 +740,16 @@ class AbandonAllArtichokes extends Table
 
     function leekChooseOpponent($opponent_id) {
         self::checkAction("leekChooseOpponent");
+        $players = self::loadPlayersBasicInfos();
+        $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('${player_name} chooses ${player_name2} as target for ${vegetable}'), null,
+                          array( 'vegetable' => $this->vegetables[VEGETABLE_LEEK]['name'],
+                                 'player_name2' => $players[$opponent_id]['player_name'],
+                          ));
         $picked_card = $this->cards->pickCardForLocation($this->player_deck($opponent_id), STOCK_DISPLAYED_CARD);
         if ($picked_card == null) {
             throw new BgaUserException(self::_("Leek can only be played on an opponent with cards in the deck"));
         }
 
-        $players = self::loadPlayersBasicInfos();
         $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} reveals ${vegetable} from the deck of ${player_name2}'), $picked_card, array(
             'origin' => STOCK_DECK,
             'origin_arg' => $opponent_id,
@@ -817,11 +817,6 @@ class AbandonAllArtichokes extends Table
 
         if (self::getGameStateValue(GAME_STATE_AUTOMATIC_PLAYER_DECISIONS) > 0 && count($target_ids) == 1) {
             $target_id = array_pop($target_ids);
-            $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('${vegetable} can only target ${player_name2}'), null,
-                              array( 'vegetable' => $this->vegetables[VEGETABLE_ONION]['name'],
-                                     'player_name2' => $this->player_name($target_id),
-                              ));
-
             $this->gamestate->nextState(STATE_ONION_CHOOSE_OPPONENT);
 
             $this->onionChooseOpponent($target_id, $id);
@@ -915,10 +910,6 @@ class AbandonAllArtichokes extends Table
 
         if (self::getGameStateValue(GAME_STATE_AUTOMATIC_PLAYER_DECISIONS) > 0 && count($target_ids) == 1) {
             $target_id = array_pop($target_ids);
-            $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('${vegetable} can only target ${player_name2}'), null,
-                              array( 'vegetable' => $this->vegetables[VEGETABLE_PEAS]['name'],
-                                     'player_name2' => $this->player_name($target_id),
-                              ));
             $this->gamestate->nextState(STATE_PEAS_CHOOSE_OPPONENT);
             $this->peasChooseOpponent($target_id);
             return;
@@ -1221,7 +1212,7 @@ class AbandonAllArtichokes extends Table
         $player_no = substr($deck, 5);
         $player_id = $this->player_id_for_player_no($player_no);
         $this->notify_one($player_id, NOTIFICATION_RESHUFFLED, '');
-        $this->notify_all(NOTIFICATION_UPDATE_COUNTERS, '${player_name} shuffled the discard pile into the deck');
+        $this->notify_all(NOTIFICATION_UPDATE_COUNTERS, '${player_name} shuffled the discard pile into the deck', null, array('player_id' => $player_id));
     }
 
     function compost_played_card() {
@@ -1378,11 +1369,13 @@ class AbandonAllArtichokes extends Table
         $this->set_if_not_set($arguments, 'player_id', self::getCurrentPlayerId());
         $this->set_if_not_set($arguments, 'player_name', $this->player_name($arguments['player_id']));
         if ($card != null) {
-            $arguments['i18n'] = array('vegetable'); // make sure 'vegetable' gets translated
             $this->set_if_not_set($arguments, 'vegetable', $this->vegetables[$card['type']]['name']);
             $this->set_if_not_set($arguments, 'card', $card);
             $this->set_if_not_set($arguments, 'origin', $card['location']);
             $this->set_if_not_set($arguments, 'origin_arg', $card['location_arg']);
+        }
+        if (array_key_exists('vegetable', $arguments)) {
+            $arguments['i18n'] = array('vegetable'); // make sure 'vegetable' gets translated
         }
         $arguments['counters'] = array();
         $players = self::loadPlayersBasicInfos();

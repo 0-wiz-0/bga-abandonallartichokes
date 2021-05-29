@@ -5,13 +5,10 @@ Possibly Later
 - reduce card overlap on big screens: need to find out how to get real
   screensize through bga's zoom feature, then write
   onScreenWidthChange handler
+- spectators get no message for eggplant passing
 
 New comments
 ===
-- spectators get no message for eggplant passing
-- explicit mention who was chosen as target of card
-  - log
-  - (message?)
 - show winning hand/(all hands?)
 - spread out discard pile? (#41702)
   - no, but perhaps tooltip with card counts?
