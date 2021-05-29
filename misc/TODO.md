@@ -12,9 +12,6 @@ New comments
     necessary.
   - the same for discarding the hand after ending the turn animating
     new card in display from deck
-- Include which cards can be played when players turn comes up. Also,
-  include options at the beginning of each turn to make game play
-  smooth.
 - The way the cards overlap, sometimes you want to read a card that is
   partially obscured. When possible, I think it would be better if the
   cards do not overlap.
@@ -76,3 +73,9 @@ Comments from players that will for now not be implemented
 - checks on client side
   -> not necessary, play servers are fast enough and this way we don't
      have to implement the code twice
+- Include options at the beginning of each turn to make game play
+  smooth.
+  -> not sure what to do here
+- Include which cards can be played when players turn comes up.
+  -> would mean implementing whole logic on javascript side again,
+  and server tells you quickly enough if you try making invalid moves
