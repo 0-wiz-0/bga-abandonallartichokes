@@ -59,6 +59,7 @@ define([
                     CardMoved: "card_moved",
                     DrewHand: "drew_hand",
                     RefilledGardenRow: "refilled_garden_row",
+                    Reshuffled: "reshuffled",
                     UpdateCounters: "update_counters",
                     Victory: "victory",
                 };
@@ -396,6 +397,7 @@ define([
                 dojo.subscribe(this.Notification.DrewHand, this, "notif_drewHand");
                 dojo.subscribe(this.Notification.RefilledGardenRow, this, "notif_refilledGardenRow");
                 dojo.subscribe(this.Notification.UpdateCounters, this, "notif_updateCounters");
+                dojo.subscribe(this.Notification.Reshuffled, this, "notif_reshuffled");
                 dojo.subscribe(this.Notification.Victory, this, "notif_victory");
 
 		this.notifqueue.setSynchronous(this.Notification.DrewHand, 500);
@@ -437,6 +439,12 @@ define([
 		if (notification.args.garden_stack_counter) {
 		    this.counter.garden_stack.setValue(notification.args.garden_stack_counter);
 		}
+            },
+
+            notif_reshuffled: function () {
+		// move all cards from discard to deck
+		this.stock[this.Stock.Discard].removeAllTo(this.Stock.Deck);
+		// update counters comes in separate notification
             },
 
             notif_updateCounters: function (notification) {

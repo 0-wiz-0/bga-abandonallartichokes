@@ -49,6 +49,7 @@ class AbandonAllArtichokes extends Table
             'deck_3' => 'discard_3',
             'deck_4' => 'discard_4',
         ];
+        $this->cards->autoreshuffle_trigger = array('obj' => $this, 'method' => 'deck_auto_reshuffle');
     }
 
     protected function getGameName()
@@ -1216,6 +1217,13 @@ class AbandonAllArtichokes extends Table
 
     }
 
+    function deck_auto_reshuffle($deck) {
+        $player_no = substr($deck, 5);
+        $player_id = $this->player_id_for_player_no($player_no);
+        $this->notify_one($player_id, NOTIFICATION_RESHUFFLED, '');
+        $this->notify_all(NOTIFICATION_UPDATE_COUNTERS, '${player_name} shuffled the discard pile into the deck');
+    }
+
     function compost_played_card() {
         $player_id = self::getActivePlayerId();
         $played_card = $this->get_played_card();
@@ -1341,6 +1349,11 @@ class AbandonAllArtichokes extends Table
 
     function player_no($player_id) {
         $sql = "SELECT player_no FROM player WHERE player_id = " . $player_id;
+        return self::getUniqueValueFromDB($sql);
+    }
+
+    function player_id_for_player_no($player_no) {
+        $sql = "SELECT player_id FROM player WHERE player_no = " . $player_no;
         return self::getUniqueValueFromDB($sql);
     }
 
