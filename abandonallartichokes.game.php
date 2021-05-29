@@ -37,6 +37,7 @@ class AbandonAllArtichokes extends Table
             GAME_STATE_PLAYED_CARROT_THIS_TURN => 12,
             GAME_STATE_AUTOMATIC_PLAYER_DECISIONS => 100,
             GAME_STATE_AUTOMATIC_TURN_END => 101,
+            GAME_STATE_ARTICHOKE_COUNTS => 110,
             GAME_STATE_AUTOMATIC_CARD_DECISIONS => 199,
         ));
 
@@ -1396,10 +1397,15 @@ class AbandonAllArtichokes extends Table
     }
 
     function get_counters($player_id) {
-        return array(
+        $result = array(
             'deck' => $this->cards->countCardInLocation($this->player_deck($player_id)),
             'hand' => $this->cards->countCardInLocation(STOCK_HAND, $player_id),
             'discard' => $this->cards->countCardInLocation($this->player_discard($player_id)),
         );
+        if (self::getGameStateValue(GAME_STATE_ARTICHOKE_COUNTS) > 0) {
+            $counts = $this->count_cards_and_artichokes($player_id);
+            $result['artichokes'] = $counts['artichoke_count'];
+        }
+        return $result;
     }
 }

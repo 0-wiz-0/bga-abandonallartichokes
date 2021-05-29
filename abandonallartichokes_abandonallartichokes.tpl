@@ -6,6 +6,7 @@ var jstpl_player_board = '<div class="artichoke_deck_board">\
     <div class="artichoke_label_line"><div class="label artichoke_label"><img class="artichoke_icon" src="{GAMETHEMEURL}img/pile.svg"/></div><div id="deck_${id}">0</div></div>\
     <div class="artichoke_label_line"><div class="label artichoke_label"><img class="artichoke_icon" src="{GAMETHEMEURL}img/hand.svg"/></div><div id="hand_${id}">0</div></div>\
     <div class="artichoke_label_line"><div class="label artichoke_label"><img class="artichoke_icon" src="{GAMETHEMEURL}img/discard.svg"/></div><div id="discard_${id}">0</div></div>\
+    <div class="artichoke_label_line" id="optional_artichokes_${id}"><div class="label artichoke_label"><img class="artichoke_icon" src="{GAMETHEMEURL}img/artichoke.svg"/></div><div id="artichokes_${id}">0</div></div>\
 </div>';
 
 var jstpl_fake_card = "<div id=\"${id}\" class=\"stockitem\" style=\"top:${top}px;left:${left}px;width:${width}px;height:${height}px;z-index:${position};background-image:url('${image}');\"></div>";

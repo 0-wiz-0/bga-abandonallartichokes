@@ -40,6 +40,14 @@ $game_options = array(
             1 => array('name' => totranslate('Automatically end turn'), 'description' => totranslate('End turn automatically if you only have artichokes in your hand')),
         ),
         'default' => 0,
+    ),
+    110 => array(
+        'name' => totranslate('Artichoke counts'),
+        'values' => array(
+            0 => array('name' => totranslate('Do not display artichoke counts'),  ),
+            2 => array('name' => totranslate('Display artichoke counts for all players'), 'description' => totranslate('Show the total number of artichokes each player has left in their cards (not recommended, but useful for games that are not played in real-time)')),
+        ),
+        'default' => 0,
     )
 
     /*
