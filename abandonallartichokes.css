@@ -68,6 +68,7 @@
 */
 
 :root {
+    --compost: #895614; /* #704711; */
     --garden: #3bc83b;
     --cardBack: 172, 203, 70;
 }
@@ -141,7 +142,11 @@
     /* for width 150px: */
     /* max-width: 770px; */
 }
-
+/*
+#compost {
+    background-color: var(--compost);
+}
+*/
 #garden_stack_counter {
     background-color: var(--garden);
     margin-bottom: 5px;
