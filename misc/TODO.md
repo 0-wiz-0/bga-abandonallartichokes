@@ -14,10 +14,9 @@ New comments
     necessary.
   - the same for discarding the hand after ending the turn animating
     new card in display from deck
-- when potato reshuffles, discard pile is not removed
 - spectators get no message for eggplant passing
 - card move for shuffle/animation at turn end
-- message for reshuffle & draw hand
+- message for draw hand
 - explicit mention who was chosen as target of card
   - log
   - (message?)
