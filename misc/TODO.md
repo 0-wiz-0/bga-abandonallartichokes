@@ -1,8 +1,10 @@
 Possibly Later
 ===
 - rhubarb
-- reduce overlap for hand on big displays? (window.screen.availWidth)
 - display other player's played cards somewhere/somehow differently?
+- reduce card overlap on big screens: need to find out how to get real
+  screensize through bga's zoom feature, then write
+  onScreenWidthChange handler
 
 New comments
 ===
@@ -12,9 +14,6 @@ New comments
     necessary.
   - the same for discarding the hand after ending the turn animating
     new card in display from deck
-- The way the cards overlap, sometimes you want to read a card that is
-  partially obscured. When possible, I think it would be better if the
-  cards do not overlap.
 - when potato reshuffles, discard pile is not removed
 - spectators get no message for eggplant passing
 - card move for shuffle/animation at turn end
