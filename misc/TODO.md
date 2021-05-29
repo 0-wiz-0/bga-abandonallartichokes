@@ -6,17 +6,13 @@ Possibly Later
   screensize through bga's zoom feature, then write
   onScreenWidthChange handler
 - spectators get no message for eggplant passing
-
-New comments
-===
-- show winning hand/(all hands?)
+- show winning hand?/(all hands?)
 - spread out discard pile? (#41702)
   - no, but perhaps tooltip with card counts?
 - mark displayed cards as other players' discard pile etc (#41753)
 
 Waiting on others
 ===
-- Corn graphics issue (white box)
 - German graphics - how to integrate them?
 - Tableau graphics
 
