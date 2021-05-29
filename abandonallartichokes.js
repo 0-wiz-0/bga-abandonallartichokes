@@ -478,9 +478,9 @@ define([
 
 	    showDisplayedArea: function (force = false) {
 		if (force || this.stock[this.Stock.DisplayedCard].count() > 0) {
-		    $(displayed_card_area).className = "artichoke_flex_center";
+		    dojo.removeClass('displayed_card_area', 'artichoke_hidden');
 		} else {
-		    $(displayed_card_area).className = "artichoke_hidden";
+		    dojo.addClass('displayed_card_area', 'artichoke_hidden');
 		}
             },
 

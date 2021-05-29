@@ -19,7 +19,7 @@ var jstpl_fake_card = "<div id=\"${id}\" class=\"stockitem\" style=\"top:${top}p
       <div id="garden_row"></div>
     </div>
   </div>
-  <div id="displayed_card_area" class="artichoke_hidden">
+  <div id="displayed_card_area" class="artichoke_flex_center artichoke_hidden whiteblock">
     <div id="displayed_card"></div>
   </div>
   <div id="hand_area" class="artichoke_flex_center">
