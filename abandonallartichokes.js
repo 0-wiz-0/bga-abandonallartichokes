@@ -400,6 +400,7 @@ define([
                 dojo.subscribe(this.Notification.Reshuffled, this, "notif_reshuffled");
                 dojo.subscribe(this.Notification.Victory, this, "notif_victory");
 
+		this.notifqueue.setSynchronous(this.Notification.Reshuffled, 500);
 		this.notifqueue.setSynchronous(this.Notification.DrewHand, 500);
             },
 
@@ -420,10 +421,16 @@ define([
             notif_drewHand: function (notification) {
                 // console.log(this.Notification.DrewHand + ' notification');
                 // console.log(notification);
-                this.stock[this.Stock.Hand].removeAll();
-                this.addCardsToStock(this.stock[this.Stock.Hand], notification.args.cards);
-                this.stock[this.Stock.Discard].removeAll();
-                this.addCardsToStock(this.stock[this.Stock.Discard], notification.args.discard);
+		// move all items from hand to discard
+		// this is an array!
+		for (var card of this.stock[this.Stock.Hand].getAllItems()) {
+		    this.moveVisibleToVisible(this.Stock.Hand, this.Stock.Discard, card);
+		}
+		// move all new cards into hand
+		// this is an object!
+		for (var keys in notification.args.cards) {
+		    this.moveVisibleToVisible(this.Stock.Deck, this.Stock.Hand, notification.args.cards[keys]);
+		}
                 this.updateCounter(notification.args.counters);
             },
 
@@ -443,7 +450,9 @@ define([
 
             notif_reshuffled: function () {
 		// move all cards from discard to deck
-		this.stock[this.Stock.Discard].removeAllTo(this.Stock.Deck);
+		for (var card of this.stock[this.Stock.Discard].getAllItems()) {
+		    this.moveVisibleToVisible(this.Stock.Discard, this.Stock.Deck, card);
+		}
 		// update counters comes in separate notification
             },
 
