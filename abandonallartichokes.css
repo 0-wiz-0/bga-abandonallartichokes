@@ -142,11 +142,14 @@
     /* for width 150px: */
     /* max-width: 770px; */
 }
-/*
-#compost {
+
+#compost_area {
     background-color: var(--compost);
+    /* stock adds 5 padding to bottom */
+    padding: 10px 10px 5px 10px;
+    border-radius: 10px;
 }
-*/
+
 #garden_stack_counter {
     background-color: var(--garden);
     margin-bottom: 5px;

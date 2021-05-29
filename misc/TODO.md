@@ -21,8 +21,6 @@ New comments
   - log
   - (message?)
 - show winning hand/(all hands?)
-- compost background
-- text in (garden row)/compost
 - spread out discard pile? (#41702)
   - no, but perhaps tooltip with card counts?
 - mark displayed cards as other players' discard pile etc (#41753)
@@ -77,3 +75,5 @@ Comments from players that will for now not be implemented
 - Include which cards can be played when players turn comes up.
   -> would mean implementing whole logic on javascript side again,
   and server tells you quickly enough if you try making invalid moves
+- text in (garden row)/compost
+  -> I don't think it brings much, compost is now brown
