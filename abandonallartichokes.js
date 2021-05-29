@@ -32,8 +32,7 @@ define([
                 this.cardwidth = 140;
                 this.cardheight = 210;
 
-		// TODO: depending on available screen space
-		this.hand_default_overlap = 50;
+		this.hand_default_overlap = 70;
 
 		// When using spritesheets, we can't use high-resolution card images
 		// There are only around 15 images, so we use single files instead
@@ -383,6 +382,11 @@ define([
             onLeekDecline: function () {
                 this.changeState(this.AjaxActions.LeekTakeCard, {take_card: false});
             },
+
+	    // Screen Width change
+	    // onScreenWidthChange: function() {
+	    // 	this.hand_default_overlap = 100;
+	    // },
 
             // Notifications
             setupNotifications: function () {
