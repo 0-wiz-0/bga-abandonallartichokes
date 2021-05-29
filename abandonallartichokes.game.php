@@ -295,7 +295,7 @@ class AbandonAllArtichokes extends Table
         $this->cards->moveAllCardsInLocation(STOCK_HAND, $this->player_discard($player_id), $player_id, $player_id);
         // draw up to five cards
         $this->cards->pickCards(5, $this->player_deck($player_id), $player_id);
-        $this->notify_one($player_id, NOTIFICATION_DREW_HAND, '', null, array(
+        $this->notify_one($player_id, NOTIFICATION_DREW_HAND, clienttranslate('${player_name} draws cards'), null, array(
             'cards' => $this->cards->getPlayerHand($player_id),
             'discard' => $result[STOCK_DISCARD] = $this->cards->getCardsInLocation($this->player_discard($player_id)),
             'player_id' => $player_id,

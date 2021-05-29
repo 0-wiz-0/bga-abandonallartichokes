@@ -8,15 +8,7 @@ Possibly Later
 
 New comments
 ===
-- Some additional animations would be helpful:
-  - getting a new hand: card by card in quick succession from the
-    personal deck. (You can make them flip if you want but it is not
-    necessary.
-  - the same for discarding the hand after ending the turn animating
-    new card in display from deck
 - spectators get no message for eggplant passing
-- card move for shuffle/animation at turn end
-- message for draw hand
 - explicit mention who was chosen as target of card
   - log
   - (message?)
@@ -77,3 +69,10 @@ Comments from players that will for now not be implemented
   and server tells you quickly enough if you try making invalid moves
 - text in (garden row)/compost
   -> I don't think it brings much, compost is now brown
+- Some additional animations would be helpful:
+  - getting a new hand: card by card in quick succession from the
+    personal deck. (You can make them flip if you want but it is not
+    necessary.
+  - the same for discarding the hand after ending the turn animating
+    new card in display from deck
+  -> done, except for the "one by one" which is hard when using Stock
