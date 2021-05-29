@@ -648,7 +648,7 @@ class AbandonAllArtichokes extends Table
 
         $player_id = self::getCurrentPlayerId();
         $this->cards->insertCardOnExtremePosition($id, $this->player_deck($player_id), true);
-        $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} takes ${vegetable}'), $card, array(
+        $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} takes ${vegetable} and puts it on top of the deck'), $card, array(
             'destination' => STOCK_DECK,
             'destination_arg' => $player_id,
         ));
@@ -1012,7 +1012,7 @@ class AbandonAllArtichokes extends Table
         $player_id = self::getCurrentPlayerId();
         // move chosen card to deck
         $this->cards->insertCardOnExtremePosition($id, $this->player_deck($player_id), true);
-        $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} takes ${vegetable}'), $card, array(
+        $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} puts ${vegetable} on top of the deck'), $card, array(
             'destination' => STOCK_DECK,
             'destination_arg' => $player_id,
         ));
