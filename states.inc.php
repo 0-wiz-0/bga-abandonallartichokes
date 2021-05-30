@@ -66,6 +66,7 @@ if (!defined('STATE_END_GAME')) { // ensure this block is only invoked once, sin
    define("STATE_BEET_CHOOSE_OPPONENT", 14);
    define("STATE_PLAYED_CARD", 15);
    define("STATE_ZOMBIE_UNDO", 16);
+   define("STATE_RHUBARB_HARVEST_CARD", 17);
    define("STATE_END_GAME", 99);
 }
 
@@ -115,6 +116,7 @@ $machinestates = array(
             STATE_PEAS_TAKE_CARD => STATE_PEAS_TAKE_CARD,
             STATE_PEAS_CHOOSE_OPPONENT => STATE_PEAS_CHOOSE_OPPONENT,
             STATE_PEPPER_TAKE_CARD => STATE_PEPPER_TAKE_CARD,
+            STATE_RHUBARB_HARVEST_CARD => STATE_RHUBARB_HARVEST_CARD,
             STATE_PLAYED_CARD => STATE_PLAYED_CARD,
         ),
     ),
@@ -235,6 +237,16 @@ $machinestates = array(
         "type" => "game",
         "action" => "stZombieUndo",
         "transitions" => array(STATE_NEXT_PLAYER => STATE_NEXT_PLAYER),
+    ),
+
+    STATE_RHUBARB_HARVEST_CARD => array(
+        "name" => "rhubarbHarvestCard",
+        "description" => clienttranslate('${actplayer} must harvest a card from the garden row'),
+        "descriptionmyturn" => clienttranslate('${you} must harvest a card from the garden row'),
+        "type" => "activeplayer",
+        "possibleactions" => array("rhubarbHarvestCard"),
+        "transitions" => array(STATE_PLAYED_CARD => STATE_PLAYED_CARD,
+                               STATE_ZOMBIE_UNDO => STATE_ZOMBIE_UNDO),
     ),
 
     // Final state.

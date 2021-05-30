@@ -37,6 +37,7 @@ class AbandonAllArtichokes extends Table
             GAME_STATE_PLAYED_CARROT_THIS_TURN => 12,
             GAME_STATE_AUTOMATIC_PLAYER_DECISIONS => 100,
             GAME_STATE_AUTOMATIC_TURN_END => 101,
+            GAME_STATE_RHUBARB => 105,
             GAME_STATE_ARTICHOKE_COUNTS => 110,
             GAME_STATE_AUTOMATIC_CARD_DECISIONS => 199,
         ));
@@ -123,7 +124,7 @@ class AbandonAllArtichokes extends Table
                 $cards[] = array('type' => $vegetable_id, 'type_arg' => 2, 'nbr' => 2 * count($players));
                 $cards[] = array('type' => $vegetable_id, 'type_arg' => 3, 'nbr' => 2 * count($players));
                 $cards[] = array('type' => $vegetable_id, 'type_arg' => 4, 'nbr' => 2 * count($players));
-            } else {
+            } else if ($vegetable_id != VEGETABLE_RHUBARB || self::getGameStateValue(GAME_STATE_RHUBARB) > 0) {
                 // for testing only; list at least two!
                 //if (!in_array($vegetable_id, array(VEGETABLE_BEET, VEGETABLE_LEEK, VEGETABLE_ONION, VEGETABLE_PEAS))) {
                 //     continue;
@@ -317,11 +318,7 @@ class AbandonAllArtichokes extends Table
         }
 
         // refill garden row
-        $new_cards = $this->refreshGardenRow(true);
-        self::notifyAllPlayers(NOTIFICATION_REFILLED_GARDEN_ROW, '', array (
-            'new_cards' => $new_cards,
-            'garden_stack_counter' => $this->cards->countCardInLocation(STOCK_GARDEN_STACK),
-        ));
+        $this->refreshGardenRow();
 
         // switch to next player
         $player_id = self::activeNextPlayer();
@@ -360,7 +357,7 @@ class AbandonAllArtichokes extends Table
         }
     }
 
-    function refreshGardenRow($notify) {
+    function refreshGardenRow($notify_players = true) {
         // limit number of tries; especially in testing and at end of game there might be impossible cases
         $loop_count = 0;
         $finished = false;
@@ -381,7 +378,7 @@ class AbandonAllArtichokes extends Table
                 $counts = array_count_values(array_column($row_after, 'type'));
                 foreach ($counts as $count) {
                     if ($count >= 4) {
-                        if ($notify) {
+                        if ($notify_players) {
                             $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('4 or more vegetables of the same type during refresh, replacing garden row'));
                         }
                         $card_ids = array_map(function($n) { return $n['id']; }, $this->cards->getCardsInLocation(STOCK_GARDEN_ROW));
@@ -411,6 +408,13 @@ class AbandonAllArtichokes extends Table
                 array_push($new_cards, $value);
             }
         }
+        if ($notify_players) {
+            self::notifyAllPlayers(NOTIFICATION_REFILLED_GARDEN_ROW, '', array (
+                'new_cards' => $new_cards,
+                'garden_stack_counter' => $this->cards->countCardInLocation(STOCK_GARDEN_STACK),
+            ));
+        }
+
         return $new_cards;
     }
 
@@ -455,6 +459,7 @@ class AbandonAllArtichokes extends Table
             VEGETABLE_PEAS => 'playPeas',
             VEGETABLE_PEPPER => 'playPepper',
             VEGETABLE_POTATO => 'playPotato',
+            VEGETABLE_RHUBARB => 'playRhubarb',
         );
         $name = $play_actions[$card['type']];
         if ($name == null) {
@@ -1046,6 +1051,42 @@ class AbandonAllArtichokes extends Table
             $this->cards->moveCard($picked_card['id'], $this->player_discard($player_id));
             $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} discards ${vegetable}'), $picked_card, array( 'destination' => STOCK_DISCARD, 'destination_arg' => $player_id ));
         }
+
+        $this->gamestate->nextState(STATE_PLAYED_CARD);
+    }
+
+    function playRhubarb($id) {
+        if ($this->cards->countCardInLocation(STOCK_GARDEN_ROW) + $this->cards->countCardInLocation(STOCK_GARDEN_STACK) == 0) {
+            throw new BgaUserException(self::_("You can not play rhubarb if there are no cards in the garden row and garden stack"));
+        }
+        $this->play_card($id, false);
+
+        $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('Refreshing garden row for rhubarb'));
+        $garden_row = $this->cards->getCardsInLocation(STOCK_GARDEN_ROW);
+        foreach ($garden_row as $id => $card) {
+            $this->cards->insertCardOnExtremePosition($id, STOCK_GARDEN_STACK, false);
+            $this->notify_all(NOTIFICATION_CARD_MOVED, '', $card, array( 'destination' => STOCK_GARDEN_STACK ));
+        }
+        $this->refreshGardenRow();
+
+        $this->gamestate->nextState(STATE_RHUBARB_HARVEST_CARD);
+    }
+
+    function rhubarbHarvestCard($id) {
+        self::checkAction("rhubarbHarvestCard");
+        $card = $this->cards->getCard($id);
+        if ($card == null || $card['location'] != STOCK_GARDEN_ROW) {
+            throw new BgaVisibleSystemException(self::_("Choose a card from the garden row"));
+        }
+
+        $this->cards->moveCard($id, STOCK_HAND, self::getActivePlayerId());
+
+        $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} harvests ${vegetable}'), $card, array(
+            'destination' => STOCK_HAND,
+            'destination_arg' => self::getActivePlayerId(),
+        ));
+
+        $this->compost_played_card();
 
         $this->gamestate->nextState(STATE_PLAYED_CARD);
     }

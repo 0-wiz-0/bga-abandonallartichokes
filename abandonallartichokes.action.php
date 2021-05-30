@@ -140,5 +140,12 @@
           self::ajaxResponse();
       }
 
+      public function rhubarbHarvestCard() {
+          self::setAjaxMode();
+          $id = self::getArg("id", AT_posint, true);
+
+          $this->game->rhubarbHarvestCard($id);
+          self::ajaxResponse();
+      }
   }
 

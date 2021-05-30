@@ -39,6 +39,7 @@ if (!defined('GAME_STATE_PLAYED_CARROT_THIS_TURN')) { // ensure this block is on
     define("GAME_STATE_TARGET_PLAYER", "target_player");
     define("GAME_STATE_AUTOMATIC_CARD_DECISIONS", "automatic_card_decisions");
     define("GAME_STATE_AUTOMATIC_TURN_END", "automatic_turn_end");
+    define("GAME_STATE_RHUBARB", "rhubard");
     define("GAME_STATE_ARTICHOKE_COUNTS", "artichoke_counts");
     define("GAME_STATE_AUTOMATIC_PLAYER_DECISIONS", "automatic_player_decisions");
 }
@@ -55,6 +56,7 @@ if (!defined('VEGETABLE_BEET')) { // ensure this block is only invoked once, sin
    define("VEGETABLE_PEPPER", 9);
    define("VEGETABLE_POTATO", 10);
    define("VEGETABLE_ARTICHOKE", 11);
+   define("VEGETABLE_RHUBARB", 16);
 }
 
 // these definitions need to match the ones in the constructor in the JavaScript code and the ids in the template file
@@ -93,4 +95,5 @@ $this->vegetables = array(
     VEGETABLE_PEPPER => array( 'name' => clienttranslate('pepper') ),
     VEGETABLE_POTATO => array( 'name' => clienttranslate('potato') ),
     VEGETABLE_ARTICHOKE => array( 'name' => clienttranslate('artichoke') ),
+    VEGETABLE_RHUBARB => array( 'name' => clienttranslate('rhubarb') ),
 );

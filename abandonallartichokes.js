@@ -77,10 +77,11 @@ define([
                     PeasTakeCard: 'peasTakeCard',
                     PepperTakeCard: 'pepperTakeCard',
                     PlayCard: 'playCard',
+		    RhubarbHarvestCard: 'rhubarbHarvestCard',
                 };
                 this.CardBackId = 1;
 
-                //vegetable types => numbers match define in material.inc.php; this also corresponds to image order in the css sprite
+                //vegetable types => numbers match define in material.inc.php
                 this.Vegetables = {
                     BEET: 1,
                     BROCCOLI: 2,
@@ -97,7 +98,8 @@ define([
                     ARTICHOKE3: 13,
                     ARTICHOKE4: 14,
                     ARTICHOKE5: 15,
-		    BACK: 16,
+		    RHUBARB: 16,
+		    BACK: 17,
                 };
             },
 
@@ -196,8 +198,8 @@ define([
                 var stock = new ebg.stock();
                 stock.create(this, $(id), this.cardwidth, this.cardheight);
 		stock.image_items_per_row = this.image_items_per_row;
-                for (var vegetable_id = 1; vegetable_id < 16; vegetable_id++) {
-		    // 1-10: main vegetables, 11-15: artichokes
+                for (var vegetable_id = 1; vegetable_id <= 16; vegetable_id++) {
+		    // 1-10: main vegetables, 11-15: artichokes, 16: rhubarb
                     //stock.addItemType(vegetable_id, 0, g_gamethemeurl + this.spritesheet, vegetable_id - 1);
 		    // if weight is true, make artichokes lighter, so the top = most visible card is a vegetable
 		    stock.addItemType(vegetable_id, weights && (vegetable_id < 11 || vegetable_id > 15) ? 1 : 0, g_gamethemeurl + 'img/' + (vegetable_id - 1) + '.jpg');
@@ -263,6 +265,9 @@ define([
 		    } else if (this.checkAction('cornTakeCard', true)) {
 			var card_id = items[0].id;
 			this.changeState(this.AjaxActions.CornTakeCard, {id: card_id});
+		    } else if (this.checkAction('rhubarbHarvestCard', true)) {
+			var card_id = items[0].id;
+			this.changeState(this.AjaxActions.RhubarbHarvestCard, {id: card_id});
                     } else {
                         this.showMessage(_("You can't harvest cards now."), "error");
                     }
@@ -647,6 +652,8 @@ define([
 		    return _("<b>ARTICHOKE</b><hr/>Okey dokey!")
                 case this.Vegetables.ARTICHOKE5:
                     return _("<b>ARTICHOKE</b><hr/>Looking forward to being abandoned by you!")
+                case this.Vegetables.RHUBARB:
+                    return _("<b>RHUBARB</b><hr/>Compost this card to refresh the Garden Row, then harvest a card. (Place old cards under Garden Stack.)")
                 }
             },
         });

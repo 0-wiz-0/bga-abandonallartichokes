@@ -41,6 +41,14 @@ $game_options = array(
         ),
         'default' => 0,
     ),
+    105 => array(
+        'name' => totranslate('Rhubarb'),
+        'values' => array(
+            0 => array('name' => totranslate('Exclude Rhubarb promo'),  ),
+            1 => array('name' => totranslate('Add Rhubard promo'), 'description' => totranslate('Play including the Rhubard promo card')),
+        ),
+        'default' => 0,
+    ),
     110 => array(
         'name' => totranslate('Artichoke counts'),
         'values' => array(
