@@ -194,6 +194,8 @@ class AbandonAllArtichokes extends Table
         }
         $result['counters']['garden_stack'] = $this->cards->countCardInLocation(STOCK_GARDEN_STACK);
 
+        $result['artichoke_count_option'] = self::getGameStateValue(GAME_STATE_ARTICHOKE_COUNTS);
+
         return $result;
     }
 

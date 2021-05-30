@@ -107,7 +107,7 @@
 }
 
 .artichoke_hidden {
-    display: none;
+    display: none !important;
 }
 
 .artichoke_label {

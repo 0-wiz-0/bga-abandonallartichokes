@@ -118,7 +118,7 @@ define([
 
             setup: function (gamedatas) {
                 // console.log("Starting game setup");
-                // console.log(gamedatas);
+                console.log(gamedatas);
 
                 this.counter = {};
                 // Setting up player boards
@@ -130,8 +130,13 @@ define([
                     this.createCounter(player_id, 'hand');
                     this.createCounter(player_id, 'deck');
                     this.createCounter(player_id, 'discard');
-		    // only used in 'artichoke counts' option
-                    this.createCounter(player_id, 'artichokes');
+		    if (this.gamedatas.artichoke_count_option > 0) {
+			// only used in 'artichoke counts' option
+			this.createCounter(player_id, 'artichokes');
+			dojo.removeClass('optional_artichokes_' + player_id, 'artichoke_hidden');
+		    } else {
+			dojo.addClass('optional_artichokes_' + player_id, 'artichoke_hidden');
+		    }
                 }
 
 		// garden stack counter
@@ -576,10 +581,8 @@ define([
                     this.counter[player_id].hand.setValue(counters[player_id].hand);
                     this.counter[player_id].deck.setValue(counters[player_id].deck);
                     this.counter[player_id].discard.setValue(counters[player_id].discard);
-		    if (counters[player_id].artichokes >= 0) {
+		    if (this.gamedatas.artichoke_count_option > 0) {
 			this.counter[player_id].artichokes.setValue(counters[player_id].artichokes);
-		    } else {
-			dojo.style('optional_artichokes_' + player_id, 'display', 'none');
 		    }
                 }
                 this.updateDecks();
