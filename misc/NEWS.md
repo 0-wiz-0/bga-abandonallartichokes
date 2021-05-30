@@ -7,7 +7,7 @@
 - Reduce hand card overlap to improve card visibility
 - Use icons instead of text in player panels
 - Give compost a background color
-- Add garden stack count
+- Give display area a background color
 - Improve some log messages
 - Translation fix; reduce strings to translate
 - Improve animations for reshuffles and hand redraw

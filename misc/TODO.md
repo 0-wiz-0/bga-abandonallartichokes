@@ -9,6 +9,7 @@ Possibly Later
 - spread out discard pile? (#41702)
   - no, but perhaps tooltip with card counts?
 - mark displayed cards as other players' discard pile etc (#41753)
+- display garden stack count
 
 Waiting on others
 ===
