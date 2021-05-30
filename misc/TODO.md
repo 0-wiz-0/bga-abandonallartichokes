@@ -9,7 +9,6 @@ Possibly Later
 - spread out discard pile? (#41702)
   - no, but perhaps tooltip with card counts?
 - mark displayed cards as other players' discard pile etc (#41753)
-- check for display pile bug in low card count game
 
 Waiting on others
 ===
