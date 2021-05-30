@@ -1,3 +1,7 @@
+210530-2348
+===
+- Bugfix for garden row refresh
+
 210530-2133
 ===
 - Add Rhubarb promo card
