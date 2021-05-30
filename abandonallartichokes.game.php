@@ -401,13 +401,14 @@ class AbandonAllArtichokes extends Table
         }
         if ($had_to_reshuffle) {
             $new_cards_object = $this->cards->getCardsInLocation(STOCK_GARDEN_ROW);
-            return array_values($new_cards_object);
-        }
-        $new_cards = [];
-        $row_after = $this->cards->getCardsInLocation(STOCK_GARDEN_ROW);
-        foreach ($row_after as $key => $value) {
-            if (!array_key_exists($key, $row_before)) {
-                array_push($new_cards, $value);
+            $new_cards = array_values($new_cards_object);
+        } else {
+            $new_cards = [];
+            $row_after = $this->cards->getCardsInLocation(STOCK_GARDEN_ROW);
+            foreach ($row_after as $key => $value) {
+                if (!array_key_exists($key, $row_before)) {
+                    array_push($new_cards, $value);
+                }
             }
         }
         if ($notify_players) {
@@ -416,8 +417,6 @@ class AbandonAllArtichokes extends Table
                 'garden_stack_counter' => $this->cards->countCardInLocation(STOCK_GARDEN_STACK),
             ));
         }
-
-        return $new_cards;
     }
 
     function harvestCard($id) {
