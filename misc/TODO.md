@@ -10,6 +10,7 @@ Possibly Later
   - no, but perhaps tooltip with card counts?
 - mark displayed cards as other players' discard pile etc (#41753)
 - display garden stack count
+- when cards are in the display area, counts are off
 
 Waiting on others
 ===
