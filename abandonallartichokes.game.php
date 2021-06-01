@@ -279,14 +279,6 @@ class AbandonAllArtichokes extends Table
                 'player_name2' => $this->player_name($target_id),
             ));
         }
-        foreach (array_keys($players) as $player_id) {
-            $this->notify_one($player_id, NOTIFICATION_DREW_HAND, '', null, array(
-                'cards' => $this->cards->getPlayerHand($player_id),
-                'discard' => $this->cards->getCardsInLocation($this->player_discard($player_id)),
-                'player_id' => $player_id,
-                'player_name' => $this->player_name($player_id),
-            ));
-        }
 
         $this->compost_played_card();
 
