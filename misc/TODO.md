@@ -11,6 +11,7 @@ Possibly Later
 - mark displayed cards as other players' discard pile etc (#41753)
 - display garden stack count
 - when cards are in the display area, counts are off
+- make some option player options instead of game options
 
 Waiting on others
 ===
