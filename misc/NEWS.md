@@ -1,3 +1,7 @@
+210603-0034
+===
+- Bugfix for eggplant notifications
+
 210530-2348
 ===
 - Bugfix for garden row refresh
