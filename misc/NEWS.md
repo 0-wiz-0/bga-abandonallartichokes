@@ -1,3 +1,8 @@
+210603-1509
+===
+- Fix bug in deployment that limited game to three different
+  vegetables
+
 210603-0034
 ===
 - Bugfix for eggplant notifications
