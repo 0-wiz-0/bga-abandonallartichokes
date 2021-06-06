@@ -1,3 +1,7 @@
+210606-1217
+===
+- Fix typo in rhubarb game option
+
 210603-1509
 ===
 - Fix bug in deployment that limited game to three different
