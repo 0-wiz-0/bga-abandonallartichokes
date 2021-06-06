@@ -1247,7 +1247,7 @@ class AbandonAllArtichokes extends Table
         $player_no = substr($deck, 5);
         $player_id = $this->player_id_for_player_no($player_no);
         $this->notify_one($player_id, NOTIFICATION_RESHUFFLED, '');
-        $this->notify_all(NOTIFICATION_UPDATE_COUNTERS, '${player_name} shuffled the discard pile into the deck', null, array('player_id' => $player_id));
+        $this->notify_all(NOTIFICATION_UPDATE_COUNTERS, clienttranslate('${player_name} shuffled the discard pile into the deck'), null, array('player_id' => $player_id));
     }
 
     function compost_played_card() {
