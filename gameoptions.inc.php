@@ -45,7 +45,7 @@ $game_options = array(
         'name' => totranslate('Rhubarb'),
         'values' => array(
             0 => array('name' => totranslate('Exclude Rhubarb promo'),  ),
-            1 => array('name' => totranslate('Add Rhubard promo'), 'description' => totranslate('Play including the Rhubard promo card')),
+            1 => array('name' => totranslate('Add Rhubarb promo'), 'description' => totranslate('Play including the Rhubarb promo card')),
         ),
         'default' => 0,
     ),
