@@ -12,15 +12,12 @@ Possibly Later
 - display garden stack count
 - when cards are in the display area, counts are off
 - make some option player options instead of game options
+- automatically pass cards for eggplant if only one choice (#42734)
 
 Waiting on others
 ===
-- German graphics - how to integrate them?
+- German graphics
 - Tableau graphics
-
-Fixed bugs - to check
-===
-+ bug in translation: vegetable names not translated
 
 Comments from players that will for now not be implemented
 ===
