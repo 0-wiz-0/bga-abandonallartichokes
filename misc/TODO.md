@@ -10,13 +10,8 @@ Possibly Later
   - no, but perhaps tooltip with card counts?
 - mark displayed cards as other players' discard pile etc (#41753)
 - display garden stack count
-- when cards are in the display area, counts are off
 - make some option player options instead of game options
 - automatically pass cards for eggplant if only one choice (#42734)
-
-Waiting on others
-===
-- German graphics
 - Tableau graphics
 
 Comments from players that will for now not be implemented

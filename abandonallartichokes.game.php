@@ -1433,7 +1433,7 @@ class AbandonAllArtichokes extends Table
     function get_counters($player_id) {
         $result = array(
             'deck' => $this->cards->countCardInLocation($this->player_deck($player_id)),
-            'hand' => $this->cards->countCardInLocation(STOCK_HAND, $player_id),
+            'hand' => $this->cards->countCardInLocation(STOCK_HAND, $player_id) + $this->cards->countCardInLocation(STOCK_LIMBO, $player_id),
             'discard' => $this->cards->countCardInLocation($this->player_discard($player_id)),
         );
         if (self::getGameStateValue(GAME_STATE_ARTICHOKE_COUNTS) > 0) {
