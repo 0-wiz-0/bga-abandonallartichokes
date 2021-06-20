@@ -153,10 +153,21 @@ define([
                     {name: this.Stock.Compost, callback: null, selectionMode: 0, overlap: 1},
                 ];
 
+		// var lang = dojo.config.locale.substr(0, 2);
+		var lang = _("english");
+
+		if (lang == 'deutsch') {
+                    this.preventpreload('');
+		    lang_prefix = 'de_';
+		} else {
+                    this.preventpreload('de');
+		    lang_prefix = '';
+		}
+
                 const extraClasses = 'artichoke_card';
                 this.stock = {};
                 for (var stock_entry of stock_constructor) {
-                    this.stock[stock_entry.name] = this.setupCardStocks(stock_entry.name, stock_entry.callback, stock_entry.weights);
+                    this.stock[stock_entry.name] = this.setupCardStocks(stock_entry.name, stock_entry.callback, lang_prefix, stock_entry.weights);
                     this.stock[stock_entry.name].setSelectionMode(stock_entry.selectionMode);
                     this.stock[stock_entry.name].setSelectionAppearance('class');
 		    this.stock[stock_entry.name].extraClasses = extraClasses;
@@ -176,7 +187,7 @@ define([
                 this.stock[this.Stock.Deck].extraClasses = extraClasses;
                 this.stock[this.Stock.Deck].autowidth = true;
                 //this.stock[this.Stock.Deck].addItemType(this.CardBackId, 0, g_gamethemeurl + this.spritesheet, this.Vegetables.BACK - 1);
-                this.stock[this.Stock.Deck].addItemType(this.CardBackId, 0, g_gamethemeurl + 'img/' + (this.Vegetables.BACK - 1) + '.jpg');
+                this.stock[this.Stock.Deck].addItemType(this.CardBackId, 0, g_gamethemeurl + 'img/' + lang_prefix + (this.Vegetables.BACK - 1) + '.jpg');
                 this.updateDecks();
 
 		this.stock[this.Stock.Hand].setOverlap(this.hand_default_overlap);
@@ -186,6 +197,17 @@ define([
 
                 // console.log(this);
                 // console.log("Ending game setup");
+            },
+
+	    preventpreload: function(lang) {
+                var prefix = lang + '_';
+                if (lang == '') {
+		    prefix = '';
+		}
+		// include card back
+		for (var vegetable_id = 1; vegetable_id <= 17; vegetable_id++) {
+		    this.dontPreloadImage(prefix + (vegetable_id - 1) + '.jpg')
+		}
             },
 
             createCounter: function (player_id, name) {
@@ -199,7 +221,7 @@ define([
 
             // Initialize a card stock
             // Arguments: div id, function which occurs when the card selection changes
-            setupCardStocks: function (id, selectionChangeFunctionName, weights = false) {
+            setupCardStocks: function (id, selectionChangeFunctionName, lang_prefix = '', weights = false) {
                 var stock = new ebg.stock();
                 stock.create(this, $(id), this.cardwidth, this.cardheight);
 		stock.image_items_per_row = this.image_items_per_row;
@@ -207,7 +229,7 @@ define([
 		    // 1-10: main vegetables, 11-15: artichokes, 16: rhubarb
                     //stock.addItemType(vegetable_id, 0, g_gamethemeurl + this.spritesheet, vegetable_id - 1);
 		    // if weight is true, make artichokes lighter, so the top = most visible card is a vegetable
-		    stock.addItemType(vegetable_id, weights && (vegetable_id < 11 || vegetable_id > 15) ? 1 : 0, g_gamethemeurl + 'img/' + (vegetable_id - 1) + '.jpg');
+		    stock.addItemType(vegetable_id, weights && (vegetable_id < 11 || vegetable_id > 15) ? 1 : 0, g_gamethemeurl + 'img/' + lang_prefix + (vegetable_id - 1) + '.jpg');
                 }
                 if (selectionChangeFunctionName != null) {
                     dojo.connect(stock, 'onChangeSelection', this, selectionChangeFunctionName);
