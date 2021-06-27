@@ -156,9 +156,13 @@
 
 .artichoke_tray_description {
     position: absolute;
-    bottom: 10px;
+    top: 275px;
     left: 50%;
     transform: translate(-50%, -50%);
+}
+
+#tray_compost_description {
+    color: white;
 }
 
 #garden_area {

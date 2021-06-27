@@ -195,6 +195,11 @@ define([
 		this.showDisplayedArea();
                 this.setupNotifications();
 
+		// replace hard-coded text with translations
+		$('tray_discard_description').innerHTML = _("Discard Pile");
+		$('tray_deck_description').innerHTML = _("Draw Pile");
+		$('tray_compost_description').innerHTML = _("Compost");
+
                 // console.log(this);
                 // console.log("Ending game setup");
             },
