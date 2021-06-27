@@ -68,7 +68,8 @@
 */
 
 :root {
-    --compost: #895614; /* #704711; */
+    /* --compost: #895614; /* #704711; */
+    --compost: #a5682a;
     --garden: #3bc83b;
     --cardBack: 172, 203, 70;
 }
@@ -88,6 +89,7 @@
 
 .artichoke_deck_space_right {
     margin-right: 20px;
+    left: 50px;
 }
 
 .artichoke_flex_away {
@@ -123,8 +125,40 @@
     margin-right: 40px;
 }
 
-#played_card {
-    filter: grayscale(100%);
+#compost_area {
+    background-color: var(--compost);
+    /* stock adds 5 padding to bottom */
+    padding: 10px 10px 5px 10px;
+    border-radius: 10px;
+}
+
+.artichoke_tray {
+    position: relative;
+    width: 254px;
+    height: 300px;
+}
+
+#tray_discard {
+    background: url('img/tray_discard.jpg');
+    background-size: cover;
+}
+
+#tray_deck {
+    background: url('img/tray_draw.jpg');
+    background-size: cover;
+}
+
+.artichoke_cards_on_tray {
+    position: absolute;
+    top: 29px;
+    left: 56px;
+}
+
+.artichoke_tray_description {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 #garden_area {
@@ -143,19 +177,16 @@
     /* max-width: 770px; */
 }
 
-#compost_area {
-    background-color: var(--compost);
-    /* stock adds 5 padding to bottom */
-    padding: 10px 10px 5px 10px;
-    border-radius: 10px;
-}
-
 #garden_stack_counter {
     background-color: var(--garden);
     margin-bottom: 5px;
     border-radius: 20px;
     //border: 1px solid black;
     padding: 10px;
+}
+
+#played_card {
+    filter: grayscale(100%);
 }
 
 /***** PLAYER PANEL ****/

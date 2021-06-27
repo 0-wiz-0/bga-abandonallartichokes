@@ -14,6 +14,12 @@ Possibly Later
 - automatically pass cards for eggplant if only one choice (#42734)
 - Tableau graphics
 
+New
+===
+- Can I suggest to have timer (ie 2 seconds) when playing leek, potatoes or beet
+- Is it possible to see all the discard piles ?
+- For beet card can we see the 2 cards before compost or swapping ?
+
 Comments from players that will for now not be implemented
 ===
 - you can only see in the log who selects who
