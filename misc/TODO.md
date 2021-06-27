@@ -12,13 +12,6 @@ Possibly Later
 - display garden stack count
 - make some option player options instead of game options
 - automatically pass cards for eggplant if only one choice (#42734)
-- Tableau graphics
-
-New
-===
-- Can I suggest to have timer (ie 2 seconds) when playing leek, potatoes or beet
-- Is it possible to see all the discard piles ?
-- For beet card can we see the 2 cards before compost or swapping ?
 
 Comments from players that will for now not be implemented
 ===
@@ -68,3 +61,9 @@ Comments from players that will for now not be implemented
   - the same for discarding the hand after ending the turn animating
     new card in display from deck
   -> done, except for the "one by one" which is hard when using Stock
+- Can I suggest to have timer (ie 2 seconds) when playing leek, potatoes or beet
+  -> no, only slows game down, see log; leek is shown already
+- Is it possible to see all the discard piles ?
+  -> no, not in rules
+- For beet card can we see the 2 cards before compost or swapping ?
+  -> no, see log
