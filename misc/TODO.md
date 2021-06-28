@@ -12,6 +12,7 @@ Possibly Later
 - display garden stack count
 - make some option player options instead of game options
 - automatically pass cards for eggplant if only one choice (#42734)
+- show garden stack
 
 Comments from players that will for now not be implemented
 ===
