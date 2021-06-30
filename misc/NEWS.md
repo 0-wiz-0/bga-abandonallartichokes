@@ -1,3 +1,10 @@
+210627-1819
+===
+- add graphics for discard/draw trays
+- show German card pictures when playing in German
+- translation bugfix
+- card count bugfix
+
 210606-1217
 ===
 - Fix typo in rhubarb game option
