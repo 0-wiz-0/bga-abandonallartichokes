@@ -441,6 +441,7 @@ define([
 
 		this.notifqueue.setSynchronous(this.Notification.Reshuffled, 500);
 		this.notifqueue.setSynchronous(this.Notification.DrewHand, 500);
+		this.notifqueue.setSynchronous(this.Notification.CardMoved, 500);
             },
 
             notif_cardMoved: function (notification) {
@@ -519,6 +520,7 @@ define([
 		if (force || this.stock[this.Stock.DisplayedCard].count() > 0) {
 		    dojo.removeClass('displayed_card_area', 'artichoke_hidden');
 		} else {
+
 		    dojo.addClass('displayed_card_area', 'artichoke_hidden');
 		}
             },
@@ -541,7 +543,7 @@ define([
                     }
                 }
 		// if there are no more cards in the display area, hide it
-		this.showDisplayedArea();
+		setTimeout(() => this.showDisplayedArea(), 500);
 
                 this.updateCounter(counters);
             },
