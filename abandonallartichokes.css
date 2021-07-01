@@ -125,11 +125,18 @@
     margin-right: 40px;
 }
 
+#left_part {
+  margin-bottom: 15px;
+}
+
+#player_area {
+    flex-wrap: wrap;
+}
+
 #compost_area {
     background-color: var(--compost);
-    /* stock adds 5 padding to bottom */
-    padding: 10px 10px 5px 10px;
     border-radius: 10px;
+    margin-left: 15px;
 }
 
 .artichoke_tray {

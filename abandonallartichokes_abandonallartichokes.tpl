@@ -27,7 +27,7 @@ var jstpl_fake_card = "<div id=\"${id}\" class=\"stockitem\" style=\"top:${top}p
     <div id="hand" class="artichoke_space_right"></div>
     <div id="played_card"></div>
   </div>
-  <div id="player_area" class="artichoke_flex_away">
+  <div id="player_area" class="artichoke_flex_center">
     <div id="left_part" class="artichoke_flex_center">
       <div id="tray_discard" class="artichoke_tray">
 	<div id="discard" class="artichoke_cards_on_tray artichoke_cardmin artichoke_deck_space_right"></div>
@@ -38,11 +38,9 @@ var jstpl_fake_card = "<div id=\"${id}\" class=\"stockitem\" style=\"top:${top}p
 	<span class="artichoke_tray_description" id="tray_deck_description">Draw Pile</span>
       </div>
     </div>
-    <div id="compost_area" class="artichoke_flex_center">
-      <div id="tray_compost" class="artichoke_tray">
-	<div id="compost" class="artichoke_cards_on_tray artichoke_cardmin"></div>
-	<span class="artichoke_tray_description" id="tray_compost_description">Compost</span>
-      </div>
+    <div id="compost_area" class="artichoke_tray">
+      <div id="compost" class="artichoke_cards_on_tray artichoke_cardmin"></div>
+      <span class="artichoke_tray_description" id="tray_compost_description">Compost</span>
     </div>
   </div>
 </div>
