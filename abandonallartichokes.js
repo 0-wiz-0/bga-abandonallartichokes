@@ -197,7 +197,7 @@ define([
 
 		// replace hard-coded text with translations
 		$('tray_discard_description').innerHTML = _("Discard Pile");
-		$('tray_deck_description').innerHTML = _("Draw Pile");
+		$('tray_deck_description').innerHTML = _("Deck");
 		$('tray_compost_description').innerHTML = _("Compost");
 
                 // console.log(this);

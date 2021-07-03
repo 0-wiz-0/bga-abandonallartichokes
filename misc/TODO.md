@@ -13,6 +13,7 @@ Possibly Later
 - make some option player options instead of game options
 - automatically pass cards for eggplant if only one choice (#42734)
 - show garden stack
+- Hovertext to identify draw/hand/discard piles in player tiles would help beginners
 
 Comments from players that will for now not be implemented
 ===
@@ -68,3 +69,5 @@ Comments from players that will for now not be implemented
   -> no, not in rules
 - For beet card can we see the 2 cards before compost or swapping ?
   -> no, see log
+- Undo button needed for some actions.
+  -> out of scope

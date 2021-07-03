@@ -35,7 +35,7 @@ var jstpl_fake_card = "<div id=\"${id}\" class=\"stockitem\" style=\"top:${top}p
       </div>
       <div id="tray_deck" class="artichoke_tray">
 	<div id="deck" class="artichoke_cards_on_tray artichoke_cardmin"></div>
-	<span class="artichoke_tray_description" id="tray_deck_description">Draw Pile</span>
+	<span class="artichoke_tray_description" id="tray_deck_description">Deck</span>
       </div>
     </div>
     <div id="compost_area" class="artichoke_tray">
