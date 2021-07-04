@@ -142,7 +142,7 @@ define([
 		// garden stack counter
                 this.counter.garden_stack = new ebg.counter();
                 this.counter.garden_stack.create('garden_stack_counter');
-		this.counter.garden_stack.setValue(this.gamedatas.counters.garden_stack);
+		        this.counter.garden_stack.setValue(this.gamedatas.counters.garden_stack);
 
                 const stock_constructor = [
                     {name: this.Stock.GardenRow, callback: 'onGardenRowSelect', selectionMode: 1},
@@ -178,17 +178,12 @@ define([
                     this.addCardsToStock(this.stock[stock_entry.name], this.gamedatas[stock_entry.name]);
                 }
 
-                // draw deck is special, we only show card backs
-                this.stock[this.Stock.Deck] = new ebg.stock();
-                this.stock[this.Stock.Deck].create(this, $(this.Stock.Deck), this.cardwidth, this.cardheight);
-		this.stock[this.Stock.Deck].image_items_per_row = this.image_items_per_row;
-                this.stock[this.Stock.Deck].setSelectionMode(0);
-                this.stock[this.Stock.Deck].setOverlap(1);
-                this.stock[this.Stock.Deck].extraClasses = extraClasses;
-                this.stock[this.Stock.Deck].autowidth = true;
-                //this.stock[this.Stock.Deck].addItemType(this.CardBackId, 0, g_gamethemeurl + this.spritesheet, this.Vegetables.BACK - 1);
-                this.stock[this.Stock.Deck].addItemType(this.CardBackId, 0, g_gamethemeurl + 'img/' + lang_prefix + (this.Vegetables.BACK - 1) + '.jpg');
+
+                this.makeStockWithCardBack(this.Stock.Deck, extraClasses);
                 this.updateDecks();
+                this.makeStockWithCardBack(this.Stock.GardenStack, extraClasses);
+                this.updateGardenStack();
+
 
 		this.stock[this.Stock.Hand].setOverlap(this.hand_default_overlap);
 
@@ -203,6 +198,18 @@ define([
                 // console.log(this);
                 // console.log("Ending game setup");
             },
+
+        makeStockWithCardBack: function(stockName, extraClasses) {
+            // draw deck is special, we only show card backs
+            this.stock[stockName] = new ebg.stock();
+            this.stock[stockName].create(this, $(stockName), this.cardwidth, this.cardheight);
+            this.stock[stockName].image_items_per_row = this.image_items_per_row;
+            this.stock[stockName].setOverlap(1);
+            this.stock[stockName].setSelectionMode(0);
+            this.stock[stockName].extraClasses = extraClasses;
+            this.stock[stockName].autowidth = true;
+            this.stock[stockName].addItemType(this.CardBackId, 0, g_gamethemeurl + 'img/' + lang_prefix + (this.Vegetables.BACK - 1) + '.jpg');
+        },
 
 	    preventpreload: function(lang) {
                 var prefix = lang + '_';
@@ -424,9 +431,9 @@ define([
             },
 
 	    // Screen Width change
-	    // onScreenWidthChange: function() {
-	    // 	this.hand_default_overlap = 100;
-	    // },
+	  /*  onScreenWidthChange: function() {
+	    //this.hand_default_overlap = 100;
+	     },*/
 
             // Notifications
             setupNotifications: function () {
@@ -456,6 +463,7 @@ define([
 		if (notification.args.garden_stack_counter) {
 		    this.counter.garden_stack.setValue(notification.args.garden_stack_counter);
 		}
+		this.updateGardenStack();
             },
 
             notif_drewHand: function (notification) {
@@ -481,11 +489,12 @@ define([
                     this.stock[this.Stock.GardenRow].removeAll();
                 }
                 for (var card of notification.args.new_cards) {
-                    this.stock[this.Stock.GardenRow].addToStockWithId(card.type, card.id);
+                    this.stock[this.Stock.GardenRow].addToStockWithId(card.type, card.id, this.Stock.GardenStack);
                 }
-		if (notification.args.garden_stack_counter) {
-		    this.counter.garden_stack.setValue(notification.args.garden_stack_counter);
-		}
+                if (notification.args.garden_stack_counter) {
+                    this.counter.garden_stack.setValue(notification.args.garden_stack_counter);
+                }
+                this.updateGardenStack();
             },
 
             notif_reshuffled: function () {
@@ -551,7 +560,6 @@ define([
             isVisible: function (location, location_arg) {
                 switch (location) {
                 case this.Stock.GardenStack:
-                    return false;
                 case this.Stock.GardenRow:
                 case this.Stock.DisplayedCard:
                 case this.Stock.PlayedCard:
@@ -574,11 +582,11 @@ define([
             },
 
             moveVisibleToVisible: function (from, to, card) {
-                if (from == this.Stock.Deck) {
-                    // the draw deck only shows a card back, so we can not move from a specific card
+                if (from == this.Stock.Deck || from == this.Stock.GardenStack) {
+                    // the draw deck or the gardenStack only shows a card back, so we can not move from a specific card
                     // also, we don't have to remove it
                     this.stock[to].addToStockWithId(card.type, card.id, from);
-                } else if (to == this.Stock.Deck) { // visibility already checked
+                } else if (to == this.Stock.Deck || to == this.Stock.GardenStack) { // visibility already checked
                     //this.slideToObject(from + '_item_' + card.id, to);
                     this.stock[from].removeFromStockById(card.id, to);
                 } else {
@@ -620,28 +628,42 @@ define([
             updateDecks: function () {
 		// for spectators, do nothing
 		if (this.isSpectator) return;
-              	//update deck according to counter
-		deck_target = this.counter[this.player_id].deck.getValue();
-		deck_status = this.stock[this.Stock.Deck].count();
-		while (deck_status < deck_target) {
-		    this.stock[this.Stock.Deck].addToStock(this.CardBackId);
-		    deck_status++;
-		}
-		if (deck_status > deck_target) {
-		    if (deck_target == 0) {
-			this.stock[this.Stock.Deck].removeAll();
-		    } else {
-			while (deck_status > deck_target) {
-			    this.stock[this.Stock.Deck].removeFromStock(this.CardBackId);
-			    deck_status--;
-			}
-		    }
-		}
+            this.updateDecksAccordingToCounter(this.counter[this.player_id].deck.getValue(), this.Stock.Deck);
                 // clean out discard if no cards there
                 if (this.counter[this.player_id].discard.getValue() == 0) {
                     this.stock[this.Stock.Discard].removeAll();
                 }
             },
+
+        updateGardenStack: function () {
+                this.updateDecksAccordingToCounter(this.counter.garden_stack.getValue(), this.Stock.GardenStack);
+           /* this.stock[this.Stock.GardenStack].removeAll();
+            const gardenStackCounter = this.gamedatas.counters.garden_stack >= 10? 10 : this.gamedatas.counters.garden_stack;
+            for (i = 0; i <= gardenStackCounter; i++) {
+                this.stock[this.Stock.GardenStack].addToStock(this.CardBackId);
+            }*/
+        },
+
+        //util function
+        updateDecksAccordingToCounter(counter, stockName) {
+            const counterWithLimit = counter >= 10? 10 : counter;
+            //deck_target = this.counter[this.player_id].deck.getValue();
+            let stockCount = this.stock[stockName].count();
+            while (stockCount < counterWithLimit) {
+                this.stock[stockName].addToStock(this.CardBackId);
+                stockCount++;
+            }
+            if (stockCount > counterWithLimit) {
+                if (counterWithLimit == 0) {
+                    this.stock[stockName].removeAll();
+                } else {
+                    while (stockCount > counterWithLimit) {
+                        this.stock[stockName].removeFromStock(this.CardBackId);
+                        stockCount--;
+                    }
+                }
+            }
+        },
 
 	    setupNewCard: function(card_div, card_type_id, card_id) {
 		if (card_type_id >= this.Vegetables.ARTICHOKE1) {

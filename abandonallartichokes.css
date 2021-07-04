@@ -125,18 +125,26 @@
     margin-right: 40px;
 }
 
-#left_part {
-  margin-bottom: 15px;
+@media screen and (max-width:1320px) {
+    .decks_area {
+        flex-direction: column;
+    }
+    .personal_decks {
+        margin-bottom: 15px;
+    }
 }
 
-#player_area {
-    flex-wrap: wrap;
-}
 
 #compost_area {
     background-color: var(--compost);
-    border-radius: 10px;
-    margin-left: 30px;
+    border-bottom-left-radius: 10px;
+    border-top-left-radius: 10px;
+}
+
+#garden_stack_area {
+    background-color: var(--garden);
+    border-bottom-right-radius: 10px;
+    border-top-right-radius: 10px;
 }
 
 .artichoke_tray {
@@ -168,9 +176,11 @@
     transform: translate(-50%, -50%);
 }
 
-#tray_compost_description {
+#tray_compost_description, #tray_garden_stack_description {
     color: white;
 }
+
+
 
 #garden_area {
     background-color: var(--garden);
@@ -188,12 +198,13 @@
     /* max-width: 770px; */
 }
 
+
 #garden_stack_counter {
-    background-color: var(--garden);
-    margin-bottom: 5px;
-    border-radius: 20px;
-    //border: 1px solid black;
-    padding: 10px;
+    color: white;
+    position: absolute;
+    top: 275px;
+    right: 5%;
+    transform: translate(-50%, -50%);
 }
 
 #played_card {

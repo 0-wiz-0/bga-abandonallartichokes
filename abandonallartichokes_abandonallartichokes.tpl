@@ -14,8 +14,7 @@ var jstpl_fake_card = "<div id=\"${id}\" class=\"stockitem\" style=\"top:${top}p
 </script>
 
 <div id="table">
-  <div class="artichoke_flex_column">
-    <div id="garden_stack_counter" class="artichoke_hidden">60</div>
+  <div class="artichoke_flex_center">
     <div id="garden_area">
       <div id="garden_row"></div>
     </div>
@@ -27,8 +26,8 @@ var jstpl_fake_card = "<div id=\"${id}\" class=\"stockitem\" style=\"top:${top}p
     <div id="hand" class="artichoke_space_right"></div>
     <div id="played_card"></div>
   </div>
-  <div id="player_area" class="artichoke_flex_center">
-    <div id="left_part" class="artichoke_flex_center">
+  <div class="decks_area artichoke_flex_away">
+    <div class="personal_decks artichoke_flex_center">
       <div id="tray_discard" class="artichoke_tray">
 	<div id="discard" class="artichoke_cards_on_tray artichoke_cardmin artichoke_deck_space_right"></div>
 	<span class="artichoke_tray_description" id="tray_discard_description">Discard Pile</span>
@@ -38,9 +37,16 @@ var jstpl_fake_card = "<div id=\"${id}\" class=\"stockitem\" style=\"top:${top}p
 	<span class="artichoke_tray_description" id="tray_deck_description">Deck</span>
       </div>
     </div>
-    <div id="compost_area" class="artichoke_tray">
-      <div id="compost" class="artichoke_cards_on_tray artichoke_cardmin"></div>
-      <span class="artichoke_tray_description" id="tray_compost_description">Compost</span>
+    <div class="common_decks artichoke_flex_center">
+      <div id="compost_area" class="artichoke_tray">
+        <div id="compost" class="artichoke_cards_on_tray artichoke_cardmin"></div>
+        <span class="artichoke_tray_description" id="tray_compost_description">Compost</span>
+      </div>
+      <div id="garden_stack_area" class="artichoke_tray">
+        <div id="garden_stack" class="artichoke_cards_on_tray artichoke_cardmin"></div>
+        <span class="artichoke_tray_description" id="tray_garden_stack_description">Garden Stack</span>
+        <span id="garden_stack_counter">60</span>
+      </div>
     </div>
   </div>
 </div>
