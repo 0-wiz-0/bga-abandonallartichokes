@@ -3,9 +3,9 @@
 <script type="text/javascript">
 
 var jstpl_player_board = '<div class="artichoke_deck_board">\
-    <div class="artichoke_label_line"><div class="label artichoke_label"><img class="artichoke_icon" src="{GAMETHEMEURL}img/pile.svg"/></div><div id="deck_${id}">0</div></div>\
-    <div class="artichoke_label_line"><div class="label artichoke_label"><img class="artichoke_icon" src="{GAMETHEMEURL}img/hand.svg"/></div><div id="hand_${id}">0</div></div>\
-    <div class="artichoke_label_line"><div class="label artichoke_label"><img class="artichoke_icon" src="{GAMETHEMEURL}img/discard.svg"/></div><div id="discard_${id}">0</div></div>\
+    <div class="artichoke_label_line"><div class="label artichoke_label" id="label_deck_${id}"><img class="artichoke_icon" src="{GAMETHEMEURL}img/pile.svg"/></div><div id="deck_${id}">0</div></div>\
+    <div class="artichoke_label_line"><div class="label artichoke_label" id="label_hand_${id}"><img class="artichoke_icon" src="{GAMETHEMEURL}img/hand.svg"/></div><div id="hand_${id}">0</div></div>\
+    <div class="artichoke_label_line"><div class="label artichoke_label" id="label_discard_${id}"><img class="artichoke_icon" src="{GAMETHEMEURL}img/discard.svg"/></div><div id="discard_${id}">0</div></div>\
     <div class="artichoke_label_line artichoke_hidden" id="optional_artichokes_${id}"><div class="label artichoke_label"><img class="artichoke_icon" src="{GAMETHEMEURL}img/artichoke.svg"/></div><div id="artichokes_${id}">-</div></div>\
 </div>';
 

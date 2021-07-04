@@ -9,11 +9,11 @@ Possibly Later
 - spread out discard pile? (#41702)
   - no, but perhaps tooltip with card counts?
 - mark displayed cards as other players' discard pile etc (#41753)
-- display garden stack count
 - make some option player options instead of game options
 - automatically pass cards for eggplant if only one choice (#42734)
-- show garden stack
-- Hovertext to identify draw/hand/discard piles in player tiles would help beginners
+- add label to displayed area to show what it displays
+- don't show trays for spectator (remove hand area too?)
+- improve draw hands animation
 
 Comments from players that will for now not be implemented
 ===

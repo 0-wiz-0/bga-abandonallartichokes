@@ -455,7 +455,7 @@ define([
 
 		this.notifqueue.setSynchronous(this.Notification.Reshuffled, 500);
 		this.notifqueue.setSynchronous(this.Notification.DrewHand, 500);
-		this.notifqueue.setSynchronous(this.Notification.CardMoved, 500);
+		this.notifqueue.setSynchronous(this.Notification.CardMoved, 600);
             },
 
             notif_cardMoved: function (notification) {
@@ -551,15 +551,15 @@ define([
                     if (this.isVisible(to, to_arg)) {
                         this.moveVisibleToVisible(from, to, card);
                     } else {
-                        this.moveVisibleToPanel(from, player_id, card);
+                        this.moveVisibleToPanel(from, to_arg, card);
                     }
                 } else {
                     if (this.isVisible(to, to_arg)) {
-                        this.movePanelToVisible(player_id, to, card);
+                        this.movePanelToVisible(from_arg, to, card);
                     }
                 }
 		// if there are no more cards in the display area, hide it
-		setTimeout(() => this.showDisplayedArea(), 500);
+		setTimeout(() => this.showDisplayedArea(), 1000);
 
                 this.updateCounter(counters);
             },
@@ -673,7 +673,8 @@ define([
         },
 
 	    setupNewCard: function(card_div, card_type_id, card_id) {
-		if (card_type_id >= this.Vegetables.ARTICHOKE1) {
+		if (card_type_id >= this.Vegetables.ARTICHOKE1
+		   && card_type_id != this.Vegetables.RHUBARB) {
 		    this.addTooltip(card_div.id, this.getVegetableInfoText(card_type_id), "");
 		} else {
 		    this.addTooltip(card_div.id, "", this.getVegetableInfoText(card_type_id));
