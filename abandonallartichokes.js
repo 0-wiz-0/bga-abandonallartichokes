@@ -137,6 +137,12 @@ define([
 		    } else {
 			dojo.addClass('optional_artichokes_' + player_id, 'artichoke_hidden');
 		    }
+		    this.addTooltip('label_hand_' + player_id, dojo.string.substitute( _("Number of cards in ${player_name}'s hand"), {
+			player_name: this.gamedatas.players[player_id].name }), "");
+		    this.addTooltip('label_deck_' + player_id, dojo.string.substitute( _("Number of cards in ${player_name}'s deck"), {
+			player_name: this.gamedatas.players[player_id].name }), "");
+		    this.addTooltip('label_discard_' + player_id, dojo.string.substitute( _("Number of cards in ${player_name}'s discard pile"), {
+			player_name: this.gamedatas.players[player_id].name }), "");
                 }
 
 		// garden stack counter
