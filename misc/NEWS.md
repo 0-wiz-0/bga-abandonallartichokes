@@ -1,9 +1,17 @@
+210xxx-xxxx
+===
+- Improve animations
+- Add pile for garden stack
+- Move compost so it does not overlap with log
+- Add tooltips to player tableaus
+- Fix deck description
+
 210627-1819
 ===
-- add graphics for discard/draw trays
-- show German card pictures when playing in German
-- translation bugfix
-- card count bugfix
+- Add graphics for discard/deck trays
+- Show German card pictures when playing in German
+- Translation bugfix
+- Card count bugfix
 
 210606-1217
 ===

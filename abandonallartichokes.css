@@ -202,9 +202,10 @@
 #garden_stack_counter {
     color: white;
     position: absolute;
-    top: 275px;
-    right: 5%;
-    transform: translate(-50%, -50%);
+    top: 112px;
+    right: 56px;
+    z-index: 100;
+    font-size: 32px;
 }
 
 #played_card {

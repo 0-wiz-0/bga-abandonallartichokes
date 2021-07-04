@@ -1,17 +1,13 @@
 Possibly Later
 ===
 - display other player's played cards somewhere/somehow differently?
-- reduce card overlap on big screens: need to find out how to get real
-  screensize through bga's zoom feature, then write
-  onScreenWidthChange handler
 - spectators get no message for eggplant passing
 - show winning hand?/(all hands?)
 - spread out discard pile? (#41702)
   - no, but perhaps tooltip with card counts?
-- mark displayed cards as other players' discard pile etc (#41753)
+- add label to displayed area to show what it displays (#41753)
 - make some option player options instead of game options
 - automatically pass cards for eggplant if only one choice (#42734)
-- add label to displayed area to show what it displays
 - don't show trays for spectator (remove hand area too?)
 - improve draw hands animation
 

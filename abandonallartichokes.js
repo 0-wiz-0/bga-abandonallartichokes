@@ -643,7 +643,12 @@ define([
             },
 
         updateGardenStack: function () {
-                this.updateDecksAccordingToCounter(this.counter.garden_stack.getValue(), this.Stock.GardenStack);
+            this.updateDecksAccordingToCounter(this.counter.garden_stack.getValue(), this.Stock.GardenStack);
+	    remaining = this.counter.garden_stack.getValue() > 10 ? 10 : this.counter.garden_stack.getValue();
+	    if (remaining < 10) {
+		offset = 66 + 6 * (10 - remaining);
+		$('garden_stack_counter').style.right = offset + 'px';
+	    }
            /* this.stock[this.Stock.GardenStack].removeAll();
             const gardenStackCounter = this.gamedatas.counters.garden_stack >= 10? 10 : this.gamedatas.counters.garden_stack;
             for (i = 0; i <= gardenStackCounter; i++) {
