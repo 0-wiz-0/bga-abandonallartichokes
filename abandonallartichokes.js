@@ -200,6 +200,7 @@ define([
 		$('tray_discard_description').innerHTML = _("Discard Pile");
 		$('tray_deck_description').innerHTML = _("Deck");
 		$('tray_compost_description').innerHTML = _("Compost");
+		$('tray_garden_stack_description').innerHTML = _("Garden Stack");
 
                 // console.log(this);
                 // console.log("Ending game setup");
