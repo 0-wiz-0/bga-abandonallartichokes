@@ -1029,9 +1029,8 @@ class AbandonAllArtichokes extends Table
 
         $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('Refreshing garden row for rhubarb'));
         $garden_row = $this->cards->getCardsInLocation(STOCK_GARDEN_ROW);
-        foreach ($garden_row as $id => $card) {
+        foreach (array_keys($garden_row) as $id) {
             $this->cards->insertCardOnExtremePosition($id, STOCK_GARDEN_STACK, false);
-            $this->notify_all(NOTIFICATION_CARD_MOVED, '', $card, array( 'destination' => STOCK_GARDEN_STACK ));
         }
         $this->refreshGardenRow();
 

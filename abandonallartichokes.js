@@ -514,7 +514,7 @@ define([
                 // console.log(this.Notification.RefilledGardenRow + ' notification');
                 // console.log(notification);
                 if (notification.args.new_cards.length >= 5) {
-                    this.stock[this.Stock.GardenRow].removeAll();
+                    this.stock[this.Stock.GardenRow].removeAllTo(this.Stock.GardenStack);
                 }
                 for (var card of notification.args.new_cards) {
                     this.stock[this.Stock.GardenRow].addToStockWithId(parseInt(card.type), card.id, this.Stock.GardenStack);
