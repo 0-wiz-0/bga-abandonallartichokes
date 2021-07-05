@@ -486,26 +486,18 @@ class AbandonAllArtichokes extends Table
 
     function beetChooseOpponent($opponent_id) {
         self::checkAction("beetChooseOpponent");
+        $opponent_hand = $this->cards->getPlayerHand($opponent_id);
+        if (count($opponent_hand) < 1) {
+            throw new BgaUserException(self::_("Beet can only be played on an opponent with cards in hand"));
+        }
+        $opponent_card = $this->cards->getCard(array_rand($opponent_hand, 1));
         $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('${player_name} chooses ${player_name2} as target for ${vegetable}'), null,
                           array( 'vegetable' => $this->vegetables[VEGETABLE_BEET]['name'],
                                  'player_name2' => $this->player_name($opponent_id),
                           ));
         $hand = $this->cards->getPlayerHand(self::getActivePlayerId());
         $card = $this->cards->getCard(array_rand($hand, 1));
-        $opponent_hand = $this->cards->getPlayerHand($opponent_id);
-        if (count($opponent_hand) < 1) {
-            throw new BgaUserException(self::_("Beet can only be played on an opponent with cards in hand"));
-        }
-        $opponent_card = $this->cards->getCard(array_rand($opponent_hand, 1));
         $this->beetHandleDrawnCards($card, $opponent_card, $opponent_id);
-
-        $played_card = $this->get_played_card();
-
-        $this->cards->moveCard($played_card['id'], $this->player_discard(self::getActivePlayerId()));
-        $this->notify_all(NOTIFICATION_CARD_MOVED, '', $played_card, array(
-            'destination' => STOCK_DISCARD,
-            'destination_arg' => self::getActivePlayerId(),
-        ));
 
         $this->gamestate->nextState(STATE_PLAYED_CARD);
     }
