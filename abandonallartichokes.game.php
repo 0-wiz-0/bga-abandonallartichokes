@@ -957,7 +957,6 @@ class AbandonAllArtichokes extends Table
         // move cards to display
         $cards = array();
         foreach ($available_types as $type => $id) {
-            $this->cards->moveCard($id, STOCK_DISPLAYED_CARD);
             array_push($cards, $this->cards->getCard($id));
         }
         $this->notify_all(NOTIFICATION_MULTIPLE_CARDS_MOVED, '', null, array(
@@ -967,6 +966,9 @@ class AbandonAllArtichokes extends Table
                 'destination' => STOCK_DISPLAYED_CARD,
         ));
 
+        foreach ($available_types as $type => $id) {
+            $this->cards->moveCard($id, STOCK_DISPLAYED_CARD);
+        }
         $this->gamestate->nextState(STATE_PEPPER_TAKE_CARD);
     }
 
