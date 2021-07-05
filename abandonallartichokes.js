@@ -119,7 +119,7 @@ define([
 
             setup: function (gamedatas) {
                 // console.log("Starting game setup");
-                console.log(gamedatas);
+                // console.log(gamedatas);
 
                 this.counter = {};
                 // Setting up player boards
@@ -476,8 +476,8 @@ define([
             },
 
 	    notif_multipleCardsMoved: function (notification) {
-                 console.log(this.Notification.MultipleCardsMoved + ' notification');
-                console.log(notification);
+                // console.log(this.Notification.MultipleCardsMoved + ' notification');
+                //console.log(notification);
 		// array
                 for (var card of notification.args.moved_cards) {
 		    // for five types of artichokes, add type_arg
