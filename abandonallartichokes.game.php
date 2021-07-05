@@ -257,19 +257,26 @@ class AbandonAllArtichokes extends Table
             $cards = $this->cards->getCards($card_ids);
             // pass them on
             $this->cards->moveCards($card_ids, STOCK_HAND, $target_id);
+            $this->notify_one($source_id, NOTIFICATION_MULTIPLE_CARDS_MOVED, '', null, array(
+                'moved_cards' => array_values($cards),
+                'origin' => STOCK_HAND,
+                'origin_arg' => $source_id,
+                'destination' => STOCK_HAND,
+                'destination_arg' => $target_id,
+            ));
+            $this->notify_one($target_id, NOTIFICATION_MULTIPLE_CARDS_MOVED, '', null, array(
+                'moved_cards' => array_values($cards),
+                'origin' => STOCK_HAND,
+                'origin_arg' => $source_id,
+                'destination' => STOCK_HAND,
+                'destination_arg' => $target_id,
+                'player_name2' => $this->player_name($source_id),
+            ));
             foreach ($cards as $passed_card) {
-                $this->notify_one($source_id, NOTIFICATION_CARD_MOVED, clienttranslate('You pass ${vegetable} to ${player_name2}'), $passed_card, array(
-                    'origin' => STOCK_HAND,
-                    'origin_arg' => $source_id,
-                    'destination' => STOCK_HAND,
-                    'destination_arg' => $target_id,
+                $this->notify_one($source_id, NOTIFICATION_MESSAGE, clienttranslate('You pass ${vegetable} to ${player_name2}'), $passed_card, array(
                     'player_name2' => $this->player_name($target_id),
                 ));
-                $this->notify_one($target_id, NOTIFICATION_CARD_MOVED, clienttranslate('You receive ${vegetable} from ${player_name2}'), $passed_card, array(
-                    'origin' => STOCK_HAND,
-                    'origin_arg' => $source_id,
-                    'destination' => STOCK_HAND,
-                    'destination_arg' => $target_id,
+                $this->notify_one($target_id, NOTIFICATION_MESSAGE, clienttranslate('You receive ${vegetable} from ${player_name2}'), $passed_card, array(
                     'player_name2' => $this->player_name($source_id),
                 ));
             }
