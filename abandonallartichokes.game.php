@@ -548,13 +548,8 @@ class AbandonAllArtichokes extends Table
         $this->play_card($id, false);
 
         $this->compost_artichoke($artichoke, self::getActivePlayerId(), false, VEGETABLE_BROCCOLI);
-        $card = $this->cards->getCard($id);
-        $player_id = self::getActivePlayerId();
-        $this->cards->moveCard($id, $this->player_discard($player_id));
-        $this->notify_all(NOTIFICATION_CARD_MOVED,  clienttranslate('${player_name} plays broccoli and composts artichoke'), $card, array(
-            'destination' => STOCK_DISCARD,
-            'destination_arg' => $player_id,
-        ));
+
+        $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('${player_name} plays broccoli and composts artichoke'));
 
         $this->gamestate->nextState(STATE_PLAYED_CARD);
     }
