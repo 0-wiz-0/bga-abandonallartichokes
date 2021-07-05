@@ -496,7 +496,7 @@ define([
                     this.stock[this.Stock.GardenRow].removeAll();
                 }
                 for (var card of notification.args.new_cards) {
-                    this.stock[this.Stock.GardenRow].addToStockWithId(card.type, card.id, this.Stock.GardenStack);
+                    this.stock[this.Stock.GardenRow].addToStockWithId(parseInt(card.type), card.id, this.Stock.GardenStack);
                 }
                 if (notification.args.garden_stack_counter) {
                     this.counter.garden_stack.setValue(notification.args.garden_stack_counter);
