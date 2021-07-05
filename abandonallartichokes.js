@@ -455,8 +455,8 @@ define([
                 dojo.subscribe(this.Notification.Reshuffled, this, "notif_reshuffled");
                 dojo.subscribe(this.Notification.Victory, this, "notif_victory");
 
-		//this.notifqueue.setSynchronous(this.Notification.Reshuffled, 500);
-		//this.notifqueue.setSynchronous(this.Notification.DrewHand, 500);
+		this.notifqueue.setSynchronous(this.Notification.Reshuffled, 500);
+		this.notifqueue.setSynchronous(this.Notification.DrewHand, 500);
 		this.notifqueue.setSynchronous(this.Notification.CardMoved, 600);
             },
 
