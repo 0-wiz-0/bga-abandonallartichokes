@@ -76,6 +76,7 @@ if (!defined('STOCK_GARDEN_ROW')) { // ensure this block is only invoked once, s
 if (!defined('NOTIFICATION_CARD_MOVED')) { // ensure this block is only invoked once, since it is included multiple times
     define("NOTIFICATION_CARD_MOVED", "card_moved");
     define("NOTIFICATION_DREW_HAND", "drew_hand");
+    define("NOTIFICATION_MULTIPLE_CARDS_MOVED", "multiple_cards_moved");
     define("NOTIFICATION_REFILLED_GARDEN_ROW", "refilled_garden_row");
     define("NOTIFICATION_RESHUFFLED", "reshuffled");
     define("NOTIFICATION_UPDATE_COUNTERS", "update_counters");

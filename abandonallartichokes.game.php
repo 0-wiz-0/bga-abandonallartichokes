@@ -837,17 +837,19 @@ class AbandonAllArtichokes extends Table
         $this->cards->pickCardsForLocation(2, STOCK_GARDEN_STACK, STOCK_DISPLAYED_CARD);
         $displayed_cards = $this->cards->getCardsInLocation(STOCK_DISPLAYED_CARD);
         $available_types = array();
-        foreach ($displayed_cards as $id => $card) {
-            $available_types[$card['type']] = $id;
-            $this->notify_all(NOTIFICATION_CARD_MOVED, '', $card, array(
+        $cards = array_values($displayed_cards);
+        $this->notify_all(NOTIFICATION_MULTIPLE_CARDS_MOVED, '', null, array(
+                'moved_cards' => $cards,
                 'origin' => STOCK_GARDEN_STACK,
                 'destination' => STOCK_DISPLAYED_CARD,
                 'garden_stack_counter' => $this->cards->countCardInLocation(STOCK_GARDEN_STACK),
-            ));
-        }
+        ));
 
         $this->gamestate->nextState(STATE_PEAS_TAKE_CARD);
 
+        foreach ($displayed_cards as $id => $card) {
+            $available_types[$card['type']] = $id;
+        }
         if (self::getGameStateValue(GAME_STATE_AUTOMATIC_CARD_DECISIONS) > 0 && count($available_types) == 1) {
             $types = array_keys($available_types);
             $type = array_pop($types);
@@ -946,15 +948,17 @@ class AbandonAllArtichokes extends Table
         }
 
         // move cards to display
+        $cards = array();
         foreach ($available_types as $type => $id) {
-            $current_card = $this->cards->getCard($id);
             $this->cards->moveCard($id, STOCK_DISPLAYED_CARD);
-            $this->notify_all(NOTIFICATION_CARD_MOVED, '', $current_card, array(
+            array_push($cards, $this->cards->getCard($id));
+        }
+        $this->notify_all(NOTIFICATION_MULTIPLE_CARDS_MOVED, '', null, array(
+                'moved_cards' => $cards,
                 'origin' => STOCK_DISCARD,
                 'origin_arg' => $player_id,
                 'destination' => STOCK_DISPLAYED_CARD,
-            ));
-        }
+        ));
 
         $this->gamestate->nextState(STATE_PEPPER_TAKE_CARD);
     }
@@ -980,11 +984,13 @@ class AbandonAllArtichokes extends Table
         $player_discard = $this->player_discard($player_id);
         foreach ($displayed_cards as $id => $card) {
             $this->cards->moveCard($id, $player_discard);
-            $this->notify_all(NOTIFICATION_CARD_MOVED, '', $card, array(
+        }
+        $this->notify_all(NOTIFICATION_MULTIPLE_CARDS_MOVED, '', null, array(
+                'moved_cards' => array_values($displayed_cards),
+                'origin' => STOCK_DISPLAYED_CARD,
                 'destination' => STOCK_DISCARD,
                 'destination_arg' => $player_id,
-            ));
-        }
+        ));
 
         $this->gamestate->nextState(STATE_PLAYED_CARD);
     }

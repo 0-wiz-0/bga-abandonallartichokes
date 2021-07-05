@@ -58,6 +58,7 @@ define([
                 this.Notification = {
                     CardMoved: "card_moved",
                     DrewHand: "drew_hand",
+                    MultipleCardsMoved: "multiple_cards_moved",
                     RefilledGardenRow: "refilled_garden_row",
                     Reshuffled: "reshuffled",
                     UpdateCounters: "update_counters",
@@ -448,6 +449,7 @@ define([
 
                 dojo.subscribe(this.Notification.CardMoved, this, "notif_cardMoved");
                 dojo.subscribe(this.Notification.DrewHand, this, "notif_drewHand");
+                dojo.subscribe(this.Notification.MultipleCardsMoved, this, "notif_multipleCardsMoved");
                 dojo.subscribe(this.Notification.RefilledGardenRow, this, "notif_refilledGardenRow");
                 dojo.subscribe(this.Notification.UpdateCounters, this, "notif_updateCounters");
                 dojo.subscribe(this.Notification.Reshuffled, this, "notif_reshuffled");
@@ -471,6 +473,25 @@ define([
 		    this.counter.garden_stack.setValue(notification.args.garden_stack_counter);
 		}
 		this.updateGardenStack();
+            },
+
+	    notif_multipleCardsMoved: function (notification) {
+                 console.log(this.Notification.MultipleCardsMoved + ' notification');
+                console.log(notification);
+		// array
+                for (var card of notification.args.moved_cards) {
+		    // for five types of artichokes, add type_arg
+		    card.type = parseInt(card.type) + parseInt(card.type_arg);
+                    this.showCardPlay(notification.args.player_id,
+				      notification.args.origin, notification.args.origin_arg,
+				      notification.args.destination, notification.args.destination_arg,
+				      card, notification.args.counters);
+		}
+
+		if (notification.args.garden_stack_counter) {
+		    this.counter.garden_stack.setValue(notification.args.garden_stack_counter);
+		    this.updateGardenStack();
+		}
             },
 
             notif_drewHand: function (notification) {
@@ -536,7 +557,6 @@ define([
 		if (force || this.stock[this.Stock.DisplayedCard].count() > 0) {
 		    dojo.removeClass('displayed_card_area', 'artichoke_hidden');
 		} else {
-
 		    dojo.addClass('displayed_card_area', 'artichoke_hidden');
 		}
             },
