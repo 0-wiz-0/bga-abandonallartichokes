@@ -1,3 +1,9 @@
+
+210706-0744
+===
+- Speed up or improve some animations
+- Fix pepper display count bug
+
 210704-2310
 ===
 - Improve animations
