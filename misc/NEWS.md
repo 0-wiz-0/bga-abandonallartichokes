@@ -1,3 +1,6 @@
+210821-1433
+===
+- improve automatic turn end
 
 210706-0744
 ===
