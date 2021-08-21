@@ -96,7 +96,7 @@ $machinestates = array(
         "descriptionmyturn" => clienttranslate('${you} must harvest a card from the garden row'),
         "type" => "activeplayer",
         "possibleactions" => array("harvestCard"),
-        "transitions" => array(STATE_PLAY_CARD => STATE_PLAY_CARD),
+        "transitions" => array(STATE_PLAY_CARD => STATE_PLAY_CARD, STATE_NEXT_PLAYER => STATE_NEXT_PLAYER),
     ),
 
     STATE_PLAY_CARD => array(

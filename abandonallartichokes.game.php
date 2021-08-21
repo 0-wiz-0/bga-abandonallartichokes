@@ -331,6 +331,8 @@ class AbandonAllArtichokes extends Table
         if (count($this->cards->getCardsInLocation(STOCK_GARDEN_ROW)) > 0) {
             $this->gamestate->nextState(STATE_HARVEST);
         } else {
+            // we do not check for automatic turn end here because it would be too confusing -- you don't see
+            // your cards long enough to notice that.
             $this->gamestate->nextState(STATE_PLAY_CARD);
         }
     }
@@ -340,18 +342,11 @@ class AbandonAllArtichokes extends Table
 
         self::incGameStateValue(GAME_STATE_CARDS_PLAYED_THIS_TURN, 1);
 
-        $hand = $this->cards->getCardsInLocation(STOCK_HAND, self::getActivePlayerId());
-        $artichoke_count = 0;
-        foreach ($hand as $card) {
-            if ($card['type'] == VEGETABLE_ARTICHOKE) {
-                $artichoke_count++;
-            }
-        }
         if (self::getGameStateValue(GAME_STATE_PLAYED_CARROT_THIS_TURN) > 0) {
             $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('${player_name} played carrot and ends turn'));
             $this->gamestate->nextState(STATE_NEXT_PLAYER);
-        } else if (self::getGameStateValue(GAME_STATE_AUTOMATIC_TURN_END) > 0 && ($artichoke_count == count($hand))) {
-            $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('Only artichokes left in hand, ${player_name} ends turn'));
+        } else if (self::getGameStateValue(GAME_STATE_AUTOMATIC_TURN_END) > 0 && $this->count_playable_cards(self::getActivePlayerId()) == 0) {
+            $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('No playable cards left in hand, ${player_name} ends turn'));
             $this->gamestate->nextState(STATE_NEXT_PLAYER);
         } else {
             $this->gamestate->nextState(STATE_PLAY_CARD);
@@ -432,7 +427,12 @@ class AbandonAllArtichokes extends Table
             'destination_arg' => self::getActivePlayerId(),
         ));
 
-        $this->gamestate->nextState(STATE_PLAY_CARD);
+        if (self::getGameStateValue(GAME_STATE_AUTOMATIC_TURN_END) > 0 && $this->count_playable_cards(self::getActivePlayerId()) == 0) {
+            $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('No playable cards left in hand, ${player_name} ends turn'));
+            $this->gamestate->nextState(STATE_NEXT_PLAYER);
+        } else {
+            $this->gamestate->nextState(STATE_PLAY_CARD);
+        }
     }
 
     function pass() {
@@ -447,6 +447,9 @@ class AbandonAllArtichokes extends Table
         if ($card == null || $card['location'] != STOCK_HAND || $card['location_arg'] != self::getActivePlayerId()) {
             throw new BgaUserException(self::_("You must play a card from your hand"));
         }
+
+        $this->card_must_be_playable($id, true);
+
         $play_actions = array (
             VEGETABLE_ARTICHOKE => 'playArtichoke',
             VEGETABLE_BEET => 'playBeet',
@@ -475,12 +478,6 @@ class AbandonAllArtichokes extends Table
     function playBeet($id) {
         $target_args = $this->arg_beetOpponents();
         $target_ids = $target_args['target_ids'];
-        if ($this->cards->countCardInLocation(STOCK_HAND, self::getCurrentPlayerId()) <= 1) {
-            throw new BgaUserException(self::_("Beet can only be played if you have cards in your hand"));
-        }
-        if (count($target_ids) < 1) {
-            throw new BgaUserException(self::_("Beet can only be played if an opponent has cards in hand"));
-        }
 
         $this->play_card($id, true);
         $this->gamestate->nextState(STATE_BEET_CHOOSE_OPPONENT);
@@ -541,15 +538,11 @@ class AbandonAllArtichokes extends Table
 
     function playBroccoli($id) {
         $hand = $this->cards->getPlayerHand(self::getActivePlayerId());
-        $artichoke_count = 0;
         foreach ($hand as $card) {
             if ($card['type'] == VEGETABLE_ARTICHOKE) {
                 $artichoke = $card;
-                $artichoke_count ++;
+                break;
             }
-        }
-        if ($artichoke_count < 3) {
-            throw new BgaUserException(self::_("To play a broccoli you need 3 artichokes in your hand"));
         }
 
         $this->play_card($id, false);
@@ -564,9 +557,6 @@ class AbandonAllArtichokes extends Table
     function playCarrot($id) {
         // find artichokes to compost
         $hand = $this->cards->getPlayerHand(self::getCurrentPlayerId());
-        if (self::getGameStateValue(GAME_STATE_CARDS_PLAYED_THIS_TURN) > 0) {
-            throw new BgaUserException(self::_("You can't play a carrot after playing another card."));
-        }
         $artichoke_1 = null;
         $artichoke_2 = null;
         foreach ($hand as $card) {
@@ -578,9 +568,6 @@ class AbandonAllArtichokes extends Table
                     break;
                 }
             }
-        }
-        if ($artichoke_2 == null) {
-            throw new BgaUserException(self::_("You must have two artichokes in hand to play a carrot"));
         }
 
         $this->play_card($id, false);
@@ -598,9 +585,6 @@ class AbandonAllArtichokes extends Table
     }
 
     function playCorn($id) {
-        if ($this->cards->countCardInLocation(STOCK_GARDEN_ROW) == 0) {
-            throw new BgaUserException(self::_("You can not play corn if there are no cards in the garden row"));
-        }
         $hand = $this->cards->getPlayerHand(self::getCurrentPlayerId());
         $artichoke = null;
         foreach ($hand as $card) {
@@ -608,9 +592,6 @@ class AbandonAllArtichokes extends Table
                 $artichoke = $card;
                 break;
             }
-        }
-        if ($artichoke == null) {
-            throw new BgaUserException(self::_("To play a corn you need an artichoke in your hand"));
         }
 
         $player_id = self::getCurrentPlayerId();
@@ -652,15 +633,6 @@ class AbandonAllArtichokes extends Table
                 break;
             }
         }
-        if ($artichoke == null) {
-            throw new BgaUserException(self::_("To play an eggplant you need an artichoke in your hand"));
-        }
-
-        // https://boardgamegeek.com/thread/2438217/eggplant-rule-question
-        // says that no additional cards are needed
-        // if (count($hand) < 4) {
-        // throw new BgaUserException(self::_("To play an eggplant you have to have 3 other cards in your hand"));
-        //}
 
         $this->play_card($id);
 
@@ -697,9 +669,6 @@ class AbandonAllArtichokes extends Table
     function playLeek($id) {
         $target_args = $this->arg_leekOpponents();
         $target_ids = $target_args['target_ids'];
-        if (count($target_ids) < 1) {
-            throw new BgaUserException(self::_("Leek can only be played if an opponent has cards in the deck"));
-        }
 
         $this->play_card($id);
 
@@ -786,9 +755,6 @@ class AbandonAllArtichokes extends Table
                 break;
             }
         }
-        if ($artichoke == null) {
-            throw new BgaUserException(self::_("To play an onion you need an artichoke in your hand"));
-        }
 
         $targets = $this->arg_allOpponents();
         $target_ids = $targets['target_ids'];
@@ -830,15 +796,6 @@ class AbandonAllArtichokes extends Table
     }
 
     function playPeas($id) {
-        $players = self::loadPlayersBasicInfos();
-        // for testing in solo-mode
-        if (count($players) < 2) {
-            throw new BgaVisibleSystemException(self::_("Peas can only be played when you have an opponent"));
-        }
-        if ($this->cards->countCardInLocation(STOCK_GARDEN_STACK) < 2) {
-            throw new BgaUserException(self::_("Peas can only be played when there are two cards in the garden stack"));
-        }
-
         $this->play_card($id);
 
         $this->cards->pickCardsForLocation(2, STOCK_GARDEN_STACK, STOCK_DISPLAYED_CARD);
@@ -924,9 +881,6 @@ class AbandonAllArtichokes extends Table
     function playPepper($id) {
         $player_id = self::getCurrentPlayerId();
         $discarded_cards = $this->cards->getCardsInLocation($this->player_discard($player_id));
-        if (count($discarded_cards) == 0) {
-            throw new BgaUserException(self::_("Pepper can only be played when you have cards in your discard pile"));
-        }
 
         $this->play_card($id);
 
@@ -1008,9 +962,6 @@ class AbandonAllArtichokes extends Table
         // look at top card of deck
         $player_id = self::getActivePlayerId();
         $picked_card = $this->cards->pickCardForLocation($this->player_deck($player_id), STOCK_DISPLAYED_CARD);
-        if ($picked_card == null) {
-            throw new BgaUserException(self::_("You must have cards in your deck to play a potato"));
-        }
 
         $this->play_card($id, false);
 
@@ -1031,9 +982,6 @@ class AbandonAllArtichokes extends Table
     }
 
     function playRhubarb($id) {
-        if ($this->cards->countCardInLocation(STOCK_GARDEN_ROW) + $this->cards->countCardInLocation(STOCK_GARDEN_STACK) == 0) {
-            throw new BgaUserException(self::_("You can not play rhubarb if there are no cards in the garden row and garden stack"));
-        }
         $this->play_card($id, false);
 
         $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('Refreshing garden row for rhubarb'));
@@ -1290,6 +1238,129 @@ class AbandonAllArtichokes extends Table
         return $last_card;
     }
 
+    function card_must_be_playable($id, $throw_error = true) {
+        $card = $this->cards->getCard($id);
+        if ($card == null) {
+            return false;
+        }
+        $player_id = self::getCurrentPlayerId();
+        $reason = null;
+        switch ($card['type']) {
+        case VEGETABLE_BEET:
+            $target_args = $this->arg_beetOpponents();
+            $target_ids = $target_args['target_ids'];
+            // TODO: check if this test is correct
+            if ($this->cards->countCardInLocation(STOCK_HAND, $player_id) <= 1) {
+                $reason = self::_("Beet can only be played if you have cards in your hand");
+                break;
+            }
+            if (count($target_ids) < 1) {
+                $reason = self::_("Beet can only be played if an opponent has cards in hand");
+                break;
+            }
+            return true;
+        case VEGETABLE_BROCCOLI:
+            if ($this->artichokes_in_player_hand($player_id) < 3) {
+                $reason = self::_("To play a broccoli you need 3 artichokes in your hand");
+                break;
+            }
+            return true;
+        case VEGETABLE_CARROT:
+            if (self::getGameStateValue(GAME_STATE_CARDS_PLAYED_THIS_TURN) > 0) {
+                $reason = self::_("You can't play a carrot after playing another card.");
+                break;
+            }
+            if ($this->artichokes_in_player_hand($player_id) < 2) {
+                $reason = self::_("You must have two artichokes in hand to play a carrot");
+                break;
+            }
+            return true;
+        case VEGETABLE_CORN:
+            if ($this->cards->countCardInLocation(STOCK_GARDEN_ROW) == 0) {
+                $reason = self::_("You can not play corn if there are no cards in the garden row");
+                break;
+            }
+            if ($this->artichokes_in_player_hand($player_id) < 1) {
+                $reason = self::_("To play a corn you need an artichoke in your hand");
+                break;
+            }
+            return true;
+        case VEGETABLE_EGGPLANT:
+            if ($this->artichokes_in_player_hand($player_id) < 1) {
+                $reason = self::_("To play an eggplant you need an artichoke in your hand");
+                break;
+            }
+            // https://boardgamegeek.com/thread/2438217/eggplant-rule-question
+            // says that no additional cards are needed
+            // if (count($hand) < 4) {
+            // throw new BgaUserException(self::_("To play an eggplant you have to have 3 other cards in your hand"));
+            //}
+            return true;
+        case VEGETABLE_LEEK:
+            $target_args = $this->arg_leekOpponents();
+            $target_ids = $target_args['target_ids'];
+            if (count($target_ids) < 1) {
+                $reason = self::_("Leek can only be played if an opponent has cards in the deck");
+                break;
+            }
+            return true;
+        case VEGETABLE_ONION:
+            if ($this->artichokes_in_player_hand($player_id) < 1) {
+                $reason = self::_("To play an onion you need an artichoke in your hand");
+                break;
+            }
+            return true;
+        case VEGETABLE_PEAS:
+            $players = self::loadPlayersBasicInfos();
+            // for testing in solo-mode
+            if (count($players) < 2) {
+                $reason = self::_("Peas can only be played when you have an opponent");
+                break;
+            }
+            if ($this->cards->countCardInLocation(STOCK_GARDEN_STACK) < 2) {
+                $reason = self::_("Peas can only be played when there are two cards in the garden stack");
+                break;
+            }
+            return true;
+        case VEGETABLE_PEPPER:
+            $discarded_cards = $this->cards->countCardInLocation($this->player_discard($player_id));
+            if ($discarded_cards < 1) {
+                $reason = self::_("Pepper can only be played when you have cards in your discard pile");
+                break;
+            }
+            return true;
+        case VEGETABLE_POTATO:
+            $available_cards = $this->cards->countCardInLocation($this->player_deck($player_id)) + $this->cards->countCardInLocation($this->player_discard($player_id));
+            if ($available_cards < 1) {
+                $reason = self::_("You must have cards in your deck to play a potato");
+                break;
+            }
+            return true;
+        case VEGETABLE_RHUBARB:
+            if ($this->cards->countCardInLocation(STOCK_GARDEN_ROW) + $this->cards->countCardInLocation(STOCK_GARDEN_STACK) == 0) {
+                $reason = self::_("You can not play rhubarb if there are no cards in the garden row and garden stack");
+                break;
+            }
+            return true;
+        }
+
+        if ($reason && $throw_error) {
+            throw new BgaUserException($reason);
+        }
+        return false;
+    }
+
+    function artichokes_in_player_hand($player_id) {
+        $hand = $this->cards->getPlayerHand($player_id);
+        $artichoke_count = 0;
+        foreach ($hand as $card) {
+            if ($card['type'] == VEGETABLE_ARTICHOKE) {
+                $artichoke_count++;
+            }
+        }
+        return $artichoke_count;
+    }
+
     function play_card($id, $notify = true) {
         $played_card = $this->cards->getCard($id);
         $this->cards->moveCard($id, STOCK_PLAYED_CARD);
@@ -1339,6 +1410,17 @@ class AbandonAllArtichokes extends Table
                          count($this->cards->getCardsOfTypeInLocation(VEGETABLE_ARTICHOKE, null, $discard)) +
                          count($this->cards->getCardsOfTypeInLocation(VEGETABLE_ARTICHOKE, null, STOCK_HAND, $player_id));
         return array('card_count' => $card_count, 'artichoke_count' => $artichoke_count);
+    }
+
+    function count_playable_cards($player_id) {
+        $hand = $this->cards->getCardsInLocation(STOCK_HAND, $player_id);
+        $playable_card_count = 0;
+        foreach ($hand as $card) {
+            if ($this->card_must_be_playable($card['id'], false)) {
+                $playable_card_count++;
+            }
+        }
+        return $playable_card_count;
     }
 
     function player_deck($player_id) {

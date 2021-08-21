@@ -37,7 +37,7 @@ $game_options = array(
         'name' => totranslate('Turn end'),
         'values' => array(
             0 => array('name' => totranslate('Manually end turn'),  ),
-            1 => array('name' => totranslate('Automatically end turn'), 'description' => totranslate('End turn automatically if you only have artichokes in your hand')),
+            1 => array('name' => totranslate('Automatically end turn'), 'description' => totranslate('End turn automatically if you have no playable cards in your hand')),
         ),
         'default' => 0,
     ),
