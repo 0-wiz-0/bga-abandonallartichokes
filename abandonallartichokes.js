@@ -677,7 +677,7 @@ define([
         },
 
         //util function
-        updateDecksAccordingToCounter(counter, stockName) {
+        updateDecksAccordingToCounter: function(counter, stockName) {
             const counterWithLimit = counter >= 10? 10 : counter;
             //deck_target = this.counter[this.player_id].deck.getValue();
             let stockCount = this.stock[stockName].count();
