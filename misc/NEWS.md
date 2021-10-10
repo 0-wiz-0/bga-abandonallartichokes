@@ -1,3 +1,7 @@
+211010-2354
+===
+- Fix bug with eggplant and automatic turn end
+
 210821-1433
 ===
 - improve automatic turn end
