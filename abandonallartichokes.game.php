@@ -346,7 +346,9 @@ class AbandonAllArtichokes extends Table
             $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('${player_name} played carrot and ends turn'));
             $this->gamestate->nextState(STATE_NEXT_PLAYER);
         } else if (self::getGameStateValue(GAME_STATE_AUTOMATIC_TURN_END) > 0 && $this->count_playable_cards(self::getActivePlayerId()) == 0) {
-            $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('No playable cards left in hand, ${player_name} ends turn'));
+            $this->notify_all(NOTIFICATION_MESSAGE, clienttranslate('No playable cards left in hand, ${player_name} ends turn'), null, array(
+                'player_id' => self::getActivePlayerId(),
+            ));
             $this->gamestate->nextState(STATE_NEXT_PLAYER);
         } else {
             $this->gamestate->nextState(STATE_PLAY_CARD);
@@ -448,7 +450,7 @@ class AbandonAllArtichokes extends Table
             throw new BgaUserException(self::_("You must play a card from your hand"));
         }
 
-        $this->card_must_be_playable($id, true);
+        $this->card_must_be_playable(self::getActivePlayerId(), $id, true);
 
         $play_actions = array (
             VEGETABLE_ARTICHOKE => 'playArtichoke',
@@ -556,7 +558,7 @@ class AbandonAllArtichokes extends Table
 
     function playCarrot($id) {
         // find artichokes to compost
-        $hand = $this->cards->getPlayerHand(self::getCurrentPlayerId());
+        $hand = $this->cards->getPlayerHand(self::getActivePlayerId());
         $artichoke_1 = null;
         $artichoke_2 = null;
         foreach ($hand as $card) {
@@ -573,8 +575,8 @@ class AbandonAllArtichokes extends Table
         $this->play_card($id, false);
 
         // compost carrot and both artichokes
-        $this->compost_artichoke($artichoke_1, self::getCurrentPlayerId(), false, VEGETABLE_CARROT);
-        $this->compost_artichoke($artichoke_2, self::getCurrentPlayerId(), false, VEGETABLE_CARROT);
+        $this->compost_artichoke($artichoke_1, self::getActivePlayerId(), false, VEGETABLE_CARROT);
+        $this->compost_artichoke($artichoke_2, self::getActivePlayerId(), false, VEGETABLE_CARROT);
         $card = $this->cards->getCard($id);
         $this->cards->moveCard($card['id'], STOCK_COMPOST);
         $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} plays carrot and composts it and two artichokes'), $card, array( 'destination' => STOCK_COMPOST ));
@@ -585,7 +587,7 @@ class AbandonAllArtichokes extends Table
     }
 
     function playCorn($id) {
-        $hand = $this->cards->getPlayerHand(self::getCurrentPlayerId());
+        $hand = $this->cards->getPlayerHand(self::getActivePlayerId());
         $artichoke = null;
         foreach ($hand as $card) {
             if ($card['type'] == VEGETABLE_ARTICHOKE) {
@@ -594,7 +596,7 @@ class AbandonAllArtichokes extends Table
             }
         }
 
-        $player_id = self::getCurrentPlayerId();
+        $player_id = self::getActivePlayerId();
 
         $this->play_card($id, false);
 
@@ -614,7 +616,7 @@ class AbandonAllArtichokes extends Table
             throw new BgaVisibleSystemException(self::_("Choose a card from the garden row"));
         }
 
-        $player_id = self::getCurrentPlayerId();
+        $player_id = self::getActivePlayerId();
         $this->cards->insertCardOnExtremePosition($id, $this->player_deck($player_id), true);
         $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} takes ${vegetable} and puts it on top of the deck'), $card, array(
             'destination' => STOCK_DECK,
@@ -625,7 +627,7 @@ class AbandonAllArtichokes extends Table
     }
 
     function playEggplant($id) {
-        $hand = $this->cards->getPlayerHand(self::getCurrentPlayerId());
+        $hand = $this->cards->getPlayerHand(self::getActivePlayerId());
         $artichoke = null;
         foreach ($hand as $card) {
             if ($card['type'] == VEGETABLE_ARTICHOKE) {
@@ -636,7 +638,7 @@ class AbandonAllArtichokes extends Table
 
         $this->play_card($id);
 
-        $this->compost_artichoke($artichoke, self::getCurrentPlayerId(), true, VEGETABLE_EGGPLANT);
+        $this->compost_artichoke($artichoke, self::getActivePlayerId(), true, VEGETABLE_EGGPLANT);
 
         $this->gamestate->nextState(STATE_EGGPLANT_CHOOSE_CARDS);
     }
@@ -779,7 +781,7 @@ class AbandonAllArtichokes extends Table
     function onionChooseOpponent($opponent_id) {
         self::checkAction("onionChooseOpponent");
         $opponent_name = $this->player_name($opponent_id);
-        if ($opponent_id == self::getCurrentPlayerId() || $opponent_name == null) {
+        if ($opponent_id == self::getActivePlayerId() || $opponent_name == null) {
             throw new BgaVisibleSystemException(self::_("Invalid target player"));
         }
 
@@ -833,7 +835,7 @@ class AbandonAllArtichokes extends Table
         if ($card == null || $card['location'] != STOCK_DISPLAYED_CARD) {
             throw new BgaVisibleSystemException(self::_("You must take a card from the display"));
         }
-        $player_id = self::getCurrentPlayerId();
+        $player_id = self::getActivePlayerId();
         $this->cards->moveCard($id, $this->player_discard($player_id));
         $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} takes ${vegetable}'), $card, array(
             'destination' => STOCK_DISCARD,
@@ -879,7 +881,7 @@ class AbandonAllArtichokes extends Table
     }
 
     function playPepper($id) {
-        $player_id = self::getCurrentPlayerId();
+        $player_id = self::getActivePlayerId();
         $discarded_cards = $this->cards->getCardsInLocation($this->player_discard($player_id));
 
         $this->play_card($id);
@@ -935,7 +937,7 @@ class AbandonAllArtichokes extends Table
         if ($card == null || $card['location'] != STOCK_DISPLAYED_CARD) {
             throw new BgaVisibleSystemException(self::_("You must take a card from the display to put on deck"));
         }
-        $player_id = self::getCurrentPlayerId();
+        $player_id = self::getActivePlayerId();
         // move chosen card to deck
         $this->cards->insertCardOnExtremePosition($id, $this->player_deck($player_id), true);
         $this->notify_all(NOTIFICATION_CARD_MOVED, clienttranslate('${player_name} puts ${vegetable} on top of the deck'), $card, array(
@@ -1238,12 +1240,11 @@ class AbandonAllArtichokes extends Table
         return $last_card;
     }
 
-    function card_must_be_playable($id, $throw_error = true) {
+    function card_must_be_playable($player_id, $id, $throw_error = true) {
         $card = $this->cards->getCard($id);
         if ($card == null) {
             return false;
         }
-        $player_id = self::getCurrentPlayerId();
         $reason = null;
         switch ($card['type']) {
         case VEGETABLE_BEET:
@@ -1416,7 +1417,7 @@ class AbandonAllArtichokes extends Table
         $hand = $this->cards->getCardsInLocation(STOCK_HAND, $player_id);
         $playable_card_count = 0;
         foreach ($hand as $card) {
-            if ($this->card_must_be_playable($card['id'], false)) {
+            if ($this->card_must_be_playable($player_id, $card['id'], false)) {
                 $playable_card_count++;
             }
         }
