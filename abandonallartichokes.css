@@ -229,6 +229,52 @@
     box-sizing: border-box;
 }
 
+.artichoke_card .name {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    text-align: center;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 30px;
+    word-break: break-word;
+    /* font-name : VVDS Bimbo Condensed Main */
+    font-family: carlmarx, sans-serif;
+    font-size: 130%;
+}
+
+.artichoke_card .name.artichoke {
+    height: 52px;
+}
+
+.artichoke_card .description {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    text-align: center;
+    bottom: 0;
+    left: 5px;
+    right: 5px;
+    height: 42px;
+    font-size: 50%;
+    color: black;
+}
+
+html[data-style='dark'] .artichoke_card .description {
+    bottom: 10px;
+    left: 14px;
+    right: 14px;
+    height: 40px;
+}
+
+html[data-style='light'] .artichoke_card .description.light-text {
+    color: white;
+}
+
+
 .artichoke_icon {
     height: 2em;
 }

@@ -1,5 +1,8 @@
 {OVERALL_GAME_HEADER}
 
+<!-- This loads the Carl Marx font used via CSS for card texts. -->
+<link rel="stylesheet" href="https://use.typekit.net/jim0ypy.css">
+
 <script type="text/javascript">
 
 var jstpl_player_board = '<div class="artichoke_deck_board">\

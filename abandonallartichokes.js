@@ -102,6 +102,48 @@ define([
 		    RHUBARB: 16,
 		    BACK: 17,
                 };
+
+                this.VegetablesColors = {
+                    '': {
+                        1: '#9f2645', // BEET
+                        2: '#33762f', // BROCCOLI
+                        3: '#ef9131', // CARROT
+                        4: '#f3d80d', // CORN
+                        5: '#7c3883', // EGGPLANT
+                        6: '#6e8d51', // LEEK
+                        7: '#b66d36', // ONION
+                        8: '#72b146', // PEAS
+                        9: '#f3b637', // PEPPER
+                        10: '#a27c3e', // POTATO
+                        11: '#c9d336', //ARTICHOKE1
+                        12: '#c9d336', //ARTICHOKE2
+                        13: '#c9d336', //ARTICHOKE3
+                        14: '#c9d336', //ARTICHOKE4
+                        15: '#c9d336', //ARTICHOKE5
+                        16: '#cb4f6b', // RHUBARB
+                        17: '',
+                    },
+
+                    'de_': {
+                        1: '#c3294d', // BEET
+                        2: '#185f1d', // BROCCOLI
+                        3: '#ee7934', // CARROT
+                        4: '#fed853', // CORN
+                        5: '#6c166f', // EGGPLANT
+                        6: '#749c3b', // LEEK
+                        7: '#bf702b', // ONION
+                        8: '#439239', // PEAS
+                        9: '#e0bd49', // PEPPER
+                        10: '#cfb05e', // POTATO
+                        11: '#c9d336', //ARTICHOKE1
+                        12: '#c9d336', //ARTICHOKE2
+                        13: '#c9d336', //ARTICHOKE3
+                        14: '#c9d336', //ARTICHOKE4
+                        15: '#c9d336', //ARTICHOKE5
+                        16: '#7f0f1d', // RHUBARB
+                        17: '',
+                    },
+                }
             },
 
             /*
@@ -120,6 +162,19 @@ define([
             setup: function (gamedatas) {
                 // console.log("Starting game setup");
                 // console.log(gamedatas);
+
+                // var lang = dojo.config.locale.substr(0, 2);
+                var lang = _("english");
+
+                if (lang == 'deutsch' || lang == 'french') {
+                    this.preventpreload('');
+                    this.lang_prefix = 'de_';
+                    document.getElementsByTagName('html')[0].dataset.style = 'dark';
+                } else {
+                    this.preventpreload('de');
+                    this.lang_prefix = '';
+                    document.getElementsByTagName('html')[0].dataset.style = 'light';
+                }
 
                 this.counter = {};
                 // Setting up player boards
@@ -160,21 +215,10 @@ define([
                     {name: this.Stock.Compost, callback: null, selectionMode: 0, overlap: 1},
                 ];
 
-		// var lang = dojo.config.locale.substr(0, 2);
-		var lang = _("english");
-
-		if (lang == 'deutsch') {
-                    this.preventpreload('');
-		    lang_prefix = 'de_';
-		} else {
-                    this.preventpreload('de');
-		    lang_prefix = '';
-		}
-
                 const extraClasses = 'artichoke_card';
                 this.stock = {};
                 for (var stock_entry of stock_constructor) {
-                    this.stock[stock_entry.name] = this.setupCardStocks(stock_entry.name, stock_entry.callback, lang_prefix, stock_entry.weights);
+                    this.stock[stock_entry.name] = this.setupCardStocks(stock_entry.name, stock_entry.callback, this.lang_prefix, stock_entry.weights);
                     this.stock[stock_entry.name].setSelectionMode(stock_entry.selectionMode);
                     this.stock[stock_entry.name].setSelectionAppearance('class');
 		    this.stock[stock_entry.name].extraClasses = extraClasses;
@@ -216,7 +260,7 @@ define([
             this.stock[stockName].setSelectionMode(0);
             this.stock[stockName].extraClasses = extraClasses;
             this.stock[stockName].autowidth = true;
-            this.stock[stockName].addItemType(this.CardBackId, 0, g_gamethemeurl + 'img/' + lang_prefix + (this.Vegetables.BACK - 1) + '.jpg');
+            this.stock[stockName].addItemType(this.CardBackId, 0, g_gamethemeurl + 'img/' + this.lang_prefix + (this.Vegetables.BACK - 1) + '.jpg');
         },
 
 	    preventpreload: function(lang) {
@@ -698,12 +742,20 @@ define([
         },
 
 	    setupNewCard: function(card_div, card_type_id, card_id) {
-		if (card_type_id >= this.Vegetables.ARTICHOKE1
-		   && card_type_id != this.Vegetables.RHUBARB) {
-		    this.addTooltip(card_div.id, this.getVegetableInfoText(card_type_id), "");
-		} else {
-		    this.addTooltip(card_div.id, "", this.getVegetableInfoText(card_type_id));
-		}
+            const fullText = this.getVegetableInfoText(card_type_id);
+            if (card_type_id >= this.Vegetables.ARTICHOKE1 && card_type_id != this.Vegetables.RHUBARB) {
+                this.addTooltip(card_div.id, fullText, "");
+            } else {
+                this.addTooltip(card_div.id, "", fullText);
+            }
+
+            const fullTextSplit = fullText.split('<hr/>');
+            const veggieName = fullTextSplit[0];
+            const veggieDescription = fullTextSplit[1];
+            dojo.place(`
+                <div class="name ${[11, 12, 13, 14, 15].includes(card_type_id) ? 'artichoke' : ''}" style="color: ${this.VegetablesColors[this.lang_prefix][card_type_id]};">${veggieName}</div>
+                <div class="description ${[1, 2, 5].includes(card_type_id) ? 'light-text' : ''}">${veggieDescription}</div>
+            `, card_div.id);
 	    },
 
             getVegetableInfoText: function(type) {
