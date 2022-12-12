@@ -312,7 +312,10 @@ class AbandonAllArtichokes extends Table
         if (empty($this->cards->getCardsOfTypeInLocation(VEGETABLE_ARTICHOKE, null, STOCK_HAND, $player_id))) {
             // game over, player won!
             self::DbQuery("UPDATE player SET player_score=1 WHERE player_id='" . self::getActivePlayerId() . "'");
-            $this->notify_all(NOTIFICATION_VICTORY, clienttranslate('${player_name} wins!'));
+            $this->notify_all(NOTIFICATION_VICTORY, clienttranslate('${player_name} wins!'), null, array(
+                'player_id' => $player_id,
+                'player_name' => self::GetActivePlayerName(),
+            ));
             $this->update_statistics();
             $this->gamestate->nextState(STATE_END_GAME);
             return;
