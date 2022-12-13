@@ -742,19 +742,20 @@ define([
         },
 
 	    setupNewCard: function(card_div, card_type_id, card_id) {
-            const fullText = this.getVegetableInfoText(card_type_id);
-            if (card_type_id >= this.Vegetables.ARTICHOKE1 && card_type_id != this.Vegetables.RHUBARB) {
-                this.addTooltip(card_div.id, fullText, "");
-            } else {
-                this.addTooltip(card_div.id, "", fullText);
-            }
+		const cardTypeId = Number(card_type_id);
+		const fullText = this.getVegetableInfoText(cardTypeId);
+		if (cardTypeId >= this.Vegetables.ARTICHOKE1 && cardTypeId != this.Vegetables.RHUBARB) {
+                    this.addTooltip(card_div.id, fullText, "");
+		} else {
+                    this.addTooltip(card_div.id, "", fullText);
+		}
 
-            const fullTextSplit = fullText.split('<hr/>');
-            const veggieName = fullTextSplit[0];
-            const veggieDescription = fullTextSplit[1];
-            dojo.place(`
-                <div class="name ${[11, 12, 13, 14, 15].includes(card_type_id) ? 'artichoke' : ''}" style="color: ${this.VegetablesColors[this.lang_prefix][card_type_id]};">${veggieName}</div>
-                <div class="description ${[1, 2, 5].includes(card_type_id) ? 'light-text' : ''}">${veggieDescription}</div>
+		const fullTextSplit = fullText.split('<hr/>');
+		const veggieName = fullTextSplit[0];
+		const veggieDescription = fullTextSplit[1];
+		dojo.place(`
+                <div class="name ${[11, 12, 13, 14, 15].includes(cardTypeId) ? 'artichoke' : ''}" style="color: ${this.VegetablesColors[this.lang_prefix][cardTypeId]};">${veggieName}</div>
+                <div class="description ${[1, 2, 5].includes(cardTypeId) ? 'light-text' : ''}">${veggieDescription}</div>
             `, card_div.id);
 	    },
 
