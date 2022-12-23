@@ -1,4 +1,4 @@
-221223-xxxx
+221223-1542
 ===
 - Support i18n on cards (from thoun@, thanks!)
 - Fix bug in display of winner after last-turn-eggplant.
