@@ -1,3 +1,8 @@
+221223-xxxx
+===
+- Support i18n on cards (from thoun@, thanks!)
+- Fix bug in display of winner after last-turn-eggplant.
+
 211010-2354
 ===
 - Fix bug with eggplant and automatic turn end
