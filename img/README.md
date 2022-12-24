@@ -28,7 +28,6 @@ Contents of the files:
 | 15.jpg           | rhubarb                                       |
 | 16.jpg           | card back                                     |
 | artichoke.svg    | artichoke icon                                |
-| back.jpg         | card back                                     |
 | discard.svg      | discard pile icon                             |
 | game_*           | game description images for the overview page |
 | hand.svg         | cards in hand icon                            |
