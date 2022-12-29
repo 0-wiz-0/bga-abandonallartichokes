@@ -1,3 +1,8 @@
+221229-2347
+===
+- remove text from artichokes (thoun@)
+- make text smaller if too much to find on card (thoun@)
+
 221223-1542
 ===
 - Support i18n on cards (from thoun@, thanks!)
