@@ -753,10 +753,23 @@ define([
 		const fullTextSplit = fullText.split('<hr/>');
 		const veggieName = fullTextSplit[0];
 		const veggieDescription = fullTextSplit[1];
-		dojo.place(`
-                <div class="name ${[11, 12, 13, 14, 15].includes(cardTypeId) ? 'artichoke' : ''}" style="color: ${this.VegetablesColors[this.lang_prefix][cardTypeId]};">${veggieName}</div>
-                <div class="description ${[1, 2, 5].includes(cardTypeId) ? 'light-text' : ''}">${veggieDescription}</div>
+            const artichoke = [11, 12, 13, 14, 15].includes(cardTypeId);
+            dojo.place(`
+                <div class="name ${artichoke ? 'artichoke' : ''}" style="color: ${this.VegetablesColors[this.lang_prefix][cardTypeId]};">${veggieName}</div>
+                <div class="description ${[1, 2, 5].includes(cardTypeId) ? 'light-text' : ''}"><div class="description-text">${artichoke ? '' : veggieDescription}</div></div>
             `, card_div.id);
+
+            const descriptionText = card_div.getElementsByClassName('description-text')[0];
+            let textHeight = descriptionText?.clientHeight;
+
+            if (textHeight > 42) {
+                descriptionText.style.fontSize = '90%';
+                textHeight = descriptionText.clientHeight;
+
+                if (textHeight > 42) {
+                    descriptionText.style.fontSize = '80%';
+                }
+            }
 	    },
 
             getVegetableInfoText: function(type) {
