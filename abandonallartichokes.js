@@ -549,6 +549,7 @@ define([
 		// move all new cards into hand
 		// this is an object!
 		for (var keys in notification.args.cards) {
+		    notification.args.cards[keys].type = parseInt(notification.args.cards[keys].type) + parseInt(notification.args.cards[keys].type_arg);
 		    this.moveVisibleToVisible(this.Stock.Deck, this.Stock.Hand, notification.args.cards[keys]);
 		}
                 this.updateCounter(notification.args.counters);
