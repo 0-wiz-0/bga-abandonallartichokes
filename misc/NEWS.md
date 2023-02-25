@@ -1,3 +1,7 @@
+23xxxx-xxxx
+===
+- fix display bug showing fewer  different artichokes
+
 221229-2347
 ===
 - remove text from artichokes (thoun@)
